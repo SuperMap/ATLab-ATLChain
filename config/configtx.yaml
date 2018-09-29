@@ -2,55 +2,57 @@ Organizations:
   - &OrgOrderer
       Name: OrgOrderer
       ID: OrgOrderer
-      MSPDir: /home/chengyang/SupermapChain/config/crypto-config/ordererOrganizations/supermapchain.com/msp
+      MSPDir: /home/chengyang/ATLab-ATLChain/config/crypto-config/ordererOrganizations/cystone.me/msp
       Policies:
         Readers:
             Type: Signature
-            Rule: "OR('OrdererMSP.member')"
+            Rule: "OR('OrgOrderer.member')"
         Writers:
             Type: Signature
-            Rule: "OR('OrdererMSP.member')"
+            Rule: "OR('OrgOrderer.member')"
         Admins:
             Type: Signature
-            Rule: "OR('OrdererMSP.admin')"
+            Rule: "OR('OrgOrderer.admin')"
 
   - &OrgA
       Name: OrgA
       ID: OrgA
-      MSPDir: /home/chengyang/SupermapChain/config/crypto-config/peerOrganizations/orga.supermapchain.com/msp
+      MSPDir: /home/chengyang/ATLab-ATLChain/config/crypto-config/peerOrganizations/orga.cystone.me/msp
       Policies:
         Readers:
             Type: Signature
-            Rule: "OR('OrgBarberMSP.admin', 'OrgBarberMSP.peer', 'OrgBarberMSP.client')"
+            Rule: "OR('OrgA.admin', 'OrgA.peer', 'OrgA.client')"
         Writers:
             Type: Signature
-            Rule: "OR('OrgBarberMSP.admin', 'OrgBarberMSP.client')"
+            Rule: "OR('OrgA.admin')"
         Admins:
             Type: Signature
-            Rule: "OR('OrgBarberMSP.admin')"
+            Rule: "OR('OrgA.admin')"
       AnchorPeers:
-        - Host: peer0.orga.supermapchain.com
+        - Host: peer0.orga.cystone.me
           Port: 7051
 
   - &OrgB
       Name: OrgB
       ID: OrgB
-      MSPDir: /home/chengyang/SupermapChain/config/crypto-config/peerOrganizations/orgb.supermapchain.com/msp
+      MSPDir: /home/chengyang/ATLab-ATLChain/config/crypto-config/peerOrganizations/orgb.cystone.me/msp
       Policies:
         Readers:
             Type: Signature
-            Rule: "OR('OrgSupermarketMSP.admin', 'OrgSupermarketMSP.peer', 'OrgSupermarketMSP.client')"
+            Rule: "OR('OrgB.admin', 'OrgB.peer', 'OrgB.client')"
         Writers:
             Type: Signature
-            Rule: "OR('OrgSupermarketMSP.admin', 'OrgSupermarketMSP.client')"
+            Rule: "OR('OrgB.admin', 'OrgB.client')"
         Admins:
             Type: Signature
-            Rule: "OR('OrgSupermarketMSP.admin')"
+            Rule: "OR('OrgB.admin')"
       AnchorPeers:
-        - Host: peer0.orgb.supermapchain.com
+        - Host: peer0.orgb.cystone.me
           Port: 7051
 
 Capabilities:
+    Channel: &ChannelCapabilities
+        V1_1: true
     Orderer: &OrdererCapabilities
         V1_1: true
     Application: &ApplicationCapabilities
@@ -74,7 +76,7 @@ Application: &ApplicationDefaults
 Orderer: &OrdererDefaults
   OrdererType: solo
   Addresses:
-    - orderer.supermapchain.com:7050
+    - orderer.cystone.me:8050
   BatchTimeout: 2s
   BatchSize:
     MaxMessageCount: 10
@@ -116,22 +118,22 @@ Channel: &ChannelDefaults
         <<: *ChannelCapabilities
 
 Profiles:
-    OrdererGenesis:
-         <<: *ChannelDefaults
+  OrdererGenesis:
+    <<: *ChannelDefaults
     Orderer:
-         <<: *OrdererDefaults
-    Organizations:
-      - *OrgOrderer
+      <<: *OrdererDefaults
+      Organizations:
+        - *OrgOrderer
     Consortiums:
-         SampleConsortium:
-             Organizations:
-               - *OrgA
-               - *OrgB
-    
-    ChannelForTx:
-        Consortium: SampleConsortium
-        Application:
-          <<: *ApplicationDefaults
-            Organizations:
-              - *OrgA
-              - *OrgB
+      SampleConsortium:
+        Organizations:
+          - *OrgA
+          - *OrgB
+
+  ChannelForTx:
+    Consortium: SampleConsortium
+    Application:
+      <<: *ApplicationDefaults
+      Organizations:
+        - *OrgA
+        - *OrgB

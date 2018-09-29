@@ -1,20 +1,20 @@
 OrdererOrgs:
-  - Name: Orderer
-    Domain: supermapchain.com
+  - Name: OrgOrderer
+    Domain: cystone.me
     Specs:
       - Hostname: orderer
 
 PeerOrgs:
   - Name: OrgA
-    Domain: orga.supermapchain.com
+    Domain: orga.cystone.me
     Template:
-      Count: 1
+      Count: 2
     Users: 
-      Count: 1
+      Count: 2
 
   - Name: OrgB
-    Domain: orgb.supermapchain.com
+    Domain: orgb.cystone.me
     Template:
-      Count: 1
+      Count: 2
     Users: 
-      Count: 1
+      Count: 2

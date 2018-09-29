@@ -1,13 +1,13 @@
 General:
     LedgerType: file
     ListenAddress: orderer.cystone.me
-    ListenPort: 7050
+    ListenPort: 8050
     TLS:
         Enabled: false
-        PrivateKey: /home/chengyang/SupermapChain/crypto-config/ordererOrganizations/cystone.me/orderers/orderer.cystone.me/tls/server.key
-        Certificate: /home/stone/Documents/TianChi/CardChain/crypto-config/ordererOrganizations/cystone.me/orderers/orderer.cystone.me/tls/server.crt
+        PrivateKey: /home/chengyang/ATLab-ATLChain/config/crypto-config/ordererOrganizations/cystone.me/orderers/orderer.altchain.com/tls/server.key
+        Certificate: /home/chengyang/ATLab-ATLChain/config/crypto-config/ordererOrganizations/cystone.me/orderers/orderer.altchain.com/tls/server.crt
         RootCAs:
-          - /home/stone/Documents/TianChi/CardChain/crypto-config/ordererOrganizations/cystone.me/orderers/orderer.cystone.me/tls/ca.crt
+          - /home/chengyang/ATLab-ATLChain/config/crypto-config/ordererOrganizations/cystone.me/orderers/orderer.cystone.me/tls/ca.crt
         ClientAuthRequired: false
         ClientRootCAs:
     Keepalive:
@@ -17,10 +17,10 @@ General:
     LogLevel: info
     LogFormat: '%{color}%{time:2006-01-02 15:04:05.000 MST} [%{module}] %{shortfunc} -> %{level:.4s} %{id:03x}%{color:reset} %{message}'
     GenesisMethod: file
-    GenesisProfile: TestOrgsOrdererGenesis
-    GenesisFile: /home/stone/Documents/TianChi/CardChain/orderer.genesis.block
-    LocalMSPDir: /home/stone/Documents/TianChi/CardChain/crypto-config/ordererOrganizations/cystone.me/orderers/orderer.cystone.me/msp
-    LocalMSPID: OrdererMSP
+    GenesisProfile: OrdererGenesis
+    GenesisFile: /home/chengyang/ATLab-ATLChain/config/orderer.genesis.block
+    LocalMSPDir: /home/chengyang/ATLab-ATLChain/config/crypto-config/ordererOrganizations/cystone.me/orderers/orderer.cystone.me/msp
+    LocalMSPID: OrgOrderer
     Profile:
         Enabled: false
         Address: 0.0.0.0:6060
@@ -36,7 +36,7 @@ General:
         TimeWindow: 15m
 
 FileLedger:
-    Location: /home/stone/Documents/TianChi/CardChain/order/production/orderer
+    Location: /home/chengyang/ATLab-ATLChain/config/order/production/orderer
     Prefix: hyperledger-fabric-ordererledger
 
 RAMLedger:
