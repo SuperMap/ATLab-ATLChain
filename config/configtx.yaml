@@ -2,7 +2,7 @@ Organizations:
   - &OrgOrderer
       Name: OrgOrderer
       ID: OrgOrderer
-      MSPDir: /home/chengyang/ATLab-ATLChain/config/crypto-config/ordererOrganizations/cystone.me/msp
+      MSPDir: /home/stone/Documents/ATL/ATLab-ATLChain/config/crypto-config/ordererOrganizations/cystone.me/msp
       Policies:
         Readers:
             Type: Signature
@@ -17,7 +17,7 @@ Organizations:
   - &OrgA
       Name: OrgA
       ID: OrgA
-      MSPDir: /home/chengyang/ATLab-ATLChain/config/crypto-config/peerOrganizations/orga.cystone.me/msp
+      MSPDir: /home/stone/Documents/ATL/ATLab-ATLChain/config/crypto-config/peerOrganizations/orga.cystone.me/msp
       Policies:
         Readers:
             Type: Signature
@@ -35,7 +35,7 @@ Organizations:
   - &OrgB
       Name: OrgB
       ID: OrgB
-      MSPDir: /home/chengyang/ATLab-ATLChain/config/crypto-config/peerOrganizations/orgb.cystone.me/msp
+      MSPDir: /home/stone/Documents/ATL/ATLab-ATLChain/config/crypto-config/peerOrganizations/orgb.cystone.me/msp
       Policies:
         Readers:
             Type: Signature
@@ -76,7 +76,7 @@ Application: &ApplicationDefaults
 Orderer: &OrdererDefaults
   OrdererType: solo
   Addresses:
-    - orderer.cystone.me:8050
+    - orderer.cystone.me:7050
   BatchTimeout: 2s
   BatchSize:
     MaxMessageCount: 10

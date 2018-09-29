@@ -11,8 +11,8 @@ logging:
     format: '%{color}%{time:2006-01-02 15:04:05.000 MST} [%{module}] %{shortfunc} -> %{level:.4s} %{id:03x}%{color:reset} %{message}'
 
 peer:
-    id: peer0.barber.cystone.me
-    networkId: CardChainNetWork
+    id: peer0.orga.cystone.me
+    networkId: ATLChain
     listenAddress: 0.0.0.0:7051
 
     # The endpoint this peer uses to listen for inbound chaincode connections.
@@ -26,7 +26,7 @@ peer:
     # peer listenAddress.
     # chaincodeAddress: 0.0.0.0:7052
 
-    address: peer0.barber.cystone.me:7051
+    address: peer0.orga.cystone.me:7051
     addressAutoDetect: false
     gomaxprocs: -1
     keepalive:
@@ -38,7 +38,7 @@ peer:
             interval: 60s
             timeout: 20s
     gossip:
-        bootstrap: peer0.barber.cystone.me:7051
+        bootstrap: peer0.orga.cystone.me:7051
         useLeaderElection: true
         orgLeader: false
         endpoint:
@@ -64,7 +64,7 @@ peer:
         aliveTimeInterval: 5s
         aliveExpirationTimeout: 25s
         reconnectInterval: 25s
-        externalEndpoint: peer0.barber.cystone.me:7051
+        externalEndpoint: peer0.orga.cystone.me:7051
         election:
             startupGracePeriod: 15s
             membershipSampleInterval: 1s
@@ -88,11 +88,11 @@ peer:
         enabled:  false
         clientAuthRequired: false
         cert:
-            file: /home/stone/Documents/TianChi/CardChain/crypto-config/peerOrganizations/barber.cystone.me/peers/peer0.barber.cystone.me/tls/server.crt
+            file: /home/stone/Documents/ATL/ATLab-ATLChain/config/crypto-config/peerOrganizations/orga.cystone.me/peers/peer0.orga.cystone.me/tls/server.crt
         key:
-            file: /home/stone/Documents/TianChi/CardChain/crypto-config/peerOrganizations/barber.cystone.me/peers/peer0.barber.cystone.me/tls/server.key
+            file: /home/stone/Documents/ATL/ATLab-ATLChain/config/crypto-config/peerOrganizations/orga.cystone.me/peers/peer0.orga.cystone.me/tls/server.key
         rootcert:
-            file: /home/stone/Documents/TianChi/CardChain/crypto-config/peerOrganizations/barber.cystone.me/peers/peer0.barber.cystone.me/tls/ca.crt
+            file: /home/stone/Documents/ATL/ATLab-ATLChain/config/crypto-config/peerOrganizations/orga.cystone.me/peers/peer0.orga.cystone.me/tls/ca.crt
         clientRootCAs:
             files:
               - tls/ca.crt
@@ -102,7 +102,7 @@ peer:
             file:
     authentication:
         timewindow: 15m
-    fileSystemPath: /home/stone/Documents/TianChi/CardChain/peer/production
+    fileSystemPath: /home/stone/Documents/ATL/ATLab-ATLChain/config/peer/production
 
     BCCSP:
         Default: SW
@@ -119,7 +119,7 @@ peer:
             Security:
             FileKeyStore:
                 KeyStore:
-    mspConfigPath: /home/stone/Documents/TianChi/CardChain/crypto-config/peerOrganizations/barber.cystone.me/peers/peer0.barber.cystone.me/msp
+    mspConfigPath: /home/stone/Documents/ATL/ATLab-ATLChain/config/crypto-config/peerOrganizations/orga.cystone.me/peers/peer0.orga.cystone.me/msp
     localMspId: OrgBarberMSP
     client:
         connTimeout: 3s

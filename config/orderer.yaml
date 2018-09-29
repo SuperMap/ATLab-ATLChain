@@ -1,13 +1,13 @@
 General:
     LedgerType: file
     ListenAddress: orderer.cystone.me
-    ListenPort: 8050
+    ListenPort: 7050
     TLS:
         Enabled: false
-        PrivateKey: /home/chengyang/ATLab-ATLChain/config/crypto-config/ordererOrganizations/cystone.me/orderers/orderer.altchain.com/tls/server.key
-        Certificate: /home/chengyang/ATLab-ATLChain/config/crypto-config/ordererOrganizations/cystone.me/orderers/orderer.altchain.com/tls/server.crt
+        PrivateKey: /home/stone/Documents/ATL/ATLab-ATLChain/config/crypto-config/ordererOrganizations/cystone.me/orderers/orderer.altchain.com/tls/server.key
+        Certificate: /home/stone/Documents/ATL/ATLab-ATLChain/config/crypto-config/ordererOrganizations/cystone.me/orderers/orderer.altchain.com/tls/server.crt
         RootCAs:
-          - /home/chengyang/ATLab-ATLChain/config/crypto-config/ordererOrganizations/cystone.me/orderers/orderer.cystone.me/tls/ca.crt
+          - /home/stone/Documents/ATL/ATLab-ATLChain/config/crypto-config/ordererOrganizations/cystone.me/orderers/orderer.cystone.me/tls/ca.crt
         ClientAuthRequired: false
         ClientRootCAs:
     Keepalive:
@@ -18,8 +18,8 @@ General:
     LogFormat: '%{color}%{time:2006-01-02 15:04:05.000 MST} [%{module}] %{shortfunc} -> %{level:.4s} %{id:03x}%{color:reset} %{message}'
     GenesisMethod: file
     GenesisProfile: OrdererGenesis
-    GenesisFile: /home/chengyang/ATLab-ATLChain/config/orderer.genesis.block
-    LocalMSPDir: /home/chengyang/ATLab-ATLChain/config/crypto-config/ordererOrganizations/cystone.me/orderers/orderer.cystone.me/msp
+    GenesisFile: /home/stone/Documents/ATL/ATLab-ATLChain/config/orderer.genesis.block
+    LocalMSPDir: /home/stone/Documents/ATL/ATLab-ATLChain/config/crypto-config/ordererOrganizations/cystone.me/orderers/orderer.cystone.me/msp
     LocalMSPID: OrgOrderer
     Profile:
         Enabled: false
@@ -36,7 +36,7 @@ General:
         TimeWindow: 15m
 
 FileLedger:
-    Location: /home/chengyang/ATLab-ATLChain/config/order/production/orderer
+    Location: /home/stone/Documents/ATL/ATLab-ATLChain/config/order/production/orderer
     Prefix: hyperledger-fabric-ordererledger
 
 RAMLedger:
