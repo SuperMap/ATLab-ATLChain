@@ -1,0 +1,112 @@
+General:
+    LedgerType: file
+    ListenAddress: orderer.cystone.me
+    ListenPort: 7050
+    TLS:
+        Enabled: false
+        PrivateKey: /home/chengyang/SupermapChain/crypto-config/ordererOrganizations/cystone.me/orderers/orderer.cystone.me/tls/server.key
+        Certificate: /home/stone/Documents/TianChi/CardChain/crypto-config/ordererOrganizations/cystone.me/orderers/orderer.cystone.me/tls/server.crt
+        RootCAs:
+          - /home/stone/Documents/TianChi/CardChain/crypto-config/ordererOrganizations/cystone.me/orderers/orderer.cystone.me/tls/ca.crt
+        ClientAuthRequired: false
+        ClientRootCAs:
+    Keepalive:
+        ServerMinInterval: 60s
+        ServerInterval: 7200s
+        ServerTimeout: 20s
+    LogLevel: info
+    LogFormat: '%{color}%{time:2006-01-02 15:04:05.000 MST} [%{module}] %{shortfunc} -> %{level:.4s} %{id:03x}%{color:reset} %{message}'
+    GenesisMethod: file
+    GenesisProfile: TestOrgsOrdererGenesis
+    GenesisFile: /home/stone/Documents/TianChi/CardChain/orderer.genesis.block
+    LocalMSPDir: /home/stone/Documents/TianChi/CardChain/crypto-config/ordererOrganizations/cystone.me/orderers/orderer.cystone.me/msp
+    LocalMSPID: OrdererMSP
+    Profile:
+        Enabled: false
+        Address: 0.0.0.0:6060
+
+    BCCSP:
+        Default: SW
+        SW:
+            Hash: SHA2
+            Security: 256
+            FileKeyStore:
+                KeyStore:
+    Authentication:
+        TimeWindow: 15m
+
+FileLedger:
+    Location: /home/stone/Documents/TianChi/CardChain/order/production/orderer
+    Prefix: hyperledger-fabric-ordererledger
+
+RAMLedger:
+    HistorySize: 1000
+
+
+Kafka:
+    Retry:
+        ShortInterval: 5s
+        ShortTotal: 10m
+        LongInterval: 5m
+        LongTotal: 12h
+        NetworkTimeouts:
+            DialTimeout: 10s
+            ReadTimeout: 10s
+            WriteTimeout: 10s
+        Metadata:
+            RetryBackoff: 250ms
+            RetryMax: 3
+        Producer:
+            RetryBackoff: 100ms
+            RetryMax: 3
+        Consumer:
+            RetryBackoff: 2s
+    Verbose: true
+
+    TLS:
+      Enabled: false
+
+      # PrivateKey: PEM-encoded private key the orderer will use for
+      # authentication.
+      PrivateKey:
+        # As an alternative to specifying the PrivateKey here, uncomment the
+        # following "File" key and specify the file name from which to load the
+        # value of PrivateKey.
+        #File: path/to/PrivateKey
+
+      # Certificate: PEM-encoded signed public key certificate the orderer will
+      # use for authentication.
+      Certificate:
+        # As an alternative to specifying the Certificate here, uncomment the
+        # following "File" key and specify the file name from which to load the
+        # value of Certificate.
+        #File: path/to/Certificate
+
+      # RootCAs: PEM-encoded trusted root certificates used to validate
+      # certificates from the Kafka cluster.
+      RootCAs:
+        # As an alternative to specifying the RootCAs here, uncomment the
+        # following "File" key and specify the file name from which to load the
+        # value of RootCAs.
+        #File: path/to/RootCAs
+
+    # Kafka protocol version used to communicate with the Kafka cluster brokers
+    # (defaults to 0.10.2.0 if not specified)
+    Version:
+
+################################################################################
+#
+#   Debug Configuration
+#
+#   - This controls the debugging options for the orderer
+#
+################################################################################
+Debug:
+
+    # BroadcastTraceDir when set will cause each request to the Broadcast service
+    # for this orderer to be written to a file in this directory
+    BroadcastTraceDir:
+
+    # DeliverTraceDir when set will cause each request to the Deliver service
+    # for this orderer to be written to a file in this directory
+    DeliverTraceDir:

@@ -1,0 +1,137 @@
+Organizations:
+  - &OrgOrderer
+      Name: OrgOrderer
+      ID: OrgOrderer
+      MSPDir: /home/chengyang/SupermapChain/config/crypto-config/ordererOrganizations/supermapchain.com/msp
+      Policies:
+        Readers:
+            Type: Signature
+            Rule: "OR('OrdererMSP.member')"
+        Writers:
+            Type: Signature
+            Rule: "OR('OrdererMSP.member')"
+        Admins:
+            Type: Signature
+            Rule: "OR('OrdererMSP.admin')"
+
+  - &OrgA
+      Name: OrgA
+      ID: OrgA
+      MSPDir: /home/chengyang/SupermapChain/config/crypto-config/peerOrganizations/orga.supermapchain.com/msp
+      Policies:
+        Readers:
+            Type: Signature
+            Rule: "OR('OrgBarberMSP.admin', 'OrgBarberMSP.peer', 'OrgBarberMSP.client')"
+        Writers:
+            Type: Signature
+            Rule: "OR('OrgBarberMSP.admin', 'OrgBarberMSP.client')"
+        Admins:
+            Type: Signature
+            Rule: "OR('OrgBarberMSP.admin')"
+      AnchorPeers:
+        - Host: peer0.orga.supermapchain.com
+          Port: 7051
+
+  - &OrgB
+      Name: OrgB
+      ID: OrgB
+      MSPDir: /home/chengyang/SupermapChain/config/crypto-config/peerOrganizations/orgb.supermapchain.com/msp
+      Policies:
+        Readers:
+            Type: Signature
+            Rule: "OR('OrgSupermarketMSP.admin', 'OrgSupermarketMSP.peer', 'OrgSupermarketMSP.client')"
+        Writers:
+            Type: Signature
+            Rule: "OR('OrgSupermarketMSP.admin', 'OrgSupermarketMSP.client')"
+        Admins:
+            Type: Signature
+            Rule: "OR('OrgSupermarketMSP.admin')"
+      AnchorPeers:
+        - Host: peer0.orgb.supermapchain.com
+          Port: 7051
+
+Capabilities:
+    Orderer: &OrdererCapabilities
+        V1_1: true
+    Application: &ApplicationCapabilities
+        V1_2: true
+
+Application: &ApplicationDefaults
+    Organizations:
+    Policies:
+        Readers:
+            Type: ImplicitMeta
+            Rule: "ANY Readers"
+        Writers:
+            Type: ImplicitMeta
+            Rule: "ANY Writers"
+        Admins:
+            Type: ImplicitMeta
+            Rule: "MAJORITY Admins"
+    Capabilities:
+        <<: *ApplicationCapabilities
+
+Orderer: &OrdererDefaults
+  OrdererType: solo
+  Addresses:
+    - orderer.supermapchain.com:7050
+  BatchTimeout: 2s
+  BatchSize:
+    MaxMessageCount: 10
+    AbsoluteMaxBytes: 98 MB
+    PreferredMaxBytes: 512 KB
+  MaxChannels: 0
+  Kafka:
+    Brokers:
+        - 127.0.0.1:9092
+  Organizations:
+  Policies:
+      Readers:
+          Type: ImplicitMeta
+          Rule: "ANY Readers"
+      Writers:
+          Type: ImplicitMeta
+          Rule: "ANY Writers"
+      Admins:
+          Type: ImplicitMeta
+          Rule: "MAJORITY Admins"
+      BlockValidation:
+          Type: ImplicitMeta
+          Rule: "ANY Writers"
+  Capabilities:
+      <<: *OrdererCapabilities
+
+Channel: &ChannelDefaults
+    Policies:
+        Readers:
+            Type: ImplicitMeta
+            Rule: "ANY Readers"
+        Writers:
+            Type: ImplicitMeta
+            Rule: "ANY Writers"
+        Admins:
+            Type: ImplicitMeta
+            Rule: "MAJORITY Admins"
+    Capabilities:
+        <<: *ChannelCapabilities
+
+Profiles:
+    OrdererGenesis:
+         <<: *ChannelDefaults
+    Orderer:
+         <<: *OrdererDefaults
+    Organizations:
+      - *OrgOrderer
+    Consortiums:
+         SampleConsortium:
+             Organizations:
+               - *OrgA
+               - *OrgB
+    
+    ChannelForTx:
+        Consortium: SampleConsortium
+        Application:
+          <<: *ApplicationDefaults
+            Organizations:
+              - *OrgA
+              - *OrgB
