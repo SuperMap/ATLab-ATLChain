@@ -20,14 +20,14 @@ Organizations:
         # Name is the key by which this org will be referenced in channel
         # configuration transactions.
         # Name can include alphanumeric characters as well as dots and dashes.
-        Name: Orderer
+        Name: OrdererMSP
 
         # ID is the key by which this org's MSP definition will be referenced.
         # ID can include alphanumeric characters as well as dots and dashes.
-        ID: Orderer 
+        ID: OrdererMSP
 
         # MSPDir is the filesystem path which contains the MSP configuration.
-        MSPDir: crypto-config/ordererOrganizations/cystone.me/msp   #/home/stone/Documents/TianChi/CardChain/crypto-config/ordererOrganizations/cystone.me/msp
+        MSPDir: /home/stone/Documents/ATL/ATLab-ATLChain/config/crypto-config/ordererOrganizations/cystone.me/msp
 
         # Policies defines the set of policies at this level of the config tree
         # For organization policies, their canonical path is usually
@@ -35,62 +35,62 @@ Organizations:
         Policies: &SampleOrgPolicies
             Readers:
                 Type: Signature
-                Rule: "OR('Orderer.admin', 'Orderer.peer', 'Orderer.client')"
+                Rule: "OR('OrdererMSP.member')" # "OR('OrdererMSP.admin', 'OrdererMSP.peer', 'OrdererMSP.client')"
                 # If your MSP is configured with the new NodeOUs, you might
                 # want to use a more specific rule like the following:
                 # Rule: "OR('SampleOrg.admin', 'SampleOrg.peer', 'SampleOrg.client')"
             Writers:
                 Type: Signature
-                Rule: "OR('Orderer.admin', 'Orderer.client')"
+                Rule: "OR('OrdererMSP.member')" # "OR('OrdererMSP.admin', 'OrdererMSP.peer', 'OrdererMSP.client')"
                 # If your MSP is configured with the new NodeOUs, you might
                 # want to use a more specific rule like the following:
                 # Rule: "OR('SampleOrg.admin', 'SampleOrg.client')"
             Admins:
                 Type: Signature
-                Rule: "OR('Orderer.admin')"
+                Rule: "OR('OrdererMSP.admin')"
                 
     - &OrgA
-        Name: OrgA
+        Name: OrgAMSP
 
-        ID: OrgA 
+        ID: OrgAMSP
 
-        MSPDir: crypto-config/peerOrganizations/orga.cystone.me/msp
+        MSPDir: /home/stone/Documents/ATL/ATLab-ATLChain/config/crypto-config/peerOrganizations/orga.cystone.me/msp
 
         Policies: &SampleOrgPolicies
             Readers:
                 Type: Signature
-                Rule: "OR('OrgA.admin', 'OrgA.peer', 'OrgA.client')"
+                Rule: "OR('OrgAMSP.admin', 'OrgAMSP.peer', 'OrgAMSP.client')"
             Writers:
                 Type: Signature
-                Rule: "OR('OrgA.member')"
+                Rule: "OR('OrgAMSP.admin', 'OrgAMSP.client')" # "OR('OrgA.member')"
             Admins:
                 Type: Signature
-                Rule: "OR('OrgA.admin')"
+                Rule: "OR('OrgAMSP.admin')"
 
         AnchorPeers:
-            - Host: 127.0.0.1
+            - Host: peer0.orga.cystone.me
               Port: 7051
 
     - &OrgB
-        Name: OrgB
+        Name: OrgBMSP
 
-        ID: OrgB 
+        ID: OrgBMSP
 
-        MSPDir: crypto-config/peerOrganizations/orgb.cystone.me/msp
+        MSPDir: /home/stone/Documents/ATL/ATLab-ATLChain/config/crypto-config/peerOrganizations/orgb.cystone.me/msp
 
         Policies: &SampleOrgPolicies
             Readers:
                 Type: Signature
-                Rule: "OR('OrgB.admin', 'OrgB.peer', 'OrgB.client')"
+                Rule: "OR('OrgBMSP.admin', 'OrgBMSP.peer', 'OrgBMSP.client')"
             Writers:
                 Type: Signature
-                Rule: "OR('OrgB.member')"
+                Rule: "OR('OrgBMSP.admin', 'OrgBMSP.client')" # "OR('OrgB.member')"
             Admins:
                 Type: Signature
-                Rule: "OR('OrgB.admin')"
+                Rule: "OR('OrgBMSP.admin')"
 
         AnchorPeers:
-            - Host: 127.0.0.1
+            - Host: peer0.orgb.cystone.me
               Port: 7051
 
 
@@ -381,7 +381,7 @@ Profiles:
     # SampleSingleMSPSolo defines a configuration which uses the Solo orderer,
     # and contains a single MSP definition (the MSP sampleconfig).
     # The Consortium SampleConsortium has only a single member, SampleOrg.
-    OrdererMSP:
+    OrdererOrg:
         <<: *ChannelDefaults
         Orderer:
             <<: *OrdererDefaults
@@ -398,7 +398,7 @@ Profiles:
     # and SampleSingleMSPKafka orderer profiles.   Note, for channel creation
     # profiles, only the 'Application' section and consortium # name are
     # considered.
-    ChannelForTx:
+    TxChannel:
         Consortium: SampleConsortium
         Application:
             <<: *ApplicationDefaults

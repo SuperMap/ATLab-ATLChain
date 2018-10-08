@@ -30,10 +30,10 @@ General:
     # TLS: TLS settings for the GRPC server.
     TLS:
         Enabled: false
-        PrivateKey: crypto-config/ordererOrganizations/cystone.me/orderers/orderer.cystone.me/tls/server.key
-        Certificate: crypto-config/ordererOrganizations/cystone.me/orderers/orderer.cystone.me/tls/server.crt
+        PrivateKey: /home/stone/Documents/ATL/ATLab-ATLChain/config/crypto-config/ordererOrganizations/cystone.me/orderers/orderer.cystone.me/tls/server.key
+        Certificate: /home/stone/Documents/ATL/ATLab-ATLChain/config/crypto-config/ordererOrganizations/cystone.me/orderers/orderer.cystone.me/tls/server.crt
         RootCAs:
-          - crypto-config/ordererOrganizations/cystone.me/orderers/orderer.cystone.me/tls/ca.crt
+          - /home/stone/Documents/ATL/ATLab-ATLChain/config/crypto-config/ordererOrganizations/cystone.me/orderers/orderer.cystone.me/tls/ca.crt
         ClientAuthRequired: false
         ClientRootCAs:
 
@@ -51,7 +51,7 @@ General:
 
     # Log Level: The level at which to log. This accepts logging specifications
     # per: fabric/docs/Setup/logging-control.md
-    LogLevel: info
+    LogLevel: debug
 
     # Log Format:  The format string to use when logging.  Especially useful to disable color logging
     LogFormat: '%{color}%{time:2006-01-02 15:04:05.000 MST} [%{module}] %{shortfunc} -> %{level:.4s} %{id:03x}%{color:reset} %{message}'
@@ -78,14 +78,14 @@ General:
     # LocalMSPDir is where to find the private crypto material needed by the
     # orderer. It is set relative here as a default for dev environments but
     # should be changed to the real location in production.
-    LocalMSPDir: crypto-config/ordererOrganizations/cystone.me/orderers/orderer.cystone.me/msp
+    LocalMSPDir: /home/stone/Documents/ATL/ATLab-ATLChain/config/crypto-config/ordererOrganizations/cystone.me/orderers/orderer.cystone.me/msp
 
     # LocalMSPID is the identity to register the local MSP material with the MSP
     # manager. IMPORTANT: The local MSP ID of an orderer needs to match the MSP
     # ID of one of the organizations defined in the orderer system channel's
     # /Channel/Orderer configuration. The sample organization defined in the
     # sample configuration provided has an MSP ID of "SampleOrg".
-    LocalMSPID: Orderer
+    LocalMSPID: OrdererMSP
 
     # Enable an HTTP service for Go "pprof" profiling as documented at:
     # https://golang.org/pkg/net/http/pprof
