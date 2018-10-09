@@ -1,4 +1,12 @@
-Scripts:
+## 网络配置文件
+
+- crypto-config.yaml: 密钥配置文件
+- configtx.yaml: 组织、通道配置文件
+- core.yaml: peer节点配置文件
+- orderer.yaml: orderer节点配置文件
+
+**网络搭建脚本**
+
 1.生成密钥文件
 cryptogen generate --config=crypto-config.yaml
 
