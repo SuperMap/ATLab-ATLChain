@@ -15,6 +15,7 @@ peer:
     id: peer0.orga.cystone.me
     networkId: ATLChainNetwork
     listenAddress: 0.0.0.0:7051
+    chaincodeListenAddress: 0.0.0.0:7052
     address: 0.0.0.0:7051
     addressAutoDetect: false
     gomaxprocs: -1
