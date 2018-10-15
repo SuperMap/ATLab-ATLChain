@@ -44,7 +44,7 @@ export CORE_PEER_LOCALMSPID=OrgAMSP
 
 8. 设置环境变量，执行创建channel的用户账号
 ```
-export CORE_PEER_MSPCONFIGPATH=/home/stone/Documents/ATL/ATLChain/config/crypto-config/peerOrganizations/orga.cystone.me/users/Admin@orga.cystone.me/msp/
+export CORE_PEER_MSPCONFIGPATH=/home/stone/Documents/ATL/ATLab-ATLChain/config/crypto-config/peerOrganizations/orga.cystone.me/users/Admin@orga.cystone.me/msp/
 ```
 
 9. 创建Channel创世块
