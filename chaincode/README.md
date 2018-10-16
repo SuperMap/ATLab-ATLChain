@@ -25,17 +25,23 @@ $ peer chaincode instantiate -o orderer.cystone.me:7050 -C fabricchannel -n AtoB
 $ peer chaincode upgrade -o orderer.cystone.me:7050 -C fabricchannel -n AtoB -v 0.1 -c '{"Args":["init"]}'
 ```
 
-4. 查询
+5. 执行链码-给A记录数据
 ```
-$ peer chaincode query -C fabricchannel -n AtoB -c '{"Args":["query","A"]}'
+$ peer chaincode invoke -o orderer.cystone.me:7050 -C fabricchannel -n AtoB -c '{"Args":["put"]}'
 ```
 
-5. 执行链码
+6. 执行链码-将A的数据转移给B
 ```
 $ peer chaincode invoke -o orderer.cystone.me:7050 -C fabricchannel -n AtoB -c '{"Args":["invoke"]}'
 ```
 
-6. 调试模式时用
+7. 查询
+```
+$ peer chaincode query -C fabricchannel -n AtoB -c '{"Args":["query","A"]}'
+```
+
+
+8. 调试模式时用
 ```
 $ export CORE_PEER_ADDRESS=127.0.0.1:7051
 $ export CORE_CHAINCODE_ID_NAME=AtoB:0.0
@@ -43,11 +49,8 @@ $ export COER_CHAINCODE_MODE=dev
 $ ./transaction -peer.address=127.0.0.1:7052
 ```
 
-7. 查询peer中已安装和已实例化的链码
+9. 查询peer中已安装和已实例化的链码
 ```
 $ peer chaincode list --instantiated -C fabricchannel
 $ peer chaincode list --installed
 ```
-
-
-
