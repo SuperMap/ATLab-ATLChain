@@ -1,12 +1,12 @@
 OrdererOrgs:
   - Name: Orderer
-    Domain: cystone.me
+    Domain: atlchain.com
     Specs:
       - Hostname: orderer
 
 PeerOrgs:
   - Name: OrgA
-    Domain: orga.cystone.me
+    Domain: orga.atlchain.com
     EnableNodeOUs: true
     Template:
       Count: 2
@@ -15,7 +15,7 @@ PeerOrgs:
       Count: 2
 
   - Name: OrgB
-    Domain: orgb.cystone.me
+    Domain: orgb.atlchain.com
     EnableNodeOUs: true
     Template:
       Count: 2

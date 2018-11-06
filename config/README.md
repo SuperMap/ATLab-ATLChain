@@ -44,12 +44,12 @@ $ export CORE_PEER_LOCALMSPID=OrgAMSP
 
 8. 设置环境变量，执行创建channel的用户账号
 ```
-$ export CORE_PEER_MSPCONFIGPATH=/home/stone/Documents/ATL/ATLab-ATLChain/config/crypto-config/peerOrganizations/orga.cystone.me/users/Admin@orga.cystone.me/msp/
+$ export CORE_PEER_MSPCONFIGPATH=/home/cy/Documents/ATL/SuperMap/ATLab-ATLChain/config/crypto-config/peerOrganizations/orga.atlchain.com/users/Admin@orga.atlchain.com/msp
 ```
 
 9. 创建Channel创世块
 ```
-$ peer channel create -o orderer.cystone.me:7050 -c fabricchannel -f fabricchannel.tx
+$ peer channel create -o 127.0.0.1:7050 -c fabricchannel -f fabricchannel.tx
 ```
 
 10. 加入Channel
@@ -59,7 +59,7 @@ $ peer channel join -b fabricchannel.block
 
 11. 通知锚节点
 ```
-$ peer channel update -o orderer.cystone.me:7050 -c fabricchannel -f OrgAMSPanchors.tx
+$ peer channel update -o 127.0.0.1:7050 -c fabricchannel -f OrgAMSPanchors.tx
 ```
 
 12. 安装链码
@@ -69,7 +69,7 @@ $ peer chaincode install -n cc -v 1.0 -p github.com/hyperledger/fabric/examples/
 
 13. 实例化链码
 ```
-$ peer chaincode instantiate -o orderer.cystone.me:7050 -C fabricchannel -n cc -v 1.0 -c '{"Args":["init","a","100","b","200"]}'
+$ peer chaincode instantiate -o 127.0.0.1:7050 -C fabricchannel -n cc -v 1.0 -c '{"Args":["init","a","100","b","200"]}'
 ```
 
 14. 查询链码

@@ -12,7 +12,7 @@ logging:
     format: '%{color}%{time:2006-01-02 15:04:05.000 MST} [%{module}] %{shortfunc} -> %{level:.4s} %{id:03x}%{color:reset} %{message}'
 
 peer:
-    id: peer0.orga.cystone.me
+    id: peer0.orga
     networkId: ATLChainNetwork
     listenAddress: 0.0.0.0:7051
     chaincodeListenAddress: 0.0.0.0:7052
@@ -56,7 +56,7 @@ peer:
         aliveTimeInterval: 5s
         aliveExpirationTimeout: 25s
         reconnectInterval: 25s
-        externalEndpoint: peer0.orga.cystone.me:7051
+        externalEndpoint: 127.0.0.1:7051
         election:
             startupGracePeriod: 15s
             membershipSampleInterval: 1s
@@ -82,14 +82,14 @@ peer:
         enabled:  false
         clientAuthRequired: false
         cert:
-            file: crypto-config/peerOrganizations/orga.cystone.me/peers/peer0.orga.cystone.me/tls/server.crt
+            file: crypto-config/peerOrganizations/orga.atlchain.com/peers/peer0.orga.atlchain.com/tls/server.crt
         key:
-            file: crypto-config/peerOrganizations/orga.cystone.me/peers/peer0.orga.cystone.me/tls/server.key
+            file: crypto-config/peerOrganizations/orga.atlchain.com/peers/peer0.orga.atlchain.com/tls/server.key
         rootcert:
-            file: crypto-config/peerOrganizations/orga.cystone.me/peers/peer0.orga.cystone.me/tls/ca.crt
+            file: crypto-config/peerOrganizations/orga.atlchain.com/peers/peer0.orga.atlchain.com/tls/ca.crt
         clientRootCAs:
             files:
-              - crypto-config/peerOrganizations/orga.cystone.me/peers/peer0.orga.cystone.me/tls/ca.crt
+              - crypto-config/peerOrganizations/orga.atlchain.com/peers/peer0.orga.atlchain.com/tls/ca.crt
         clientKey:
             file:
         clientCert:
@@ -115,7 +115,7 @@ peer:
             FileKeyStore:
                 KeyStore:
 
-    mspConfigPath: crypto-config/peerOrganizations/orga.cystone.me/peers/peer0.orga.cystone.me/msp
+    mspConfigPath: crypto-config/peerOrganizations/orga.atlchain.com/peers/peer0.orga.atlchain.com/msp
 
     localMspId: OrgAMSP
 

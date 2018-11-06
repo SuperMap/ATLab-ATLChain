@@ -1,13 +1,13 @@
 General:
     LedgerType: file
-    ListenAddress: orderer.cystone.me
+    ListenAddress: 127.0.0.1
     ListenPort: 7050
     TLS:
         Enabled: false
-        PrivateKey: crypto-config/ordererOrganizations/cystone.me/orderers/orderer.cystone.me/tls/server.key
-        Certificate: crypto-config/ordererOrganizations/cystone.me/orderers/orderer.cystone.me/tls/server.crt
+        PrivateKey: crypto-config/ordererOrganizations/atlchain.com/orderers/orderer.atlchain.com/tls/server.key
+        Certificate: crypto-config/ordererOrganizations/atlchain.com/orderers/orderer.atlchain.com/tls/server.crt
         RootCAs:
-          - crypto-config/ordererOrganizations/cystone.me/orderers/orderer.cystone.me/tls/ca.crt
+          - crypto-config/ordererOrganizations/atlchain.com/orderers/orderer.atlchain.com/tls/ca.crt
         ClientAuthRequired: false
         ClientRootCAs:
 
@@ -21,7 +21,7 @@ General:
     GenesisMethod: file
     GenesisProfile: SampleInsecureSolo
     GenesisFile: orderer.genesis.block
-    LocalMSPDir: crypto-config/ordererOrganizations/cystone.me/orderers/orderer.cystone.me/msp
+    LocalMSPDir: crypto-config/ordererOrganizations/atlchain.com/orderers/orderer.atlchain.com/msp
     LocalMSPID: OrdererMSP
     Profile:
         Enabled: false

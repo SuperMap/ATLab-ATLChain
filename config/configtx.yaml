@@ -3,7 +3,7 @@ Organizations:
     - &Orderer
         Name: OrdererMSP
         ID: OrdererMSP
-        MSPDir: crypto-config/ordererOrganizations/cystone.me/msp
+        MSPDir: crypto-config/ordererOrganizations/atlchain.com/msp
         Policies: &SampleOrgPolicies
             Readers:
                 Type: Signature
@@ -20,7 +20,7 @@ Organizations:
 
         ID: OrgAMSP
 
-        MSPDir: crypto-config/peerOrganizations/orga.cystone.me/msp
+        MSPDir: crypto-config/peerOrganizations/orga.atlchain.com/msp
 
         Policies: &SampleOrgPolicies
             Readers:
@@ -34,7 +34,7 @@ Organizations:
                 Rule: "OR('OrgAMSP.admin')"
 
         AnchorPeers:
-            - Host: peer0.orga.cystone.me
+            - Host: 127.0.0.1
               Port: 7051
 
     - &OrgB
@@ -42,7 +42,7 @@ Organizations:
 
         ID: OrgBMSP
 
-        MSPDir: crypto-config/peerOrganizations/orgb.cystone.me/msp
+        MSPDir: crypto-config/peerOrganizations/orgb.atlchain.com/msp
 
         Policies: &SampleOrgPolicies
             Readers:
@@ -56,7 +56,7 @@ Organizations:
                 Rule: "OR('OrgBMSP.admin')"
 
         AnchorPeers:
-            - Host: peer0.orgb.cystone.me
+            - Host: 127.0.0.1
               Port: 7051
 
 
@@ -105,7 +105,7 @@ Application: &ApplicationDefaults
 Orderer: &OrdererDefaults
     OrdererType: solo
     Addresses:
-        - orderer.cystone.me:7050
+        - 127.0.0.1:7050
     BatchTimeout: 2s
     BatchSize:
         MaxMessageCount: 10
