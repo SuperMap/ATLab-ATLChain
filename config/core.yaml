@@ -234,7 +234,7 @@ ledger:
 
   state:
     # stateDatabase - options are "goleveldb", "CouchDB"
-    stateDatabase: goleveldb
+    stateDatabase: CouchDB
     couchDBConfig:
        couchDBAddress: 127.0.0.1:5984
        username: admin
