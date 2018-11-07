@@ -30,17 +30,17 @@ func (t *TxCC) Init(stub shim.ChaincodeStubInterface) pb.Response {
 }
 
 // 写入记录
-// args: 0-{address},1-{Buyer},2-{Seller},3-{Price},4-{Time},5-{Hash}
+// args: 0-{BuyerAddr},1-{SellerAddr},2-{Price},3-{Time},4-{Hash}
 func (t *TxCC) PutRecord(stub shim.ChaincodeStubInterface, args []string) pb.Response {
-    argsNeed := 6
+    argsNeed := 5
     argsLength := len(args)
     if argsLength != argsNeed {
         return shim.Error(strconv.Itoa(argsNeed) + " args wanted, but given " + strconv.Itoa(argsLength))
     }
     fmt.Println("PutRecord: address=>" + args[0])
 
-    price, _:= strconv.Atoi(args[3])
-    record := Record{args[1], args[2], price, args[4], args[5]}
+    price, _:= strconv.Atoi(args[2])
+    record := Record{args[0], args[1], price, args[3], args[4]}
 
     recordByte, _ := json.Marshal(record)
     error := stub.PutState(args[0], recordByte)

@@ -212,7 +212,7 @@ chaincode:
 
     startuptimeout: 300s
     executetimeout: 30s
-    mode: net
+    mode: net # dev
     keepalive: 0
 
     system:
