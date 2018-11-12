@@ -1,0 +1,36 @@
+=============== Nov 6, 2018 (CST) ===============
+15:12:01.123334 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+15:12:01.183495 db@open opening
+15:12:01.184590 version@stat F·[] S·0B[] Sc·[]
+15:12:01.217841 db@janitor F·2 G·0
+15:12:01.217892 db@open done T·34.356237ms
+=============== Nov 6, 2018 (CST) ===============
+16:24:35.342992 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+16:24:35.343196 version@stat F·[] S·0B[] Sc·[]
+16:24:35.343206 db@open opening
+16:24:35.343340 journal@recovery F·1
+16:24:35.343686 journal@recovery recovering @1
+16:24:35.380187 memdb@flush created L0@2 N·17 S·368B "fab..nfo,v15":"tes..n\x01\x01,v10"
+16:24:35.380633 version@stat F·[1] S·368B[368B] Sc·[0.25]
+16:24:35.481055 db@janitor F·3 G·0
+16:24:35.481123 db@open done T·137.907576ms
+=============== Nov 7, 2018 (CST) ===============
+14:06:40.534578 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+14:06:40.555968 version@stat F·[1] S·368B[368B] Sc·[0.25]
+14:06:40.556012 db@open opening
+14:06:40.556169 journal@recovery F·1
+14:06:40.558447 journal@recovery recovering @3
+14:06:40.598856 memdb@flush created L0@5 N·2 S·170B "fab..nfo,v19":"tes..nfo,v20"
+14:06:40.599928 version@stat F·[2] S·538B[538B] Sc·[0.50]
+14:06:40.733049 db@janitor F·4 G·0
+14:06:40.733104 db@open done T·177.075188ms
+=============== Nov 8, 2018 (CST) ===============
+09:21:08.332932 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+09:21:08.368248 version@stat F·[2] S·538B[538B] Sc·[0.50]
+09:21:08.368293 db@open opening
+09:21:08.368453 journal@recovery F·1
+09:21:08.369330 journal@recovery recovering @6
+09:21:08.423545 memdb@flush created L0@8 N·35 S·552B "fab..nfo,v54":"tes..nfo,v23"
+09:21:08.424308 version@stat F·[3] S·1KiB[1KiB] Sc·[0.75]
+09:21:08.557905 db@janitor F·5 G·0
+09:21:08.557959 db@open done T·189.649356ms

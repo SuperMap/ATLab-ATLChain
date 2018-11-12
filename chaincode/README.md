@@ -39,6 +39,7 @@ $ peer chaincode query -C fabricchannel -n atlchain -c '{"Args":["GetRecord","ad
 8. 查询历史
 ```
 $ peer chaincode query -C fabricchannel -n atlchain -c '{"Args":["GetHistory","addB"]}'
+// 结果示例 {"TxId":"3a198be789b60fb964141e4d4e24b47298f874b0378900ae5e33c98f401afbb9", "Value":{"Buyer":"addB","Seller":"addC","Price":100,"Time":"20181108","Hash":"hashcode2"}, "Timestamp":"2018-11-07 06:58:56.420657457 +0000 UTC", "IsDelete":"false"}
 ```
 
 
