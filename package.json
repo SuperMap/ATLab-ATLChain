@@ -1,0 +1,21 @@
+{
+  "name": "ATLChain",
+  "version": "0.0.1",
+  "description": "ATLChain DEMO",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "keywords": [
+    "ATLChain"
+  ],
+  "engines": {
+    "node": ">=8.9.4 <9.0",
+    "npm": ">=5.6.0 <6.0"
+  },
+  "license": "Apache-2.0",
+  "dependencies": {
+    "express": "^4.15.2",
+    "log4js": "^0.6.38"
+  }
+}
