@@ -22,7 +22,7 @@ General:
     GenesisProfile: SampleInsecureSolo
     GenesisFile: orderer.genesis.block
     LocalMSPDir: crypto-config/ordererOrganizations/atlchain.com/orderers/orderer.atlchain.com/msp
-    LocalMSPID: OrdererMSP
+    LocalMSPID: Orderer
     Profile:
         Enabled: false
         Address: 0.0.0.0:6060

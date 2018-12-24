@@ -1,59 +1,59 @@
 Organizations:
 
     - &Orderer
-        Name: OrdererMSP
-        ID: OrdererMSP
+        Name: Orderer
+        ID: Orderer
         MSPDir: crypto-config/ordererOrganizations/atlchain.com/msp
         Policies: &SampleOrgPolicies
             Readers:
                 Type: Signature
-                Rule: "OR('OrdererMSP.member', 'OrdererMSP.admin', 'OrdererMSP.peer', 'OrdererMSP.client')" # "OR('OrdererMSP.admin', 'OrdererMSP.peer', 'OrdererMSP.client')"
+                Rule: "OR('Orderer.member', 'Orderer.admin', 'Orderer.peer', 'Orderer.client')" # "OR('Orderer.admin', 'Orderer.peer', 'Orderer.client')"
             Writers:
                 Type: Signature
-                Rule: "OR('OrdererMSP.member', 'OrdererMSP.admin', 'OrdererMSP.peer', 'OrdererMSP.client')" # "OR('OrdererMSP.admin', 'OrdererMSP.peer', 'OrdererMSP.client')"
+                Rule: "OR('Orderer.member', 'Orderer.admin', 'Orderer.peer', 'Orderer.client')" # "OR('Orderer.admin', 'Orderer.peer', 'Orderer.client')"
             Admins:
                 Type: Signature
-                Rule: "OR('OrdererMSP.admin')"
+                Rule: "OR('Orderer.admin')"
                 
     - &OrgA
-        Name: OrgAMSP
+        Name: OrgA
 
-        ID: OrgAMSP
+        ID: OrgA
 
         MSPDir: crypto-config/peerOrganizations/orga.atlchain.com/msp
 
         Policies: &SampleOrgPolicies
             Readers:
                 Type: Signature
-                Rule: "OR('OrgAMSP.admin', 'OrgAMSP.peer', 'OrgAMSP.client', 'OrgA.member')"
+                Rule: "OR('OrgA.admin', 'OrgA.peer', 'OrgA.client', 'OrgA.member')"
             Writers:
                 Type: Signature
-                Rule: "OR('OrgAMSP.admin', 'OrgAMSP.peer', 'OrgAMSP.client', 'OrgA.member')" # "OR('OrgA.member')"
+                Rule: "OR('OrgA.admin', 'OrgA.peer', 'OrgA.client', 'OrgA.member')" # "OR('OrgA.member')"
             Admins:
                 Type: Signature
-                Rule: "OR('OrgAMSP.admin')"
+                Rule: "OR('OrgA.admin')"
 
         AnchorPeers:
             - Host: 127.0.0.1
               Port: 7051
 
     - &OrgB
-        Name: OrgBMSP
+        Name: OrgB
 
-        ID: OrgBMSP
+        ID: OrgB
 
         MSPDir: crypto-config/peerOrganizations/orgb.atlchain.com/msp
 
         Policies: &SampleOrgPolicies
             Readers:
                 Type: Signature
-                Rule: "OR('OrgBMSP.admin', 'OrgBMSP.peer', 'OrgBMSP.client', 'OrgB.member')"
+                Rule: "OR('OrgB.admin', 'OrgB.peer', 'OrgB.client', 'OrgB.member')"
             Writers:
                 Type: Signature
-                Rule: "OR('OrgBMSP.admin', 'OrgBMSP.peer', 'OrgBMSP.client', 'OrgB.member')" # "OR('OrgB.member')"
+                Rule: "OR('OrgB.admin', 'OrgB.peer', 'OrgB.client', 'OrgB.member')" # "OR('OrgB.member')"
             Admins:
                 Type: Signature
-                Rule: "OR('OrgBMSP.admin')"
+                Rule: "OR('OrgB.admin')"
 
         AnchorPeers:
             - Host: 127.0.0.1
@@ -103,7 +103,7 @@ Application: &ApplicationDefaults
         <<: *ApplicationCapabilities
 
 Orderer: &OrdererDefaults
-    OrdererType: solo
+    OrdererType: kafka # kafka solo
     Addresses:
         - 127.0.0.1:7050
     BatchTimeout: 2s
@@ -115,9 +115,9 @@ Orderer: &OrdererDefaults
 
     Kafka:
         Brokers:
-            - kafka0:9092
-            - kafka1:9092
-            - kafka2:9092
+            - 148.70.109.243:9092
+            - 148.70.109.243:9093
+            - 148.70.109.243:9094
 
     Organizations:
 

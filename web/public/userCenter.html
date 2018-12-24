@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="jquery-2.1.4.min.js"></script>
+    <script src="js.js"></script>
+    <link rel="stylesheet" href="css.css">
+    <meta charset="utf-8">
+    <title>ATLChain</title>
+</head>
+
+<body>
+    <ul>
+        <li><a href="putRecord.html" id="tx_bar">交易</a></li>
+        <li><a href="queryByBuyerAddr.html" id="query_addr_bar">根据买方地址查询交易历史</a></li>
+        <li><a href="queryByHash.html" id="query_hash_bar">根据hash查询交易历史</a></li>
+        <li><a href="queryBySellerAddr.html" id="query_addr_hash_bar">根据卖方地址查询交易历史</a></li>
+        <li><a href="queryHBaseData.html" id="query_addr_hash_bar">根据hash查询GIS数据</a></li>
+        <li><a href="userCenter.html" id="query_addr_hash_bar">个人信息</a></li>
+    </ul>
+
+    <div id="usercenter_div">
+        <h2 style="text-align: center">个人信息</h2>
+        <form>
+            <fieldset>
+                <p>
+                    <label for="username_label" style="width:130px">用户名:</label>
+                    <input type="text" id="username_input" style="width: 300px" readonly="readonly">
+                </p>
+                <p>
+                    <label for="orgname_label" style="width:130px">组织名称:</label>
+                    <input type="text" id="orgname_input" style="width: 300px" readonly="readonly">
+                </p>
+                <p>
+                    <label for="useradress_label" style="width:130px">账户地址:</label>
+                    <input type="text" id="useraddress_input" style="width: 300px" readonly="readonly">
+                </p>
+                <p>
+                    <button type="button" id="quit_btn">退出</button>
+                </p>
+            </fieldset>
+        </form>     
+    </div>
+</body>
+</html>

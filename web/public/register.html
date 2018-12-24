@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="jquery-2.1.4.min.js"></script>
+    <script src="js.js"></script>
+    <link rel="stylesheet" href="css.css">
+    <meta charset="utf-8">
+    <title>ATLChain</title>
+</head>
+
+<body>
+
+    <div id="enroll_div">
+        <h2 style="text-align: center">注册账户</h2>
+        <h3 style="text-align: center">(只有管理员才可以注册账户，然后将密钥和证书发送给用户)</h3>
+        <form>
+            <fieldset>
+            <p>
+                <label for="username_label" >username:</label>
+                <input type="text" id="username_input" value="Jim">
+            </p>
+            <p>
+                <label for="orgName_label">orgName:</label>
+                <input type="text" id="orgName_input" readonly="readonly" value="OrgA">
+            </p>
+            <p>
+                <button type="button" id="enroll_btn">登记用户并下载证书和密钥文件</button>
+            </p>
+            <p hidden="hidden" id="indexJump_p">
+                请确认保存好密钥和证书文件后</span><a href="index.html">登录</a>
+            </p>
+            </fieldset>
+        </form>        
+    </div>
+
+    <hr>
+
+    <div id="result_div">
+        <p style="text-align: center">
+            <label for="accountAddress_label">账户地址:</label>
+            <textarea id="accountAddress_input"  rows="3" cols="50" readonly="readonly"></textarea>
+        </p>
+    </div>
+</body>
+</html>

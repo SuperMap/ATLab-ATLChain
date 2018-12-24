@@ -1,0 +1,263 @@
+# ATLab-ATLChain
+ATLChain
+
+1. npm install
+2. node start
+
+## Sample REST APIs Requests
+
+### Login Request
+
+* Register and enroll new users in Organization - **OrgA**:
+
+`curl -s -X POST http://localhost:4000/users -H "content-type: application/x-www-form-urlencoded" -d 'username=Jim&orgName=OrgA'`
+
+**OUTPUT:**
+
+```
+{
+  "success": true,
+  "secret": "RaxhMgevgJcm",
+  "message": "Jim enrolled Successfully",
+  "token": "<put JSON Web Token here>"
+}
+```
+
+The response contains the success/failure status, an **enrollment Secret** and a **JSON Web Token (JWT)** that is a required string in the Request Headers for subsequent requests.
+
+### Create Channel request
+
+```
+curl -s -X POST \
+  http://localhost:4000/channels \
+  -H "authorization: Bearer <put JSON Web Token here>" \
+  -H "content-type: application/json" \
+  -d '{
+	"channelName":"mychannel",
+	"channelConfigPath":"../artifacts/channel/mychannel.tx"
+}'
+```
+
+Please note that the Header **authorization** must contain the JWT returned from the `POST /users` call
+
+### Join Channel request
+
+```
+curl -s -X POST \
+  http://localhost:4000/channels/mychannel/peers \
+  -H "authorization: Bearer <put JSON Web Token here>" \
+  -H "content-type: application/json" \
+  -d '{
+	"peers": ["peer0.org1.example.com","peer1.org1.example.com"]
+}'
+```
+### Install chaincode
+
+```
+curl -s -X POST \
+  http://localhost:4000/chaincodes \
+  -H "authorization: Bearer <put JSON Web Token here>" \
+  -H "content-type: application/json" \
+  -d '{
+	"peers": ["peer0.org1.example.com","peer1.org1.example.com"],
+	"chaincodeName":"mycc",
+	"chaincodePath":"github.com/example_cc/go",
+	"chaincodeType": "golang",
+	"chaincodeVersion":"v0"
+}'
+```
+**NOTE:** *chaincodeType* must be set to **node** when node.js chaincode is used and *chaincodePath* must be set to the location of the node.js chaincode. Also put in the $PWD
+```
+ex:
+curl -s -X POST \
+  http://localhost:4000/chaincodes \
+  -H "authorization: Bearer <put JSON Web Token here>" \
+  -H "content-type: application/json" \
+  -d '{
+	"peers": ["peer0.org1.example.com","peer1.org1.example.com"],
+	"chaincodeName":"mycc",
+	"chaincodePath":"$PWD/artifacts/src/github.com/example_cc/node",
+	"chaincodeType": "node",
+	"chaincodeVersion":"v0"
+}'
+```
+
+### Instantiate chaincode
+
+This is the endorsement policy defined during instantiation.
+This policy can be fulfilled when members from both orgs sign the transaction proposal.
+
+```
+{
+	identities: [{
+			role: {
+				name: 'member',
+				mspId: 'OrgAMSP'
+			}
+		},
+		{
+			role: {
+				name: 'member',
+				mspId: 'OrgBMSP'
+			}
+		}
+	],
+	policy: {
+		'2-of': [{
+			'signed-by': 0
+		}, {
+			'signed-by': 1
+		}]
+	}
+}
+```
+
+```
+curl -s -X POST \
+  http://localhost:4000/channels/mychannel/chaincodes \
+  -H "authorization: Bearer <put JSON Web Token here>" \
+  -H "content-type: application/json" \
+  -d '{
+	"chaincodeName":"mycc",
+	"chaincodeVersion":"v0",
+	"chaincodeType": "golang",
+	"args":["a","100","b","200"]
+}'
+```
+**NOTE:** *chaincodeType* must be set to **node** when node.js chaincode is used
+
+### Invoke request
+
+This invoke request is signed by peers from both orgs, *org1* & *org2*.
+```
+curl -s -X POST \
+  http://localhost:4000/channels/mychannel/chaincodes/mycc \
+  -H "authorization: Bearer <put JSON Web Token here>" \
+  -H "content-type: application/json" \
+  -d '{
+	"peers": ["peer0.org1.example.com","peer0.org2.example.com"],
+	"fcn":"move",
+	"args":["a","b","10"]
+}'
+```
+**NOTE:** Ensure that you save the Transaction ID from the response in order to pass this string in the subsequent query transactions.
+
+### Chaincode Query
+
+```
+curl -s -X POST http://localhost:4000/atlchannel/atlchain/putRecord -H "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1NDMyNjcyODgsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Ik9yZ0EiLCJpYXQiOjE1NDMyMzEyODh9.uBolTI5I66xEn43IFZ06O6QdaqIGn1wnCT65vQG-6yU" -H "content-type: application/json" -d '{"peers":["peer0.orga.atlchain.com"], "args":["addE","addA","44", "20181122", "0a3fcd18a3d28960fa13fbe3ef1f5dcab885f51f"] }'
+
+curl -s -X GET "http://localhost:4000/atlchannel/atlchain/getHistoryByAddr?peer=peer0.orga.atlchain.com&args=%5B%22addE%22%5D" -H "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1NDMzMjYyNDksInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Ik9yZ0EiLCJpYXQiOjE1NDMyOTAyNDl9.-MfuurrLCVN7ET2pXDL0kA39YScyLMlHH9DvHMkJDMw" -H "content-type: application/json"
+
+curl -s -X GET "http://localhost:4000/atlchannel/atlchain/getHistoryByHash?peer=peer0.orga.atlchain.com&args=%5B%220a3fcd18a3d28960fa13fbe3ef1f5dcab885f51f%22%5D" -H "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1NDMyNjcyODgsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Ik9yZ0EiLCJpYXQiOjE1NDMyMzEyODh9.uBolTI5I66xEn43IFZ06O6QdaqIGn1wnCT65vQG-6yU" -H "content-type: application/json"
+
+curl -s -X GET "http://localhost:4000/atlchannel/atlchain/getHistoryByHashAndBuyerAddr?peer=peer0.orga.atlchain.com&args=%5B%220a3fcd18a3d28960fa13fbe3ef1f5dcab885f51f%22%2c%22addE%22%5D" -H "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1NDMyNjcyODgsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Ik9yZ0EiLCJpYXQiOjE1NDMyMzEyODh9.uBolTI5I66xEn43IFZ06O6QdaqIGn1wnCT65vQG-6yU" -H "content-type: application/json"
+
+curl -s -X GET "http://localhost:4000/getDataByHash?hash=169d9703961ba0a947ea99a7d79ec889fbbba657" -H "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1NDMzMjYyNDksInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Ik9yZ0EiLCJpYXQiOjE1NDMyOTAyNDl9.-MfuurrLCVN7ET2pXDL0kA39YScyLMlHH9DvHMkJDMw" -H "content-type: application/json"
+
+// putRecord
+curl -s -X POST http://localhost:4000/atlchannel/atlchain/putRecord -H "authorization: Bearer <put JSON Web Token here>" -H "content-type: application/json" -d '{"peers":["peer0.orga.atlchain.com"], "args":["addE","addA","44", "20181122", "0a3fcd18a3d28960fa13fbe3ef1f5dcab885f51f"] }'
+
+// getHistoryByBuyerAddr
+curl -s -X GET "http://localhost:4000/atlchannel/atlchain/getHistoryByBuyerAddr?peer=peer0.orga.atlchain.com&args=%5B%22addE%22%5D" -H "authorization: Bearer <put JSON Web Token here>" -H "content-type: application/json"
+
+// getHisrotyByHash
+curl -s -X GET "http://localhost:4000/atlchannel/atlchain/getHistoryByHash?peer=peer0.orga.atlchain.com&args=%5B%220a3fcd18a3d28960fa13fbe3ef1f5dcab885f51f%22%5D" -H "authorization: Bearer <put JSON Web Token here>" -H "content-type: application/json"
+
+// getHistoryByHashAndBuyerAddr
+curl -s -X GET "http://localhost:4000/atlchannel/atlchain/getHistoryByHashAndBuyerAddr?peer=peer0.orga.atlchain.com&args=%5B%220a3fcd18a3d28960fa13fbe3ef1f5dcab885f51f%22%2c%22addB%22%5D" -H "authorization: Bearer <put JSON Web Token here>" -H "content-type: application/json"
+
+// getDataFromHBase
+curl -s -X GET "http://localhost:4000/getDataByHash?hash=021126a76bc471b41d0cd79f77095266b4f685de" -H "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1NDI4OTEyNTUsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Ik9yZ0EiLCJpYXQiOjE1NDI4NTUyNTV9.p-o799TCqBz3ri8C-FO5KVfllk6CzWC1I5wVbvd5hwg" -H "content-type: application/json"
+```
+
+### Query Block by BlockNumber
+
+```
+curl -s -X GET \
+  "http://localhost:4000/channels/mychannel/blocks/1?peer=peer0.org1.example.com" \
+  -H "authorization: Bearer <put JSON Web Token here>" \
+  -H "content-type: application/json"
+```
+
+### Query Transaction by TransactionID
+
+```
+curl -s -X GET http://localhost:4000/channels/mychannel/transactions/<put transaction id here>?peer=peer0.org1.example.com \
+  -H "authorization: Bearer <put JSON Web Token here>" \
+  -H "content-type: application/json"
+```
+**NOTE**: The transaction id can be from any previous invoke transaction, see results of the invoke request, will look something like `8a95b1794cb17e7772164c3f1292f8410fcfdc1943955a35c9764a21fcd1d1b3`.
+
+
+### Query ChainInfo
+
+```
+curl -s -X GET \
+  "http://localhost:4000/channels/mychannel?peer=peer0.org1.example.com" \
+  -H "authorization: Bearer <put JSON Web Token here>" \
+  -H "content-type: application/json"
+```
+
+### Query Installed chaincodes
+
+```
+curl -s -X GET \
+  "http://localhost:4000/chaincodes?peer=peer0.org1.example.com&type=installed" \
+  -H "authorization: Bearer <put JSON Web Token here>" \
+  -H "content-type: application/json"
+```
+
+### Query Instantiated chaincodes
+
+```
+curl -s -X GET \
+  "http://localhost:4000/chaincodes?peer=peer0.org1.example.com&type=instantiated" \
+  -H "authorization: Bearer <put JSON Web Token here>" \
+  -H "content-type: application/json"
+```
+
+### Query Channels
+
+```
+curl -s -X GET \
+  "http://localhost:4000/channels?peer=peer0.org1.example.com" \
+  -H "authorization: Bearer <put JSON Web Token here>" \
+  -H "content-type: application/json"
+```
+
+### Clean the network
+
+The network will still be running at this point. Before starting the network manually again, here are the commands which cleans the containers and artifacts.
+
+```
+docker rm -f $(docker ps -aq)
+docker rmi -f $(docker images | grep dev | awk '{print $3}')
+rm -rf fabric-client-kv-org[1-2]
+```
+
+### Network configuration considerations
+
+You have the ability to change configuration parameters by either directly editing the network-config.yaml file or provide an additional file for an alternative target network. The app uses an optional environment variable "TARGET_NETWORK" to control the configuration files to use. For example, if you deployed the target network on Amazon Web Services EC2, you can add a file "network-config-aws.yaml", and set the "TARGET_NETWORK" environment to 'aws'. The app will pick up the settings inside the "network-config-aws.yaml" file.
+
+#### IP Address** and PORT information
+
+If you choose to customize your docker-compose yaml file by hardcoding IP Addresses and PORT information for your peers and orderer, then you MUST also add the identical values into the network-config.yaml file. The url and eventUrl settings will need to be adjusted to match your docker-compose yaml file.
+
+```
+peer1.org1.example.com:
+  url: grpcs://x.x.x.x:7056
+  eventUrl: grpcs://x.x.x.x:7058
+
+```
+
+#### Discover IP Address
+
+To retrieve the IP Address for one of your network entities, issue the following command:
+
+```
+# this will return the IP Address for peer0
+docker inspect peer0 | grep IPAddress
+```
+
+<a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.

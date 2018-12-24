@@ -15,7 +15,16 @@
   },
   "license": "Apache-2.0",
   "dependencies": {
+    "base58-native": "^0.1.4",
+    "body-parser": "^1.17.1",
+    "cors": "^2.8.3",
     "express": "^4.15.2",
-    "log4js": "^0.6.38"
+    "express-bearer-token": "^2.1.0",
+    "express-jwt": "^5.1.0",
+    "fabric-ca-client": "~1.3.0",
+    "fabric-client": "~1.3.0",
+    "jsonwebtoken": "^8.4.0",
+    "log4js": "^0.6.38",
+    "hbase": "^0.4.2"
   }
 }

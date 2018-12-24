@@ -79,8 +79,8 @@ peer:
         sendTimeout: 60s
 
     tls:
-        enabled:  false
-        clientAuthRequired: false
+        enabled: false
+        clientAuthRequired: false 
         cert:
             file: crypto-config/peerOrganizations/orga.atlchain.com/peers/peer0.orga.atlchain.com/tls/server.crt
         key:
@@ -117,7 +117,7 @@ peer:
 
     mspConfigPath: crypto-config/peerOrganizations/orga.atlchain.com/peers/peer0.orga.atlchain.com/msp
 
-    localMspId: OrgAMSP
+    localMspId: OrgA
 
     client:
         connTimeout: 3s
@@ -234,11 +234,11 @@ ledger:
 
   state:
     # stateDatabase - options are "goleveldb", "CouchDB"
-    stateDatabase: CouchDB
+    stateDatabase: CouchDB 
     couchDBConfig:
        couchDBAddress: 127.0.0.1:5984
        username: admin
-       password: admin
+       password: adminpw
        maxRetries: 3
        maxRetriesOnStartup: 10
        requestTimeout: 35s
