@@ -1,18 +1,18 @@
-## 系统启动过程
+## ATLChain
 
-#### 前提
-HBase已运行，且已存入数据，且已启动REST服务
+0. Prerequisites
+Hbase, Kafka, Fabric, Go, Node.js
 
-
-1. 启动网络
+1. start
 ```
 ./startup start
 ```
 
-2. 在浏览器中访问http://127.0.0.1:8080/index.html
+2. http://127.0.0.1:8080/index.html
 
-3. 停止网络
+3. stop 
 ```
 ./startup stop
 ```
 
+TODO: We will do it better.
