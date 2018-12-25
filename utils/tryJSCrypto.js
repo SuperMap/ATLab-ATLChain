@@ -26,16 +26,44 @@ ogAOgXACaIqiFyrk3wIDAQAB
 -----END PUBLIC KEY-----
 `;
 
-//加密
+// 加密
 function encrypt(data, pubKey){
     return crypto.publicEncrypt(pubKey, Buffer.from(data));
 }
-//解密
+// 解密
 function decrypt(encrypted, privKey){
     return crypto.privateDecrypt(privKey, encrypted);
 }
 
-let en = encrypt("你好", pubKey);
-console.log(en);    // 661728d44eacc82388b6de09e06f78dc
-let de = decrypt(en, privKey);
-console.log(de.toString());  // hello world
+// 签名
+function signer(algorithm,key,data){
+    var sign = crypto.createSign(algorithm);
+    sign.update(data);
+    sig = sign.sign(key, 'hex');
+    return sig;
+}
+
+// 验签
+function verify(algorithm,pubkey,sig,data){
+    var verify = crypto.createVerify(algorithm);
+    verify.update(data);
+    return verify.verify(pubkey, sig, 'hex')
+}
+
+// 加密
+// let en = encrypt("你好", pubKey);
+// console.log(en);    // 661728d44eacc82388b6de09e06f78dc
+
+// 解密
+// let de = decrypt(en, privKey);
+// console.log(de.toString());  // hello world
+
+var algorithm = 'SHA256';
+var data = "abcdef";   //传输的数据
+
+// 签名
+var sig = signer(algorithm, privKey, data);
+
+// 验签
+console.log(verify(algorithm, pubKey, sig, data));         //验证数据，通过公钥、数字签名 =》是原始数据
+console.log(verify(algorithm, pubKey, sig, data + "2"));    //验证数据，通过公钥、数字签名  =》不是原始数据
