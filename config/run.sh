@@ -1,17 +1,17 @@
 #!/bin/sh
 if [ $1 = clean ]
 then
-    rm atlchannel.block atlchannel.tx orderer.genesis.block OrgAanchors.tx
+    rm atlchannel.block atlchannel.tx genesisblock OrgAanchors.tx
 
-    rm -rf orderer peer
+    rm -rf ./production
 
 elif [ $1 = s1 ]
 then
     # echo "### configtxgen -profile OrdererOrg --outputBlock orderer.genesis.block ###"
     # cryptogen generate --config=crypto-config.yaml
 
-    echo "### configtxgen -profile OrdererOrg --outputBlock orderer.genesis.block ###"
-    configtxgen -profile OrdererOrg --outputBlock orderer.genesis.block
+    echo "### configtxgen -profile OrdererChannel --outputBlock genesisblock ###"
+    configtxgen -profile OrdererChannel --outputBlock genesisblock
 
     echo "### Finish stage 1 ###"
 

@@ -14,7 +14,7 @@ $ cryptogen generate --config=crypto-config.yaml
 
 2. 生成orderer创世块
 ```
-$ configtxgen -profile OrdererOrg --outputBlock orderer.genesis.block
+$ configtxgen -profile OrdererChannel -outputBlock genesisblock -channelID atlchannel
 ```
 
 3. 启动orderer节点（需要在另外一个终端中执行）
