@@ -22,7 +22,7 @@ General:
     LedgerType: file
 
     # Listen address: The IP on which to bind to listen.
-    ListenAddress: 0.0.0.0
+    ListenAddress: 0.0.0.0 
 
     # Listen port: The port on which to bind to listen.
     ListenPort: 7050
