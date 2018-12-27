@@ -7,16 +7,16 @@ then
 
 elif [ $1 = s1 ]
 then
-    # echo "### configtxgen -profile OrdererOrg --outputBlock orderer.genesis.block ###"
+    # echo "### configtxgen -profile OrdererOrg -outputBlock orderer.genesis.block ###"
     # cryptogen generate --config=crypto-config.yaml
 
-    echo "### configtxgen -profile OrdererChannel --outputBlock genesisblock ###"
-    configtxgen -profile OrdererChannel --outputBlock genesisblock
+    echo "### configtxgen -profile OrdererChannel -outputBlock genesisblock ###"
+    configtxgen -profile OrdererChannel -outputBlock genesisblock -channelID ordererchannel
 
     echo "### Finish stage 1 ###"
 
     echo "### You should start Ordere and peer ###"
-    
+
 elif [ $1 = s2 ]
 then
     echo "### configtxgen -profile TxChannel -outputCreateChannelTx atlchannel.tx -channelID atlchannel ###"

@@ -576,7 +576,7 @@ Profiles:
                       <<: *OrdererOrgAPolicies
                       Admins:
                           Type: Signature
-                          Rule: "OR('OrdererOrgA.admin')"
+                          Rule: "OR('OrdererOrgA.admin', 'OrdererOrgB.admin')"
                          
         Consortiums:
             SampleConsortium:
@@ -587,7 +587,7 @@ Profiles:
                           <<: *OrgAPolicies
                           Admins:
                               Type: Signature
-                              Rule: "OR('OrgA.admin')"
+                              Rule: "OR('OrgA.admin', 'OrgB.admin')"
                           
     ## TxChannel Genesis Block
     TxChannel:
