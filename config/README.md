@@ -5,6 +5,11 @@
 - core.yaml: peer节点配置文件
 - orderer.yaml: orderer节点配置文件
 
+#### ccpack.out 来自于
+```
+$ peer chaincode package -n cc -p github.com/hyperledger/fabric/examples/chaincode/go/example02/cmd -v 1.02 ccpack.out
+```
+
 #### 网络搭建测试脚本
 
 1. 生成密钥文件
