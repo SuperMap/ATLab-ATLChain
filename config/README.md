@@ -52,6 +52,12 @@ $ export CORE_PEER_LOCALMSPID=OrgA
 $ export CORE_PEER_MSPCONFIGPATH=$PWD/crypto-config/peerOrganizations/orga.atlchain.com/users/Admin@orga.atlchain.com/msp
 ```
 
+export CORE_PEER_TLS_ENABLED=true
+
+export CORE_PEER_TLS_ROOTCERT_FILE=$PWD/crypto-config/peerOrganizations/orga.atlchain.com/tlsca/tlsca.orga.atlchain.com-cert.pem
+
+peer channel create -o 127.0.0.1:7050 -c atlchannel -f atlchannel.tx --tls --cafile ./crypto-config/peerOrganizations/orga.atlchain.com/tlsca/tlsca.orga.atlchain.com-cert.pem
+
 9. 创建Channel创世块
 ```
 $ peer channel create -o 127.0.0.1:7050 -c atlchannel -f atlchannel.tx
@@ -96,3 +102,19 @@ $ openssl genrsa -out test.key 1024
 ```
 $ openssl rsa -in test.key -pubout -out test_pub.key
 ```
+
+
+// peer1orgb  sshT1
+export CORE_PEER_LOCALMSPID=OrgB
+
+export CORE_PEER_MSPCONFIGPATH=$PWD/crypto-config/peerOrganizations/orgb.atlchain.com/users/Admin@orgb.atlchain.com/msp
+
+// peer0orga  sshT2
+export CORE_PEER_LOCALMSPID=OrgA
+
+export export CORE_PEER_MSPCONFIGPATH=$PWD/crypto-config/peerOrganizations/orga.atlchain.com/users/Admin@orga.atlchain.com/msp
+
+// peer0orgb  sshT3
+export CORE_PEER_LOCALMSPID=OrgB
+
+export CORE_PEER_MSPCONFIGPATH=$PWD/crypto-config/peerOrganizations/orgb.atlchain.com/users/Admin@orgb.atlchain.com/msp
