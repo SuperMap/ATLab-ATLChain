@@ -37,7 +37,7 @@
 #############################################################################
 
 # Version of config file
-version: 1.3.0
+version: 1.4.0-snapshot-b191f9c
 
 # Server's listening port (default: 7054)
 port: 7054
@@ -80,11 +80,11 @@ tls:
 #############################################################################
 ca:
   # Name of this CA
-  name: ca-orga
+  name:
   # Key file (is only used to import a private key into BCCSP)
-  keyfile: ./msp/keystore/bc0d4531af7131ad6ab83dcfb9a92fe3b8e43c03957f5027d35af459d4284e6a_sk
+  keyfile:
   # Certificate file (default: ca-cert.pem)
-  certfile: ./ca.orga.atlchain.com-cert.pem
+  certfile:
   # Chain file
   chainfile:
 
@@ -301,19 +301,19 @@ signing:
 #     CA certificates though it can still issue end entity certificates.
 ###########################################################################
 csr:
-   cn: fabric-ca-server
+   cn: orga-fabric-ca-server
    keyrequest:
      algo: ecdsa
      size: 256
    names:
-      - C: US
-        ST: "North Carolina"
+      - C: CN
+        ST: Sichuan
         L:
-        O: Hyperledger
-        OU: Fabric
+        O: SuperMap
+        OU: ATL
    hosts:
+     - supermap.com
      - cyPC
-     - localhost
    ca:
       expiry: 131400h
       pathlength: 1
@@ -431,3 +431,15 @@ intermediate:
     client:
       certfile:
       keyfile:
+
+#############################################################################
+# CA configuration section
+#
+# Configure the number of incorrect password attempts are allowed for
+# identities. By default, the value of 'passwordattempts' is 10, which
+# means that 10 incorrect password attempts can be made before an identity get
+# locked out.
+#############################################################################
+cfg:
+  identities:
+    passwordattempts: 10

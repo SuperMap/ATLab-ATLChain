@@ -5,11 +5,6 @@
 - core.yaml: peer节点配置文件
 - orderer.yaml: orderer节点配置文件
 
-#### ccpack.out 来自于
-```
-$ peer chaincode package -n cc -p github.com/hyperledger/fabric/examples/chaincode/go/example02/cmd -v 1.02 ccpack.out
-```
-
 #### 网络搭建测试脚本
 
 1. 生成密钥文件
@@ -51,12 +46,30 @@ $ export CORE_PEER_LOCALMSPID=OrgA
 ```
 $ export CORE_PEER_MSPCONFIGPATH=$PWD/crypto-config/peerOrganizations/orga.atlchain.com/users/Admin@orga.atlchain.com/msp
 ```
+/////////////////////三个服务器的环境变量/////////////////////////
+// peer1orgb  sshT1
+export CORE_PEER_LOCALMSPID=OrgB
 
+export CORE_PEER_MSPCONFIGPATH=$PWD/crypto-config/peerOrganizations/orgb.atlchain.com/users/Admin@orgb.atlchain.com/msp
+
+// peer0orga  sshT2
+export CORE_PEER_LOCALMSPID=OrgA
+
+export export CORE_PEER_MSPCONFIGPATH=$PWD/crypto-config/peerOrganizations/orga.atlchain.com/users/Admin@orga.atlchain.com/msp
+
+// peer0orgb  sshT3
+export CORE_PEER_LOCALMSPID=OrgB
+
+export CORE_PEER_MSPCONFIGPATH=$PWD/crypto-config/peerOrganizations/orgb.atlchain.com/users/Admin@orgb.atlchain.com/msp
+///////////////////////////////////////////////////////////
+
+///////////////////使用TLS的时候/////////////////////////////
 export CORE_PEER_TLS_ENABLED=true
 
 export CORE_PEER_TLS_ROOTCERT_FILE=$PWD/crypto-config/peerOrganizations/orga.atlchain.com/tlsca/tlsca.orga.atlchain.com-cert.pem
 
 peer channel create -o 127.0.0.1:7050 -c atlchannel -f atlchannel.tx --tls --cafile ./crypto-config/peerOrganizations/orga.atlchain.com/tlsca/tlsca.orga.atlchain.com-cert.pem
+/////////////////////////////////////////////////////////////
 
 9. 创建Channel创世块
 ```
@@ -103,18 +116,50 @@ $ openssl genrsa -out test.key 1024
 $ openssl rsa -in test.key -pubout -out test_pub.key
 ```
 
+#### 链码打包（package）
+1. 打包
+```
+$ peer chaincode package -n cc -p github.com/hyperledger/fabric/examples/chaincode/go/example02/cmd -v 1.02 ccpack.out
+```
 
-// peer1orgb  sshT1
-export CORE_PEER_LOCALMSPID=OrgB
+2. 安装
+```
+$ peer chaincode install ccpack.out
+```
 
-export CORE_PEER_MSPCONFIGPATH=$PWD/crypto-config/peerOrganizations/orgb.atlchain.com/users/Admin@orgb.atlchain.com/msp
+#### CA使用
+**Fabric CA Server**
+1. 初始化 Fabric CA Server
+```
+// 1.用户名密码可以自定义
+// 2.init后会生成配置文件 “fabric-ca-server-config.yaml” ，如需修改配置文件，修改之后再次执行初始化即可
+// 3.CA 根证书应该使用对应组织的根证书
+$ fabric-ca-server init -b admin:adminpw
+```
 
-// peer0orga  sshT2
-export CORE_PEER_LOCALMSPID=OrgA
+2. 启动 Fabric CA Server
+```
+$ fabric-ca-server start
 
-export export CORE_PEER_MSPCONFIGPATH=$PWD/crypto-config/peerOrganizations/orga.atlchain.com/users/Admin@orga.atlchain.com/msp
+// 或者使用默认配置快速启动，该过程也会先执行 init，然后启动 server
+$ fabric-ca-server start -b admin:adminpw
+```
+**Fabric CA Client**
+3. enroll
+```
+$ export FABRIC_CA_CLIENT_HOME=$PWD/admin
+$ fabric-ca-client enroll -u http://admin:adminpw@127.0.0.1:7054
+```
 
-// peer0orgb  sshT3
-export CORE_PEER_LOCALMSPID=OrgB
+enroll （登记）的过程是，用户获取证书、私钥和CA根证书的过程。
 
-export CORE_PEER_MSPCONFIGPATH=$PWD/crypto-config/peerOrganizations/orgb.atlchain.com/users/Admin@orgb.atlchain.com/msp
+4. register
+```
+// 1.register 成功之后会返回一个密码，用户 enroll 的时候需要使用这个密码
+// 2.这个密码也可以在 register 的时候通过 --id.secret passwd 来指定
+// 3.register 的时候有很多参数可设置，具体可参考 (Fabric CA 官方文档- Fabric CA Client 部分)[https://hyperledger-fabric-ca.readthedocs.io/en/latest/users-guide.html#fabric-ca-client]。
+
+$ fabric-ca-client register --id.name client2 --id.affiliation org1.department1 --id.attrs 'hf.IntermediateCA=false' --id.type=client
+```
+
+**注册的用户得到密码之后，就可以在自己的主机上 enroll ，获取证书和私钥了， enroll 过程参考第 3 步**
