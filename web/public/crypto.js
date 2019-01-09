@@ -7,14 +7,13 @@
  */
 
 function getPubKeyFromCert(pubKeyCert) {
-    subject = KEYUTIL.getKey(pubKeyCert);
-    pubKey = getPriKeyFromPEM();
-    return pubKey;
+    pubKeyObj = KEYUTIL.getKey(pubKeyCert);
+    return pubKeyObj.pubKeyHex;
 }
 
 function getPrvKeyFromPEM(prvKeyPEM) {
-    prvKey = KEYUTIL.getKey(prvKeyPEM);
-    return prvKey;
+    prvKeyObj = KEYUTIL.getKey(prvKeyPEM);
+    return prvKeyObj.prvKeyHex;
 }
 
 function ECSign(prvKey, text) {

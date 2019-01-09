@@ -27,11 +27,11 @@ var instantiate = require('./app/instantiate-chaincode.js');
 var invoke = require('./app/invoke-transaction.js');
 var query = require('./app/query.js');
 var account = require('./app/account.js');
-var utils = require('./app/utils.js');
+var crypto = require('./app/crypto.js');
 
 var port = process.env.PORT || hfc.getConfigSetting('port');
 var host = process.env.HOST || hfc.getConfigSetting('host');
-var hbaseClient = hbase({ host: '127.0.0.1', port: 8000 });
+// var hbaseClient = hbase({ host: '127.0.0.1', port: 8000 });
 
 ///////////////////////////////////////////////////////////////////////////////
 //////////////////////////////// SET CONFIGURATONS ////////////////////////////
@@ -49,35 +49,35 @@ app.set('secret', 'thisismysecret');
 app.use(expressJWT({
 	secret: 'thisismysecret'
 }).unless({
-	path: ['/users']
+	path: ['/users', '/login']
 }));
 app.use(bearerToken());
-app.use(function(req, res, next) {
-	logger.debug(' ------>>>>>> new request for %s',req.originalUrl);
-	if (req.originalUrl.indexOf('/users') >= 0) {
-		return next();
-	}
-
-	var token = req.token;
-	jwt.verify(token, app.get('secret'), function(err, decoded) {
-		if (err) {
-			res.send({
-				success: false,
-				message: 'Failed to authenticate token. Make sure to include the ' +
-					'token returned from /users call in the authorization header ' +
-					' as a Bearer token'
-			});
-			return;
-		} else {
-			// add the decoded user name and org name to the request object
-			// for the downstream code to use
-			req.username = decoded.username;
-			req.orgname = decoded.orgName;
-			logger.debug(util.format('Decoded from JWT token: username - %s, orgname - %s', decoded.username, decoded.orgName));
-			return next();
-		}
-	});
-});
+// app.use(function(req, res, next) {
+// 	logger.debug(' ------>>>>>> new request for %s',req.originalUrl);
+// 	if (req.originalUrl.indexOf('/users') >= 0) {
+// 		return next();
+// 	}
+// 
+// 	var token = req.token;
+// 	jwt.verify(token, app.get('secret'), function(err, decoded) {
+// 		if (err) {
+// 			res.send({
+// 				success: false,
+// 				message: 'Failed to authenticate token. Make sure to include the ' +
+// 					'token returned from /users call in the authorization header ' +
+// 					' as a Bearer token'
+// 			});
+// 			return;
+// 		} else {
+// 			// add the decoded user name and org name to the request object
+// 			// for the downstream code to use
+// 			req.username = decoded.username;
+// 			req.orgname = decoded.orgName;
+// 			logger.debug(util.format('Decoded from JWT token: username - %s, orgname - %s', decoded.username, decoded.orgName));
+// 			return next();
+// 		}
+// 	});
+// });
 
 ///////////////////////////////////////////////////////////////////////////////
 //////////////////////////////// START SERVER /////////////////////////////////
@@ -102,33 +102,36 @@ function getErrorMessage(field) {
 ////////////////////////////////////////// APIs about user //////////////////////////////////////////
 // Login
 app.post('/login', async function(req, res) {
-	var username = req.body.username;
-	var orgName = req.body.orgname;
+	// var username = req.body.username;
+	// var orgName = req.body.orgname;
 	var cert = req.body.cert;
 	var signature = req.body.signature;
 
+    console.log("==========lognin========");
+
 	// Check the cert
-    if(!utils.checkCert(cert, username, orgname)) {
-		res.json({success: false, message: "Invalid Certificate"});
-	}
+    // if(!crypto.certCheck(cert, username, orgname)) {
+	// 	res.json({success: false, message: "Invalid Certificate"});
+	// }
 
     // Verify the signature of the cert
-	if(!signatureVerify(signature)) {
+	if(!crypto.signatureVerify(cert, cert, signature)) {
 		res.json({success: false, message: "Invalid Signature"});
 	}
+    console.log(crypto.signatureVerify(cert, cert, signature));
 
     // Generate JWT
-    var token = jwt.sign({
-		exp: Math.floor(Date.now() / 1000) + parseInt(hfc.getConfigSetting('jwt_expiretime')),
-		username: username,
-		orgName: orgName
-	}, app.get('secret'));
+    // var token = jwt.sign({
+	// 	exp: Math.floor(Date.now() / 1000) + parseInt(hfc.getConfigSetting('jwt_expiretime')),
+	// 	username: username,
+	// 	orgName: orgName
+	// }, app.get('secret'));
 
-    var response = {
-        token: token,
-        message: "login sucessfully",
-    }
-    res.json({success: true, message: response});
+    // var response = {
+    //     token: token,
+    //     message: "login sucessfully",
+    // }
+    res.json({success: true, message: "response"});
 })
 
 // Register and enroll user

@@ -1,8 +1,10 @@
 // enroll
 //
 
-var RESTURL = "http://148.70.109.243:4000";
-var FileURL = "http://148.70.109.243:8080";
+// var RESTURL = "http://148.70.109.243:4000";
+// var FileURL = "http://148.70.109.243:8080";
+var RESTURL = "http://127.0.0.1:4000";
+var FileURL = "http://127.0.0.1:8080";
 
 $(document).ready(function(){
     // 设置预设值
@@ -47,6 +49,40 @@ $(document).ready(function(){
         });
     });
 
+
+    $("#ECert_input").change(function(){
+        var objFiles = document.getElementById("ECert_input");
+        var fileName = objFiles.files[0].name;
+        var isFileValide = true;    // 交互click和ajax之间的信息
+        
+        // 读取文件内容
+        var reader = new FileReader();//新建一个FileReader
+        reader.readAsText(objFiles.files[0], "UTF-8");//读取文件 
+        reader.onload = function(evt){ //读取完文件之后会回来这里
+            var fileString = evt.target.result; // 读取文件内容
+            try {
+                var jsonFile = JSON.parse(fileString);
+            } catch(err){
+                alert("请选择正确的证书文件");
+                return;
+            }
+            $("#ECert_text").val(fileString);
+        }
+    });
+    
+    $("#pkey_input").change(function(){
+        var objFiles = document.getElementById("pkey_input");
+        var fileName = objFiles.files[0].name;
+        
+        // 读取文件内容
+        var reader = new FileReader();//新建一个FileReader
+        reader.readAsText(objFiles.files[0], "UTF-8");//读取文件 
+        reader.onload = function(evt){ //读取完文件之后会回来这里
+            var fileString = evt.target.result; // 读取文件内容
+            $("#pkey_text").val(fileString);
+        }
+    });
+
     // login
     $("#login_btn").click(function(){
         console.log("click Run");
@@ -55,61 +91,40 @@ $(document).ready(function(){
         delCookie("username");
         delCookie("orgname");
 
-        if( $("#ECert_input").val() == ""){
-            alert("请选择正确的证书文件!");
+        if($("#ECert_text").val() == "" || $("#pkey_text").val() == ""){
+            alert("请选择证书和私钥文件");
             return;
         }
-        var objFiles = document.getElementById("ECert_input");
-        var fileName = objFiles.files[0].name;
-        var isFileValide = true;    // 交互click和ajax之间的信息
-        
-        // var file2 = $("#pkey_input").val();
-        //if( file1 == "" || file2.split("-")[1] != "priv"){
-        
-        // 读取文件内容
-        var reader = new FileReader();//新建一个FileReader
-        console.log("select file Run");
-        reader.readAsText(objFiles.files[0], "UTF-8");//读取文件 
-        reader.onload = function(evt){ //读取完文件之后会回来这里
-            console.log("file read Run");
-            var fileString = evt.target.result; // 读取文件内容
-            try {
-                var jsonFile = JSON.parse(fileString);
-            } catch(err){
-                isFileValide = false;
-                alert("请选择正确的证书文件");
-                return;
-            }
-            if(jsonFile.name != fileName){
-                isFileValide = false;
-                alert("请选择正确的证书文件,文件名和用户名一致");
-                return;
-            }
-        }
 
-        // TODO: 交易时附上签名和公钥，发送到服务端后，服务端验证证书有效性，然后再验证证书，通过后再执行写入账本的方法。
+        var prvKey = getPrvKeyFromPEM($("#pkey_text").val());
+        console.log("prvKey: ", prvKey);
+        var signature = ECSign(prvKey, $("#ECert_text").val());
+        console.log("signature: ", signature);
 
         $.ajax({
             type:'post',
-            url: RESTURL + '/users',
+            url: RESTURL + '/login',
             data:{
-                username:fileName,
-                orgName:"OrgA"
+                signature: signature,
+                cert: $("#ECert_text").val()
             },
             success:function(data){
-                if(!isFileValide){
-                    return;
-                }
-                console.log("ajax Run");
-                document.cookie = "token=" + data.token;
-                document.cookie = "address=" + data.address;
-                document.cookie = "username=" + fileName;
-                document.cookie = "orgname=" + "OrgA";
-                if(data.address == undefined){
-                    alert("证书有误");
-                } else {
+                console.log(data);
+                if(data.success){
+                    alert("login success");
                     window.location.href="./putRecord.html";
+                } else {
+                    alert("login failed");
                 }
+                //document.cookie = "token=" + data.token;
+                //document.cookie = "address=" + data.address;
+                //document.cookie = "username=" + fileName;
+                //document.cookie = "orgname=" + "OrgA";
+                //if(data.address == undefined){
+                //    alert("证书有误");
+                //} else {
+                //    window.location.href="./putRecord.html";
+                //}
             },
             error:function(err){
                 console.log(err)
