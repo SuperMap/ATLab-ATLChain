@@ -1,5 +1,5 @@
 /*
- *  Storage tools set for app, include HBase and hdfs
+ *  HDFS tools set for app
  *  
  *  Author: chengyang@supermap.com
  *  Date:   2019-01-09
@@ -10,7 +10,7 @@
 var webhdfs = require('webhdfs');
 var fs = require('fs');
 
-// TODO hdfs operate functions
+// TODO hdfs remote operate, now the function just avaliable in localhost. 
 class HDFS {
     constructor(user, host, port) {
         this.client = webhdfs.createClient({
@@ -22,6 +22,7 @@ class HDFS {
     }
     
     put(localFile, remoteFile){
+        console.log("====put====")
         var localFileStream = fs.createReadStream(localFile);
         var remoteFileStream = this.client.createWriteStream(remoteFile);
     

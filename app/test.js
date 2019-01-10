@@ -7,7 +7,6 @@
  *
  */
 
-// ======================== Test crypto.js ======================= 
 // console.log("======================== Begin test crypto.js =======================")
 // 
 // var crypto = require('./crypto.js');
@@ -23,14 +22,24 @@
 // }
 // 
 // console.log("======================== End test crypto.js =======================")
+// 
+// 
+// console.log("======================== Begin test hdfs.js =======================")
+// var HDFS = require('./hdfs.js');
+// 
+// var hdfs = new HDFS('chengyang', 'localhost', '50070');
+// hdfs.put("./orgA.yaml", "/user/chengyang/orgA.yaml");
+// hdfs.get("/user/chengyang/orgA.yaml", "./ttttt");
+// 
+// console.log("======================== End test hdfs.js =======================")
+// 
+// 
+console.log("======================== Begin test hbase.js =======================")
+var hbase = require('./hbase.js');
+var hbaseClient = new hbase();
+hbaseClient.put();
+ 
+console.log("======================== End test hbase.js =======================")
 
 
-// ======================== Test storage.js =======================
-console.log("======================== Begin test storage.js =======================")
 
-var HDFS = require('./hdfs.js');
-
-var hdfs = new HDFS('chenyang', '148.70.109.243', '50070');
-hdfs.put("./orgA.yaml", "/user/chengyang/orgA.yaml");
-
-console.log("======================== End test storage.js =======================")
