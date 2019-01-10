@@ -16,7 +16,7 @@ var fs = require('fs');
 
 require('./config.js');
 var hfc = require('fabric-client');
-const hbase = require('hbase-client');
+const hbase = require('hbase');
 
 var helper = require('./app/helper.js');
 var createChannel = require('./app/create-channel.js');
@@ -31,7 +31,7 @@ var crypto = require('./app/crypto.js');
 
 var port = process.env.PORT || hfc.getConfigSetting('port');
 var host = process.env.HOST || hfc.getConfigSetting('host');
-// var hbaseClient = hbase({ host: '127.0.0.1', port: 8000 });
+var hbaseClient = hbase({ host: '127.0.0.1', port: 8080 });
 
 ///////////////////////////////////////////////////////////////////////////////
 //////////////////////////////// SET CONFIGURATONS ////////////////////////////
@@ -273,6 +273,8 @@ app.post('/atlchannel/atlchain/putRecord', async function(req, res) {
 		res.json(getErrorMessage('\'args\''));
 		return;
 	}
+
+    //get("", "", function(){ res.json})
 
 	// Put data into HBase
 	// statement about create database:

@@ -26,7 +26,7 @@
     "fabric-ca-client": "1.4.0-rc2",
     "fabric-client": "1.4.0-rc2",
     "fs-extra": "^2.0.0",
-    "hbase-client": "^1.6.1",
+    "hbase": "^0.4.2",
     "jsonwebtoken": "^7.3.0",
     "jsrsasign": "^8.0.12",
     "jsrsasign-util": "^1.0.0",

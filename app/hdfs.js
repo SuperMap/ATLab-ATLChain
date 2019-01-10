@@ -18,10 +18,9 @@ class HDFS {
             host: host,
             port: port
         });
-        console.log("client: ", this.client);
     }
     
-    put(localFile, remoteFile){
+    put(localFile, remoteFile, callback){
         console.log("====put====")
         var localFileStream = fs.createReadStream(localFile);
         var remoteFileStream = this.client.createWriteStream(remoteFile);
@@ -33,11 +32,12 @@ class HDFS {
         });
     
         remoteFileStream.on('finish', function onFinish() {
+            callback();
             console.log("finish");
         });
     }
     
-    get(remoteFile, localFile){
+    get(remoteFile, localFile, callback){
         var remoteFileStream = this.client.createReadStream(remoteFile);
         var localFileStream = fs.createWriteStream(localFile);
     
@@ -51,7 +51,8 @@ class HDFS {
         });
     
         remoteFileStream.on('finish', function onFinish() {
-            console.log('finish');
+            callback();
+            console.log("finish");
         });
     }
 }

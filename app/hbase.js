@@ -7,21 +7,48 @@
  *
  */
 
-var hbaseClient = require('hbase-client');
+var hbaseClient = require('hbase');
 
 class HBase {
-    constructor() {
-        this.client = hbaseClient.create({
-            zookeeperHosts: [
-                '127.0.0.1:2182'
-            ]
+    constructor(host, port) {
+        this.client = hbase({
+            host: host, 
+            port: port 
+        })
+    }
+
+    createTable(tableName, columnFamilyName) {
+        this.client
+            .table(tableName)
+            .create(columnFamilyName, function(error, success) {
+            console.info('Table created: ' + (success ? 'yes' : 'no'))
         });
     }
 
-    put() {
-        this.client.putRow('test', 'rowkey1', {'cf:name': 'foo name'}, function (err){
-            console.log("error: ", err);
-        });
+    deleteTable(tableName) {
+        this.client
+            .table(tableName)
+            .delete((error, success) => {
+                assert.ok(success)
+            });
+    }
+
+    get(tableName, rowName, columnFamilyName, callback) {
+        this.client
+            .table(tableName)
+            .row(rowName)
+            .get(columnFamilyName, (error, value) => {
+                console.info(value)
+            });
+    }
+
+    put(tableName, rowName, listColumnFamilyName, listValue, callback) {
+        this.client
+            .table(tableName)
+            .row(rowName)
+            .put(listColumnFamilyName, listValue, (error, value) => {
+                assert.strictEqual(true, success)
+            });
     }
 }
 
