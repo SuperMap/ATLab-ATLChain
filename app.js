@@ -314,7 +314,7 @@ app.get('/getDataByHash', async function(req, res) {
           endRow: hash,
           maxVersions: 1
         }, (err, rows) => {
-            res.send(rows) 
+            res.send(rows);
         })
 });
 

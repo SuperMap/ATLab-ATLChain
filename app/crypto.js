@@ -1,7 +1,7 @@
 /*
  *  Crypto tool set for app
  *  
- *  Author: cystone@aliyun.com
+ *  Author: chengyang@supermap.com
  *  Date:   2019-01-08
  *  Log:    create
  *
@@ -35,6 +35,20 @@ function getPubKeyFromCert(cert) {
     var jsonCert = JSON.parse(cert);
     var pubKeyObj = rs.KEYUTIL.getKey(jsonCert.enrollment.identity.certificate);
     return pubKeyObj.pubKeyHex;
+}
+
+// TODO: RSA encrypt decrypt functions
+function getRSAKey(){
+    var keypair = "";
+    return keypair;
+}
+
+function RSAEncrypt() {
+    return true;
+}
+
+function RSADecrypt() {
+    return true;
 }
 
 // exports.certCheck = certCheck;

@@ -30,6 +30,7 @@
     "jsonwebtoken": "^7.3.0",
     "jsrsasign": "^8.0.12",
     "jsrsasign-util": "^1.0.0",
-    "log4js": "^0.6.38"
+    "log4js": "^0.6.38",
+    "webhdfs": "^1.2.0"
   }
 }
