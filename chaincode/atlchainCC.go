@@ -1,67 +1,65 @@
 package main
 
 import (
-	"bytes"
-	"encoding/json"
-	"fmt"
-	"strconv"
+    "bytes"
+    "strconv"
+    // "encoding/json"
+    "fmt"
 
-	"github.com/hyperledger/fabric/core/chaincode/shim"
-	pb "github.com/hyperledger/fabric/protos/peer"
+    "github.com/hyperledger/fabric/core/chaincode/shim"
+    pb "github.com/hyperledger/fabric/protos/peer"
 )
 
 type AtlchainCC struct {
 }
 
 func (a *AtlchainCC) Init(stub shim.ChaincodeStubInterface) pb.Response {
-	return shim.Success(nil)
+    return shim.Success(nil)
 }
 
 // 写入账本，key => AddrReceive
-// args: 0-{AddrReceive},1-{jsonString}
-// eg: peer chaincode invoke -o 127.0.0.1:7050 -C atlchannel -n atlchainCC -c '{"Args":["Put","addrA" , "{\"AddrReceive\":\"addrA\", \"AddrSend\":\"addrB\"}"]}'
+// args: 0-{jsonStr},1-{signatureStr},2-{pubkeyPemStr}
+// eg:"{"AddrReceive":"addrA", "AddrSend":"addrB"}"
 func (a *AtlchainCC) Put(stub shim.ChaincodeStubInterface, args []string) pb.Response {
-	argsNeed := 2
-	argsLength := len(args)
+    argsNeed := 2
+    argsLength := len(args)
 	if argsLength != argsNeed {
 		return shim.Error("Incorrect number of arguments. Expecting " + strconv.Itoa(argsNeed) + ", given " + strconv.Itoa(argsLength))
 	}
 
-	recordByte := []byte(args[1])
-	var f interface{}
-	err := json.Unmarshal(recordByte, &f)
-	if err != nil {
-		return shim.Error(err.Error())
-	}
+    var jsonStr = args[0]
+    var signatureStr = args[1]
+    var pubkeyPemStr = args[2]
 
-	err = stub.PutState(args[0], recordByte)
-	if err != nil {
-		return shim.Error(err.Error())
-	}
+    if !verify(jsonStr, signatureStr, pubkeyPemStr) {
+        return shim.Error("Invalid signature")
+    }
 
-	return shim.Success(nil)
+    var putKey = getPutKeyFromJsonStr(jsonStr)
+
+    recordByte := []byte(jsonStr)
+
+    err := stub.PutState(putKey, recordByte)
+    if err != nil {
+        return shim.Error(err.Error())
+    }
+
+    return shim.Success(nil)
 }
 
 // 根据各种条件查询交易历史
-// args: 0-{queryJsonString} eg: {"hash":"hashstring", "AddrSend":"addressstring"}
-// eg: peer chaincode query -C atlchannel -n atlchainCC -c '{"Args":["Query", "{\"AddrSend\":\"addrB\", \"AddrReceive\":\"addrA\"}"]}'
-func (t *AtlchainCC) Query(stub shim.ChaincodeStubInterface, args []string) pb.Response {
-	argsNeed := 1
-	argsLength := len(args)
+// args: 0-{queryJsonString} 
+// eg: {"hash":"hashstring", "AddrSend":"addressstring"}
+func (t *AtlchainCC) Get(stub shim.ChaincodeStubInterface, args []string) pb.Response {
+    argsNeed := 1
+    argsLength := len(args)
 	if len(args) != argsNeed {
 		return shim.Error("Incorrect number of arguments. Expecting " + strconv.Itoa(argsNeed) + ", given " + strconv.Itoa(argsLength))
 	}
 
-	queryConditionByte := []byte(args[0])
-	var f interface{}
-	err := json.Unmarshal(queryConditionByte, &f)
-	if err != nil {
-		return shim.Error(err.Error())
-	}
-
 	//queryString := "{\"selector\":{\"Hash\":\"" + hash + "\"}}"
-	queryString := "{\"selector\":" + args[0] + "}"
-	queryResults, err := getQueryResultForQueryString(stub, queryString)
+	queryString := "{\"selector\":" + args[0]+ "}"
+	queryResults, err := getQueryResult(stub, queryString)
 	if err != nil {
 		return shim.Error(err.Error())
 	}
@@ -69,7 +67,7 @@ func (t *AtlchainCC) Query(stub shim.ChaincodeStubInterface, args []string) pb.R
 }
 
 // 执行查询条件
-func getQueryResultForQueryString(stub shim.ChaincodeStubInterface, queryString string) ([]byte, error) {
+func getQueryResult(stub shim.ChaincodeStubInterface, queryString string) ([]byte, error) {
 	resultsIterator, err := stub.GetQueryResult(queryString)
 	if err != nil {
 		return nil, err
@@ -117,20 +115,20 @@ func constructQueryResponseFromIterator(resultsIterator shim.StateQueryIteratorI
 }
 
 func (a *AtlchainCC) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
-	function, args := stub.GetFunctionAndParameters()
-	switch function {
-	case "Put":
-		return a.Put(stub, args)
-	case "Query":
-		return a.Query(stub, args)
-	default:
-		return shim.Error("Invalid invoke function name")
-	}
+    function, args := stub.GetFunctionAndParameters()
+    switch function {
+    case "Put":
+        return a.Put(stub, args)
+    case "Get":
+        return a.Get(stub, args)
+    default:
+        return shim.Error("Invalid invoke function name")
+    }
 }
 
 func main() {
-	err := shim.Start(new(AtlchainCC))
-	if err != nil {
-		fmt.Printf("Error starting AtlchainCC chaincode: %s", err)
-	}
+    err := shim.Start(new(AtlchainCC))
+    if err != nil {
+        fmt.Printf("Error starting AtlchainCC chaincode: %s", err)
+    }
 }
