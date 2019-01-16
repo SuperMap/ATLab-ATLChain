@@ -184,11 +184,6 @@ app.get('/channels/:channelName/chaincodes/:chaincodeName/fcn/:fcn', async funct
 	let args = req.query.args;
 	let peer = req.query.peer;
 
-	logger.debug('channelName : ' + channelName);
-	logger.debug('chaincodeName : ' + chaincodeName);
-	logger.debug('fcn : ' + fcn);
-	logger.debug('args : ' + args);
-
 	if (!chaincodeName) {
 		res.json(getErrorMessage('\'chaincodeName\''));
 		return;
@@ -207,95 +202,61 @@ app.get('/channels/:channelName/chaincodes/:chaincodeName/fcn/:fcn', async funct
 	}
 	args = args.replace(/'/g, '"');
 	args = JSON.parse(args);
-	logger.debug("args: " + args);
 
-    switch (fcn) {
-        case "getHistoryByBuyerAddr":
-            break;
-        case "getHistoryByHash":
-            break;
-        case "getHistoryBySellerAddr":
-            break;
-        default:
-           res.send("Invalid request");
-    }
 
 	let message = await query.queryChaincode(peer, channelName, chaincodeName, args, fcn, req.username, req.orgname);
 	res.send(message);
 });
 
 // Invoke transaction on chaincode on target peers
-// app.post('/channels/:channelName/chaincodes/:chaincodeName', async function(req, res) {
-// 	logger.debug('==================== INVOKE ON CHAINCODE ==================');
-// 	var peers = req.body.peers;
-// 	var chaincodeName = req.params.chaincodeName;
-// 	var channelName = req.params.channelName;
-// 	var fcn = req.body.fcn;
-// 	var args = req.body.args;
-// 	logger.debug('channelName  : ' + channelName);
-// 	logger.debug('chaincodeName : ' + chaincodeName);
-// 	logger.debug('fcn  : ' + fcn);
-// 	logger.debug('args  : ' + args);
-// 	if (!chaincodeName) {
-// 		res.json(getErrorMessage('\'chaincodeName\''));
-// 		return;
-// 	}
-// 	if (!channelName) {
-// 		res.json(getErrorMessage('\'channelName\''));
-// 		return;
-// 	}
-// 	if (!fcn) {
-// 		res.json(getErrorMessage('\'fcn\''));
-// 		return;
-// 	}
-// 	if (!args) {
-// 		res.json(getErrorMessage('\'args\''));
-// 		return;
-// 	}
-
-// 	let message = await invoke.invokeChaincode(peers, channelName, chaincodeName, fcn, args, req.username, req.orgname);
-// 	res.send(message);
-// });
-
-// Invoke transaction on chaincode on target peers
-app.post('/atlchannel/atlchain/putRecord', async function(req, res) {
+app.post('/channels/:channelName/chaincodes/:chaincodeName', async function(req, res) {
 	logger.debug('==================== INVOKE ON CHAINCODE ==================');
 	var peers = req.body.peers;
+    var channel = req.body.channel;     // atlchannel
+    var chaincode = req.body.chaincode; // atlchain
+    var fcn = req.body.fcn; // Put
 	var args = req.body.args;
-	var hash = req.body.hash;
-	var data = req.body.data;
-	logger.debug('peers  : ' + peers);
-	logger.debug('args  : ' + args);
-	logger.debug('hash  : ' + hash);
-	logger.debug('data  : ' + data);
 
 	if (!args) {
 		res.json(getErrorMessage('\'args\''));
 		return;
 	}
+    
+    //TODO: parse JSON string to get data and hash for hbase storage
+    var jsonObj =JSON.parse(str);
 
-    //get("", "", function(){ res.json})
+    if(jsonObj.hbaseHash) {
+        var data = jsonObj.data;
+        var hash = jsonObj.hbaseHash;
 
-	// Put data into HBase
-	// statement about create database:
-	// 1. create 'atlchain', 'data'
-	// 2. put 'atlchain', 'hash1', 'data:data', "json string value"
-	hbaseClient
-        .table('atlchain')
-		.row(args[4])
-		.put('data:data', data, (error, success) => {
-			console.log("hbaseClient put: ", success);
-		  })
+	    // Put data into HBase
+	    // statement about create database:
+	    // 1. create 'atlchain', 'data'
+	    // 2. put 'atlchain', 'hash1', 'data:data', "json string value"
+	    hbaseClient
+            .table('atlchain')
+	    	.row(hash)
+	    	.put('data:data', data, (error, success) => {
+	    		console.log("hbaseClient put: ", success);
+	    	  })
+    }
 
+    if (jsonObj.hdfsPath) {
+        // TODO: put data into HDFS
+    }
+    
+    
     // TODO: 验证参数中的证书和签名，通过后再执行交易
     // if ( verifyCert() && verifySignature() ){
 	//      let message = await invoke.invokeChaincode(peers, "atlchannel", "atlchain", "putRecord", args, req.username, req.orgname);
     // }
 	
 	// invoke
-	let message = await invoke.invokeChaincode(peers, "atlchannel", "atlchain", "putRecord", args, req.username, req.orgname);
+	let message = await invoke.invokeChaincode(peers, channel, chanicode, fcn, args, req.username, req.orgname);
 	res.send(message);
 });
+
+// TODO: Get data from HDFS
 
 // Get data from HBase by hash
 app.get('/getDataByHash', async function(req, res) {
