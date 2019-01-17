@@ -149,35 +149,84 @@ $(document).ready(function(){
             $("#Hash_tx_input").val(hex_sha256(fileString)); // 计算hash
         }
     })
-
+    
+    // put
     $("#put_select").change(function(){
         switch ($("#put_select").val()) {
-            case "estate":
+            case "transaction":
                 $("#content_put_div").html(" \
                     <p> \
-                        <label for=\"BuyerAddr_op1_put_label\">发送方地址:</label> \
-                        <input type=\"text\" id=\"BuyerAddr_op1_put_input\"> \
+                        <label for=\"AddrSend_op0_put_label\">发送方地址:</label> \
+                        <input type=\"text\" id=\"AddrSend_op0_put_input\"> \
                     </p> \
                     <p> \
-                        <label for=\"SellerAddr_op1_put_label\">接收方地址:</label> \
-                        <input type=\"text\" id=\"SellerAddr_op1_put_input\" value=\"1Lyji2Uei5sKo8uxyS1MAdP1e2gNLvhc5p\"> \
+                        <label for=\"AddrRec_op0_put_label\">接收方地址:</label> \
+                        <input type=\"text\" id=\"AddrRec_op0_put_input\" value=\"1Lyji2Uei5sKo8uxyS1MAdP1e2gNLvhc5p\"> \
                     </p> \
                     <p> \
-                        <label for=\"Price_op1_put_label\">价格:</label> \
-                        <input type=\"text\" id=\"Price_op1_put_input\" value=\"10000\"> \
+                        <label for=\"Price_op0_put_label\">价格:</label> \
+                        <input type=\"text\" id=\"Price_op0_put_input\" value=\"10000\"> \
                     </p> \
                     <p> \
-                        <label for=\"File_op1_put_label\">数据文件:</label> \
-                        <input type=\"file\" id=\"File_op1_put_input\"> \
+                        <label for=\"File_op0_put_label\">数据文件:</label> \
+                        <input type=\"file\" id=\"File_op0_put_input\"> \
                     </p> \
                     <p> \
-                        <label for=\"Hash_op1_put_label\">数据哈希:</label> \
-                        <textarea id=\"Hash_op1_put_input\" rows=\"3\" cols=\"38\" readonly=\"readonly\" style=\"vertical-align: top;\"></textarea> \
+                        <label for=\"Hash_op0_put_label\">数据哈希:</label> \
+                        <textarea id=\"Hash_op0_put_input\" rows=\"3\" cols=\"38\" readonly=\"readonly\" style=\"vertical-align: top;\"></textarea> \
                     </p> \
                 ")
                 break;
-            case "transcation":
+            case "estate":
                 $("#content_put_div").html(" \
+                    <p> \
+                        <label for=\"org_op1_put_label\">发证机构:</label> \
+                        <input type=\"text\" id=\"org_op1_put_input\"> \
+                    </p> \
+                    <p> \
+                        <label for=\"ower_op1_put_label\">权利人:</label> \
+                        <input type=\"text\" id=\"ower_op1_put_input\"> \
+                    </p> \
+                    <p> \
+                        <label for=\"common_op1_put_label\">共有情况:</label> \
+                        <input type=\"text\" id=\"common_op1_put_input\"> \
+                    </p> \
+                    <p> \
+                        <label for=\"position_op1_put_label\">坐落:</label> \
+                        <input type=\"text\" id=\"position_op1_put_input\"> \
+                    </p> \
+                    <p> \
+                        <label for=\"unitNum_op1_put_label\">不动产单元号:</label> \
+                        <input type=\"text\" id=\"unitNum_op1_put_input\"> \
+                    </p> \
+                    <p> \
+                        <label for=\"rightType_op1_put_label\">权利类型:</label> \
+                        <input type=\"text\" id=\"rightType_op1_put_input\"> \
+                    </p> \
+                    <p> \
+                        <label for=\"rigthNature_op1_put_label\">权利性质:</label> \
+                        <input type=\"text\" id=\"rightNature_op1_put_input\"> \
+                    </p> \
+                    <p> \
+                        <label for=\"usage_op1_put_label\">用途:</label> \
+                        <input type=\"text\" id=\"usage_op1_put_input\"> \
+                    </p> \
+                    <p> \
+                        <label for=\"area_op1_put_label\">面积:</label> \
+                        <input type=\"text\" id=\"area_op1_put_input\"> \
+                    </p> \
+                    <p> \
+                        <label for=\"deadline_op1_put_label\">使用期限:</label> \
+                        <input type=\"text\" id=\"deadline_op1_put_input\"> \
+                    </p> \
+                    <p> \
+                        <label for=\"other_op1_put_label\">权利其他状况:</label> \
+                        <input type=\"text\" id=\"other_op1_put_input\"> \
+                    </p> \
+                    <p> \
+                        <label for=\"attachment_op1_put_label\">附记:</label> \
+                        <input type=\"text\" id=\"attachment_op1_put_input\"> \
+                    </p> \
                 ")
                 break;
             default:
@@ -185,9 +234,8 @@ $(document).ready(function(){
         } 
     })
     
-    // put 
+    // TODO: put data into HBase and HDFS
     $("#put_btn").click(function(){
-        
         var objFiles = document.getElementById("File_put_input");
         // 读取文件内容
         var reader = new FileReader();//新建一个FileReader
@@ -224,13 +272,93 @@ $(document).ready(function(){
         }
     });
 
-    // query by buyer addr
-    $("#query_addr_btn").click(function(){
+    // get
+    $("#get_select").change(function(){
+        switch ($("#get_select").val()) {
+            case "transaction":
+                $("#content_get_div").html(" \
+                    <p> \
+                        <label for=\"AddrSend_op0_get_label\">发送方地址:</label> \
+                        <input type=\"text\" id=\"AddrSend_op0_get_input\"> \
+                    </p> \
+                    <p> \
+                        <label for=\"AddrRec_op0_get_label\">接收方地址:</label> \
+                        <input type=\"text\" id=\"AddrRec_op0_get_input\"> \
+                    </p> \
+                    <p> \
+                        <label for=\"Price_op0_get_label\">价格:</label> \
+                        <input type=\"text\" id=\"Price_op0_get_input\"> \
+                    </p> \
+                    <p> \
+                        <label for=\"Hash_op0_get_label\">数据哈希:</label> \
+                        <textarea id=\"Hash_op0_get_input\" rows=\"3\" cols=\"38\" style=\"vertical-align: top;\"></textarea> \
+                    </p> \
+                ")
+                break;
+            case "estate":
+                $("#content_get_div").html(" \
+                    <p> \
+                        <label for=\"org_op1_get_label\">发证机构:</label> \
+                        <input type=\"text\" id=\"org_op1_get_input\"> \
+                    </p> \
+                    <p> \
+                        <label for=\"ower_op1_get_label\">权利人:</label> \
+                        <input type=\"text\" id=\"ower_op1_get_input\"> \
+                    </p> \
+                    <p> \
+                        <label for=\"common_op1_get_label\">共有情况:</label> \
+                        <input type=\"text\" id=\"common_op1_get_input\"> \
+                    </p> \
+                    <p> \
+                        <label for=\"position_op1_get_label\">坐落:</label> \
+                        <input type=\"text\" id=\"position_op1_get_input\"> \
+                    </p> \
+                    <p> \
+                        <label for=\"unitNum_op1_get_label\">不动产单元号:</label> \
+                        <input type=\"text\" id=\"unitNum_op1_get_input\"> \
+                    </p> \
+                    <p> \
+                        <label for=\"rightType_op1_get_label\">权利类型:</label> \
+                        <input type=\"text\" id=\"rightType_op1_get_input\"> \
+                    </p> \
+                    <p> \
+                        <label for=\"rigthNature_op1_get_label\">权利性质:</label> \
+                        <input type=\"text\" id=\"rightNature_op1_get_input\"> \
+                    </p> \
+                    <p> \
+                        <label for=\"usage_op1_get_label\">用途:</label> \
+                        <input type=\"text\" id=\"usage_op1_get_input\"> \
+                    </p> \
+                    <p> \
+                        <label for=\"area_op1_get_label\">面积:</label> \
+                        <input type=\"text\" id=\"area_op1_get_input\"> \
+                    </p> \
+                    <p> \
+                        <label for=\"deadline_op1_get_label\">使用期限:</label> \
+                        <input type=\"text\" id=\"deadline_op1_get_input\"> \
+                    </p> \
+                    <p> \
+                        <label for=\"other_op1_get_label\">权利其他状况:</label> \
+                        <input type=\"text\" id=\"other_op1_get_input\"> \
+                    </p> \
+                    <p> \
+                        <label for=\"attachment_op1_get_label\">附记:</label> \
+                        <input type=\"text\" id=\"attachment_op1_get_input\"> \
+                    </p> \
+                ")
+                break;
+            default:
+                break;
+        } 
+    })
+
+    // TODO: test
+    $("#get_btn").click(function(){
+        var args = '["{' + "addrsend:" + $("#AddrSend_op0_get_input").val() +",addrrec:" + $("AddrRec_op0_get_input").val() + ",price:" + $("#Price_op0_get_input") +",hash:" + $("#Hash_op0_get_input") + '}"]';
+
         $.ajax({
             type:'get',
-            
-            url: RESTURL + '/atlchannel/atlchain/getHistoryByBuyerAddr?peer=peer0.orga.atlchain.com&args=["' + $("#BuyerAddr_query_addr_input").val() + '"]',
-            data:JSON.stringify(),
+            url: RESTURL + '/channels/atlchannel/chaincodes/atlchain/Get?peer=peer0.orga.atlchain.com&args=' + args,
             headers: {
                 "authorization": "Bearer " + getCookie("token") ,
                 "content-type": "application/json"
@@ -240,50 +368,6 @@ $(document).ready(function(){
                 alert("查询成功");
                 
                 $("#result_input").html(FormatOutput(data));
-            },
-            error:function(err){
-                console.log(err);
-            }
-        });
-    });
-
-    // query by hash
-    $("#query_hash_btn").click(function(){
-        $.ajax({
-            type:'get',
-            
-            url: RESTURL + '/atlchannel/atlchain/getHistoryByHash?peer=peer0.orga.atlchain.com&args=["' + $("#hash_query_hash_input").val() + '"]',
-            data:JSON.stringify({}),
-            headers: {
-                "authorization": "Bearer " + getCookie("token"),
-                "content-type": "application/json"
-            },
-            success:function(data){
-                console.log(data);
-                alert("查询成功");
-                $("#result_input").html(FormatOutput2(data));
-            },
-            error:function(err){
-                console.log(err);
-            }
-        });
-    });
-
-    // query by seller addr
-    $("#query_SellerAddr_btn").click(function(){
-        $.ajax({
-            type:'get',
-            
-            url: RESTURL + '/atlchannel/atlchain/getHistoryBySellerAddr?peer=peer0.orga.atlchain.com&args=["' + $("#SellerAddr_query_input").val() + '"]',
-            data:JSON.stringify({}),
-            headers: {
-                "authorization": "Bearer " + getCookie("token"),
-                "content-type": "application/json"
-            },
-            success:function(data){
-                console.log(data);
-                alert("查询成功");
-                $("#result_input").html(FormatOutput2(data));
             },
             error:function(err){
                 console.log(err);

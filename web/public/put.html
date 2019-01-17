@@ -22,65 +22,38 @@
             <p>
                 <label for="Type_put_label">选择记录类型:</label>
                 <select id="put_select" style="height:25px">
+                    <option value="transaction">数据交易</option>
                     <option value="estate">不动产证书</option>
-                    <option value="transcation">数据交易</option>
                 </select>
             </p>
             
             <div id="content_put_div">
-            </div>
-            <p>
-                <label for="org_op0_put_label">发证机构</label>
-                <input type="text" id="_op0_put_input">
-            </p>
-            <p>
-                <label for="ower_op0_put_label">权利人</label>
-                <input type="text" id="_op0_put_input">
-            </p>
-            <p>
-                <label for="common_op0_put_label">共有情况</label>
-                <input type="text" id="_op0_put_input">
-            </p>
-            <p>
-                <label for="position_op0_put_label">坐落</label>
-                <input type="text" id="_op0_put_input">
-            </p>
-            <p>
-                <label for="unitNum_op0_put_label">不动产单元号</label>
-                <input type="text" id="_op0_put_input">
-            </p>
-            <p>
-                <label for="rightType_op0_put_label">权利类型</label>
-                <input type="text" id="_op0_put_input">
-            </p>
-            <p>
-                <label for="rigthNature_op0_put_label">权利性质</label>
-                <input type="text" id="_op0_put_input">
-            </p>
-            <p>
-                <label for="usage_op0_put_label">用途</label>
-                <input type="text" id="_op0_put_input">
-            </p>
-            <p>
-                <label for="area_op0_put_label">面积</label>
-                <input type="text" id="_op0_put_input">
-            </p>
-            <p>
-                <label for="deadline_op0_put_label">使用期限</label>
-                <input type="text" id="_op0_put_input">
-            </p>
-            <p>
-                <label for="other_op0_put_label">权利其他状况</label>
-                <input type="text" id="_op0_put_input">
-            </p>
-            <p>
-                <label for="attachment_op0_put_label">附记</label>
-                <input type="text" id="_op0_put_input">
-            </p>
+                <p>
+                    <label for="BuyerAddr_op0_put_label">发送方地址:</label>
+                    <input type="text" id="BuyerAddr_op0_put_input">
+                </p>
+                <p>
+                    <label for="SellerAddr_op0_put_label">接收方地址:</label>
+                    <input type="text" id="SellerAddr_op0_put_input" value="1Lyji2Uei5sKo8uxyS1MAdP1e2gNLvhc5p">
+                </p>
+                <p>
+                    <label for="Price_op0_put_label">价格:</label>
+                    <input type="text" id="Price_op0_put_input" value="10000">
+                </p>
+                <p>
+                    <label for="File_op0_put_label">数据文件:</label>
+                    <input type="file" id="File_op0_put_input">
+                </p>
+                <p>
+                    <label for="Hash_op0_put_label">数据哈希:</label>
+                    <textarea id="Hash_op0_put_input" rows="3" cols="38" readonly="readonly" style="vertical-align: top;"></textarea>
+                </p>
 
+            </div>
+            
             <p>
                 <label for="Prvkey_put_label">签名密钥:</label>
-                <input type="file" id="File_op1_put_input">
+                <input type="file" id="File_op0_put_input">
             </p>
             <p>
                 <button type="button" id="put_btn">提交</button>
