@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="jquery-2.1.4.min.js"></script>
+    <script src="sha256.js"></script>
+    <script src="js.js"></script>
+     
+    <link rel="stylesheet" href="css.css">
+    <meta charset="utf-8">
+    <title>ATLChain</title>
+</head>
+
+<body>
+    <div id="header">
+    </div>
+
+    <div id="put_div">
+        <h2 style="text-align: center">写入</h2>
+        <form>
+
+            <fieldset>
+            <p>
+                <label for="Type_put_label">选择记录类型:</label>
+                <select id="put_select" style="height:25px">
+                    <option value="estate">不动产证书</option>
+                    <option value="transcation">数据交易</option>
+                </select>
+            </p>
+            
+            <div id="content_put_div">
+            </div>
+            <p>
+                <label for="org_op0_put_label">发证机构</label>
+                <input type="text" id="_op0_put_input">
+            </p>
+            <p>
+                <label for="ower_op0_put_label">权利人</label>
+                <input type="text" id="_op0_put_input">
+            </p>
+            <p>
+                <label for="common_op0_put_label">共有情况</label>
+                <input type="text" id="_op0_put_input">
+            </p>
+            <p>
+                <label for="position_op0_put_label">坐落</label>
+                <input type="text" id="_op0_put_input">
+            </p>
+            <p>
+                <label for="unitNum_op0_put_label">不动产单元号</label>
+                <input type="text" id="_op0_put_input">
+            </p>
+            <p>
+                <label for="rightType_op0_put_label">权利类型</label>
+                <input type="text" id="_op0_put_input">
+            </p>
+            <p>
+                <label for="rigthNature_op0_put_label">权利性质</label>
+                <input type="text" id="_op0_put_input">
+            </p>
+            <p>
+                <label for="usage_op0_put_label">用途</label>
+                <input type="text" id="_op0_put_input">
+            </p>
+            <p>
+                <label for="area_op0_put_label">面积</label>
+                <input type="text" id="_op0_put_input">
+            </p>
+            <p>
+                <label for="deadline_op0_put_label">使用期限</label>
+                <input type="text" id="_op0_put_input">
+            </p>
+            <p>
+                <label for="other_op0_put_label">权利其他状况</label>
+                <input type="text" id="_op0_put_input">
+            </p>
+            <p>
+                <label for="attachment_op0_put_label">附记</label>
+                <input type="text" id="_op0_put_input">
+            </p>
+
+            <p>
+                <label for="Prvkey_put_label">签名密钥:</label>
+                <input type="file" id="File_op1_put_input">
+            </p>
+            <p>
+                <button type="button" id="put_btn">提交</button>
+            </p>
+            </fieldset>
+        </form>
+    </div>
+
+    <hr>
+
+    <div id="result_div">
+        <p style="text-align: center">
+            <label for="txID_label">交易ID:</label>
+            <textarea id="txID_input"  rows="3" cols="50" readonly="readonly" style="vertical-align: top;">交易ID </textarea>
+        </p>
+    </div>
+</body>
+</html>

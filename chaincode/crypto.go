@@ -9,7 +9,7 @@ import(
     // "crypto/ecdsa"
 )
 
-//TODO verify record signature
+//TODO verify record signature, now this function is in node SDK API
 func verify(json string, signature string, pubkeyPem string) bool {
     // hash := hash(json)
 

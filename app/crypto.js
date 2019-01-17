@@ -16,7 +16,7 @@ var rsu = require('jsrsasign-util');
 var algName = "SHA256withECDSA";
 
 // TODO: certCheck(cert, username, orgname)
-function certCheck(cert, username, orgName) {
+function certCheck(cert) {
     return true;
 }
 

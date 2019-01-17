@@ -1,5 +1,4 @@
 // enroll
-//
 
 // var RESTURL = "http://148.70.109.243:4000";
 // var FileURL = "http://148.70.109.243:8080";
@@ -14,6 +13,13 @@ $(document).ready(function(){
     $("#useraddress_input").val(getCookie("address"));
     $("#BuyerAddr_query_addr_input").val(getCookie("address"));
     $("#BuyerAddr_query_hash_addr_input").val(getCookie("address"));
+
+    $("#header").html("<ul> \
+        <li><a href=\"\"><b> >>== 区块链系统DEMO ==<< </b></a></li> \
+        <li><a href=\"put.html\" id=\"tx_bar\">写入</a></li> \
+        <li><a href=\"get.html\" id=\"query_addr_bar\">查询</a></li> \
+        <li><a href=\"userCenter.html\" id=\"query_addr_hash_bar\">个人信息</a></li> \
+        </ul>"); 
 
     $("#enroll_btn").click(function(){
         $.ajax({
@@ -144,9 +150,45 @@ $(document).ready(function(){
         }
     })
 
-    // tx
-    $("#tx_btn").click(function(){
-        var objFiles = document.getElementById("File_tx_input");
+    $("#put_select").change(function(){
+        switch ($("#put_select").val()) {
+            case "estate":
+                $("#content_put_div").html(" \
+                    <p> \
+                        <label for=\"BuyerAddr_op1_put_label\">发送方地址:</label> \
+                        <input type=\"text\" id=\"BuyerAddr_op1_put_input\"> \
+                    </p> \
+                    <p> \
+                        <label for=\"SellerAddr_op1_put_label\">接收方地址:</label> \
+                        <input type=\"text\" id=\"SellerAddr_op1_put_input\" value=\"1Lyji2Uei5sKo8uxyS1MAdP1e2gNLvhc5p\"> \
+                    </p> \
+                    <p> \
+                        <label for=\"Price_op1_put_label\">价格:</label> \
+                        <input type=\"text\" id=\"Price_op1_put_input\" value=\"10000\"> \
+                    </p> \
+                    <p> \
+                        <label for=\"File_op1_put_label\">数据文件:</label> \
+                        <input type=\"file\" id=\"File_op1_put_input\"> \
+                    </p> \
+                    <p> \
+                        <label for=\"Hash_op1_put_label\">数据哈希:</label> \
+                        <textarea id=\"Hash_op1_put_input\" rows=\"3\" cols=\"38\" readonly=\"readonly\" style=\"vertical-align: top;\"></textarea> \
+                    </p> \
+                ")
+                break;
+            case "transcation":
+                $("#content_put_div").html(" \
+                ")
+                break;
+            default:
+                break;
+        } 
+    })
+    
+    // put 
+    $("#put_btn").click(function(){
+        
+        var objFiles = document.getElementById("File_put_input");
         // 读取文件内容
         var reader = new FileReader();//新建一个FileReader
         reader.readAsText(objFiles.files[0], "UTF-8");//读取文件 
