@@ -16,7 +16,8 @@ var fs = require('fs');
 
 require('./config.js');
 var hfc = require('fabric-client');
-const hbase = require('hbase');
+var hbase = require('./app/hbase.js');
+var hdfs = require('./app/hdfs.js');
 
 var helper = require('./app/helper.js');
 var createChannel = require('./app/create-channel.js');
@@ -31,7 +32,8 @@ var crypto = require('./app/crypto.js');
 
 var port = process.env.PORT || hfc.getConfigSetting('port');
 var host = process.env.HOST || hfc.getConfigSetting('host');
-var hbaseClient = hbase({ host: '127.0.0.1', port: 8080 });
+var hbaseClient = new hbase('127.0.0.1', '8080');
+var hdfsClient = new hdfs('chengyang', 'localhost', '50070');
 
 ///////////////////////////////////////////////////////////////////////////////
 //////////////////////////////// SET CONFIGURATONS ////////////////////////////
