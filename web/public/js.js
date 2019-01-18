@@ -175,6 +175,11 @@ $(document).ready(function(){
                         <label for=\"Hash_op0_put_label\">数据哈希:</label> \
                         <textarea id=\"Hash_op0_put_input\" rows=\"3\" cols=\"38\" readonly=\"readonly\" style=\"vertical-align: top;\"></textarea> \
                     </p> \
+                    <p> \
+                        <label for=\"Stroage_op0_put_label\">存储方式:</label> \
+                        <input type=\"radio\" id=\"hbase_op0_put_label\" name=\"storageType\" value=\"hbase\" style=\"width:20px; height:15px\">HBase \
+                        <input type=\"radio\" id=\"hdfs_op0_put_label\" name=\"storageType\" value=\"hdfs\" style=\"width:20px; height:15px\">HDFS \
+                    </p> \
                 ")
                 break;
             case "estate":
@@ -234,7 +239,7 @@ $(document).ready(function(){
         } 
     })
     
-    // TODO: put data into HBase and HDFS
+    // TODO: 1. put data into HBase and HDFS. 2. parent txID
     $("#put_btn").click(function(){
         var objFiles = document.getElementById("File_put_input");
         // 读取文件内容
@@ -242,6 +247,7 @@ $(document).ready(function(){
         reader.readAsText(objFiles.files[0], "UTF-8");//读取文件 
         reader.onload = function(evt){ //读取完文件之后会回来这里
             var fileString = evt.target.result; // 读取文件内容
+        var args = '{"addrsend:"' + $("#AddrSend_op0_put_input").val() + '",addrrec:"' + $("#AddrRec_op0_put_input").val() + '",price:"' + $("#Price_op0_put_input").val()+ '",hash:"' + $("#Hash_op0_put_input").val() + '}';
         
             $.ajax({
                 type:'post',
@@ -249,9 +255,8 @@ $(document).ready(function(){
                 url: RESTURL + '/atlchannel/atlchain/putRecord',
                 data:JSON.stringify({
                     'peers': ['peer0.orga.atlchain.com'],
-                    'args':[$("#BuyerAddr_tx_input").val(), $("#SellerAddr_tx_input").val(), $("#Price_tx_input").val(), "20181123150000",$("#Hash_tx_input").val()],
+                    'args':[args],
                     'hash':$("#Hash_tx_input").val(),
-                    'data':fileString
                     // TODO: 在交易内容上附上签名和公钥
                     // ,'signature':signature
                     // ,'Cert':file1

@@ -203,6 +203,23 @@ app.get('/channels/:channelName/chaincodes/:chaincodeName/fcn/:fcn', async funct
 	args = args.replace(/'/g, '"');
 	args = JSON.parse(args);
 
+    switch storageType {
+        case "hbase":
+            hbaseClient
+                .table('atlchain')
+                .scan({
+                  startRow: hash,
+                  endRow: hash,
+                  maxVersions: 1
+                }, (err, rows) => {
+                    res.send(rows);
+                })
+            break;
+        case "hdfs":
+            break;
+        default:
+            break;
+    }
 
 	let message = await query.queryChaincode(peer, channelName, chaincodeName, args, fcn, req.username, req.orgname);
 	res.send(message);
@@ -218,6 +235,7 @@ app.post('/channels/:channelName/chaincodes/:chaincodeName', async function(req,
 	var args = req.body.args;
     var cert = req.body.cert;
     var signature = req.body.signature;
+    var storageType = req.body.storageType;
     var username = req.username;
     var orgname = req.orgname;
 
@@ -234,28 +252,30 @@ app.post('/channels/:channelName/chaincodes/:chaincodeName', async function(req,
 		return;
     }
 
-    
-    // //TODO: parse JSON string to get data and hash for hbase storage
+    // TODO: parse JSON string to get data and hash for hbase storage
+    switch storageType {
+        case "onchain":
+            break;
+        case "hbase" :
+            var data = jsonObj.data;
+            var hash = jsonObj.hash;
 
-    // if(jsonObj.hbaseHash) {
-    //     var data = jsonObj.data;
-    //     var hash = jsonObj.hbaseHash;
-
-	//     // Put data into HBase
-	//     // statement about create database:
-	//     // 1. create 'atlchain', 'data'
-	//     // 2. put 'atlchain', 'hash1', 'data:data', "json string value"
-	//     hbaseClient
-    //         .table('atlchain')
-	//     	.row(hash)
-	//     	.put('data:data', data, (error, success) => {
-	//     		console.log("hbaseClient put: ", success);
-	//     	  })
-    // }
-
-    // if (jsonObj.hdfsPath) {
-    //     // TODO: put data into HDFS
-    // }
+	        // Put data into HBase
+	        // statement about create database:
+	        // 1. create 'atlchain', 'data'
+	        // 2. put 'atlchain', 'hash1', 'data:data', "json string value"
+	        hbaseClient
+                .table('atlchain')
+	        	.row(hash)
+	        	.put('data:data', data, (error, success) => {
+	        		console.log("hbaseClient put: ", success);
+	        	  })
+            break;
+        case "hdfs" :
+            break;
+        default:
+            break;
+    }
     
 	// invoke
 	let message = await invoke.invokeChaincode(peers, channel, chanicode, fcn, args, username, orgname);
