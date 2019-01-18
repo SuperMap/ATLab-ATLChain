@@ -33,7 +33,7 @@ $ peer chaincode upgrade -o 127.0.0.1:7050 -C atlchannel -n atlchain -v 0.2 -c '
 $ peer chaincode invoke -o 127.0.0.1:7050 -C atlchannel -n atlchain -c '{"Args":["putRecord", "addB", "addA", "100", "20181107", "hashcode"]}'
 
 // atlchainCC-v0.3 
-$ peer chaincode invoke -o 127.0.0.1:7050 -C atlchannel -n atlchainCC -c '{"Args":["Put","addrA" , "{\"AddrReceive\":\"addrA\", \"AddrSend\":\"addrB\"}"]}' 
+$ peer chaincode invoke -o 127.0.0.1:7050 -C atlchannel -n atlchainCC -c '{"Args":["Put", "{\"AddrReceive\":\"addrABC\", \"AddrSend\":\"addrB\"}", "signagure", "pubKey"]}'
 ```
 
 7. 根据买方地址查询交易记录
@@ -42,7 +42,7 @@ $ peer chaincode invoke -o 127.0.0.1:7050 -C atlchannel -n atlchainCC -c '{"Args
 $ peer chaincode query -C atlchannel -n atlchain -c '{"Args":["getRecordByBuyerAddr","addB"]}'
 
 // atlchainCC-v0.3 
-$ peer chaincode query -C atlchannel -n atlchainCC -c '{"Args":["Query", "{\"AddrSend\":\"addrB\", \"AddrReceive\":\"addrA\"}"]}'
+$ peer chaincode query -C atlchannel -n atlchainCC -c '{"Args":["Get", "{\"AddrSend\":\"addrB\", \"AddrReceive\":\"addrABC\"}"]}'
 ```
 
 8. 根据买方地址查询历史交易记录

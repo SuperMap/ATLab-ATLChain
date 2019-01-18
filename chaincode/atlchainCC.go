@@ -5,6 +5,8 @@ import (
     "strconv"
     // "encoding/json"
     "fmt"
+    "strings"
+    "crypto/sha256"
 
     "github.com/hyperledger/fabric/core/chaincode/shim"
     pb "github.com/hyperledger/fabric/protos/peer"
@@ -21,7 +23,7 @@ func (a *AtlchainCC) Init(stub shim.ChaincodeStubInterface) pb.Response {
 // args: 0-{jsonStr},1-{signatureStr},2-{pubkeyPemStr}
 // eg:"{"AddrReceive":"addrA", "AddrSend":"addrB"}"
 func (a *AtlchainCC) Put(stub shim.ChaincodeStubInterface, args []string) pb.Response {
-    argsNeed := 2
+    argsNeed := 3
     argsLength := len(args)
 	if argsLength != argsNeed {
 		return shim.Error("Incorrect number of arguments. Expecting " + strconv.Itoa(argsNeed) + ", given " + strconv.Itoa(argsLength))
@@ -112,6 +114,28 @@ func constructQueryResponseFromIterator(resultsIterator shim.StateQueryIteratorI
 	}
 	buffer.WriteString("]")
 	return &buffer, nil
+}
+
+//TODO verify record signature, now this function is in node SDK API
+func verify(json string, signature string, pubkeyPem string) bool {
+    // hash := hash(json)
+
+    return true
+}
+
+func hash(str string) string {
+    hash := sha256.Sum256([]byte(str))
+    return string(hash[:])
+}
+
+func getPutKeyFromJsonStr(jsonString string) string {
+
+    _str := strings.Replace(jsonString, "\"", " ", -1)
+    _str2 := strings.Split(_str, " ")
+
+    key := _str2[3]
+
+    return key
 }
 
 func (a *AtlchainCC) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
