@@ -37,7 +37,7 @@
 #############################################################################
 
 # Version of config file
-version: 1.4.0-snapshot-b191f9c
+version: 1.4.0
 
 # Server's listening port (default: 7054)
 port: 7054
@@ -80,11 +80,11 @@ tls:
 #############################################################################
 ca:
   # Name of this CA
-  name:
+  name: ca-orga
   # Key file (is only used to import a private key into BCCSP)
-  keyfile:
+  keyfile: ./msp/keystore/bce161b0a693f1ffb62ea679253bfc35c9fc489d772122d936f06b7b0153a5fd_sk
   # Certificate file (default: ca-cert.pem)
-  certfile:
+  certfile: ./ca.orga.atlchain.com-cert.pem
   # Chain file
   chainfile:
 
@@ -237,7 +237,7 @@ ldap:
 # which are always stored in lower case.
 #############################################################################
 affiliations:
-   org1:
+   OrgA:
       - department1
       - department2
    org2:
@@ -301,19 +301,19 @@ signing:
 #     CA certificates though it can still issue end entity certificates.
 ###########################################################################
 csr:
-   cn: orga-fabric-ca-server
+   cn: fabric-ca-server
    keyrequest:
      algo: ecdsa
      size: 256
    names:
-      - C: CN
-        ST: Sichuan
+      - C: US
+        ST: "North Carolina"
         L:
-        O: SuperMap
-        OU: ATL
+        O: Hyperledger
+        OU: Fabric
    hosts:
-     - supermap.com
      - cyPC
+     - localhost
    ca:
       expiry: 131400h
       pathlength: 1

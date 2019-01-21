@@ -49,37 +49,37 @@ app.use(bodyParser.urlencoded({
 // set secret variable
 app.set('secret', 'thisismysecret');
 app.use(expressJWT({
-	secret: 'thisismysecret'
+ secret: 'thisismysecret'
 }).unless({
-	path: ['/users', '/login']
+	path: ['/login']
 }));
 app.use(bearerToken());
-// app.use(function(req, res, next) {
-// 	logger.debug(' ------>>>>>> new request for %s',req.originalUrl);
-// 	if (req.originalUrl.indexOf('/users') >= 0) {
-// 		return next();
-// 	}
-// 
-// 	var token = req.token;
-// 	jwt.verify(token, app.get('secret'), function(err, decoded) {
-// 		if (err) {
-// 			res.send({
-// 				success: false,
-// 				message: 'Failed to authenticate token. Make sure to include the ' +
-// 					'token returned from /users call in the authorization header ' +
-// 					' as a Bearer token'
-// 			});
-// 			return;
-// 		} else {
-// 			// add the decoded user name and org name to the request object
-// 			// for the downstream code to use
-// 			req.username = decoded.username;
-// 			req.orgname = decoded.orgName;
-// 			logger.debug(util.format('Decoded from JWT token: username - %s, orgname - %s', decoded.username, decoded.orgName));
-// 			return next();
-// 		}
-// 	});
-// });
+app.use(function(req, res, next) {
+	logger.debug(' ------>>>>>> new request for %s',req.originalUrl);
+	if (req.originalUrl.indexOf('/login') >= 0) {
+		return next();
+	}
+
+	var token = req.token;
+	jwt.verify(token, app.get('secret'), function(err, decoded) {
+		if (err) {
+			res.send({
+				success: false,
+				message: 'Failed to authenticate token. Make sure to include the ' +
+					'token returned from /users call in the authorization header ' +
+					' as a Bearer token'
+			});
+			return;
+		} else {
+			// add the decoded user name and org name to the request object
+			// for the downstream code to use
+			req.username = decoded.username;
+			req.orgname = decoded.orgName;
+			logger.debug(util.format('Decoded from JWT token: username - %s, orgname - %s', decoded.username, decoded.orgName));
+			return next();
+		}
+	});
+});
 
 ///////////////////////////////////////////////////////////////////////////////
 //////////////////////////////// START SERVER /////////////////////////////////
@@ -104,36 +104,37 @@ function getErrorMessage(field) {
 ////////////////////////////////////////// APIs about user //////////////////////////////////////////
 // Login
 app.post('/login', async function(req, res) {
-	// var username = req.body.username;
-	// var orgName = req.body.orgname;
+	var username = req.body.username;
+	var orgName = req.body.orgname;
 	var cert = req.body.cert;
 	var signature = req.body.signature;
 
     console.log("==========lognin========");
 
 	// Check the cert
-    // if(!crypto.certCheck(cert, username, orgname)) {
-	// 	res.json({success: false, message: "Invalid Certificate"});
-	// }
-
-    // Verify the signature of the cert
-	if(!crypto.signatureVerify(cert, cert, signature)) {
-		res.json({success: false, message: "Invalid Signature"});
+    if(!crypto.certCheck(cert)) {
+		res.json({success: false, message: "Invalid Certificate"});
+        return;
 	}
-    console.log(crypto.signatureVerify(cert, cert, signature));
+
+    // Verify the signature by cert
+	if(!crypto.signatureVerify(cert, cert, signature)) {
+	 	res.json({success: false, message: "Invalid Signature"});
+        return;
+	}
 
     // Generate JWT
-    // var token = jwt.sign({
-	// 	exp: Math.floor(Date.now() / 1000) + parseInt(hfc.getConfigSetting('jwt_expiretime')),
-	// 	username: username,
-	// 	orgName: orgName
-	// }, app.get('secret'));
+    var token = jwt.sign({
+		exp: Math.floor(Date.now() / 1000) + parseInt(hfc.getConfigSetting('jwt_expiretime')),
+		username: username,
+		orgName: orgName
+	}, app.get('secret'));
 
-    // var response = {
-    //     token: token,
-    //     message: "login sucessfully",
-    // }
-    res.json({success: true, message: "response"});
+    var response = {
+        token: token,
+        message: "login sucessfully",
+    }
+    res.json({success: true, message: response});
 })
 
 // Register and enroll user
@@ -178,13 +179,16 @@ app.post('/users', async function(req, res) {
 
 ////////////////////////////////////////// APIs about operate chaincode //////////////////////////////////////////
 // Query on chaincode on target peers
-app.get('/channels/:channelName/chaincodes/:chaincodeName/fcn/:fcn', async function(req, res) {
+app.get('/channels/:channelName/chaincodes/:chaincodeName', async function(req, res) {
 	logger.debug('==================== QUERY BY CHAINCODE ==================');
 	var channelName = req.params.channelName;
 	var chaincodeName = req.params.chaincodeName;
-	var fcn = req.params.fcn;
-	let args = req.query.args;
-	let peer = req.query.peer;
+	var fcn = req.body.fcn;
+	let args = req.body.args;
+	let peers = req.body.peers;
+    let storageType = req.body.storageType;
+    let username = req.body.username;
+    let orgname = req.body.orgname;
 
 	if (!chaincodeName) {
 		res.json(getErrorMessage('\'chaincodeName\''));
@@ -205,7 +209,9 @@ app.get('/channels/:channelName/chaincodes/:chaincodeName/fcn/:fcn', async funct
 	args = args.replace(/'/g, '"');
 	args = JSON.parse(args);
 
-    switch storageType {
+    switch(storageType) {
+        case "onchain":
+            break;
         case "hbase":
             hbaseClient
                 .table('atlchain')
@@ -223,7 +229,7 @@ app.get('/channels/:channelName/chaincodes/:chaincodeName/fcn/:fcn', async funct
             break;
     }
 
-	let message = await query.queryChaincode(peer, channelName, chaincodeName, args, fcn, req.username, req.orgname);
+	let message = await query.queryChaincode(peer, channelName, chaincodeName, args, fcn, username, orgname);
 	res.send(message);
 });
 
@@ -231,31 +237,30 @@ app.get('/channels/:channelName/chaincodes/:chaincodeName/fcn/:fcn', async funct
 app.post('/channels/:channelName/chaincodes/:chaincodeName', async function(req, res) {
 	logger.debug('==================== INVOKE ON CHAINCODE ==================');
 	var peers = req.body.peers;
-    var channel = req.body.channel;     // atlchannel
-    var chaincode = req.body.chaincode; // atlchain
+    var channel = req.params.channelName;     // atlchannel
+    var chaincode = req.params.chaincodeName; // atlchain
     var fcn = req.body.fcn; // Put
 	var args = req.body.args;
     var cert = req.body.cert;
     var signature = req.body.signature;
     var storageType = req.body.storageType;
-    var username = req.username;
-    var orgname = req.orgname;
+    var username = req.body.username;
+    var orgname = req.body.orgname;
 
 	if (!args) {
 		res.json(getErrorMessage('\'args\''));
 		return;
 	}
    
-    var jsonObj =JSON.parse(str);
     
     // TODO: 验证参数中的证书和签名，通过后再执行交易
-    if (crypto.certCheck(cert) && crypto.signatureVerify(cert, args, signature)){
+    if (!crypto.certCheck(cert) || !crypto.signatureVerify(cert, args, signature)){
 		res.json(getErrorMessage('\'signature\''));
 		return;
     }
 
     // TODO: parse JSON string to get data and hash for hbase storage
-    switch storageType {
+    switch(storageType) {
         case "onchain":
             break;
         case "hbase" :
@@ -280,7 +285,8 @@ app.post('/channels/:channelName/chaincodes/:chaincodeName', async function(req,
     }
     
 	// invoke
-	let message = await invoke.invokeChaincode(peers, channel, chanicode, fcn, args, username, orgname);
+    console.log(storageType);
+	let message = await invoke.invokeChaincode(peers, channel, chaincode, fcn, args, username, orgname);
 	res.send(message);
 });
 

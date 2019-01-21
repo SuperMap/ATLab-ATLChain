@@ -7,10 +7,30 @@ ATLChain
 ## Sample REST APIs Requests
 
 ### Login Request
+* login by username, orgname and cert *
+```
+curl -s -X POST http://localhost:4000/login \
+-H "content-type: application/json" \
+-d '{
+  "username":"Jim",
+  "orgname":"OrgA",
+  "cert":"-----BEGIN CERTIFICATE-----\nMIICXDCCAgKgAwIBAgIUJbmJPWgMfwhga0JCaifHyHsAhoMwCgYIKoZIzj0EAwIw\ndTELMAkGA1UEBhMCVVMxEzARBgNVBAgTCkNhbGlmb3JuaWExFjAUBgNVBAcTDVNh\nbiBGcmFuY2lzY28xGjAYBgNVBAoTEW9yZ2EuYXRsY2hhaW4uY29tMR0wGwYDVQQD\nExRjYS5vcmdhLmF0bGNoYWluLmNvbTAeFw0xODExMjkwMjMwMDBaFw0xOTExMjkw\nMjM1MDBaMB8xDzANBgNVBAsTBmNsaWVudDEMMAoGA1UEAxMDSmltMFkwEwYHKoZI\nzj0CAQYIKoZIzj0DAQcDQgAErvN7eXvvyReFtT1172ElhrrE5/qCUU+czcxKjMQC\nCvLBommXlHeC1Nlp5FtzZvTx5VxDV8lWcUjQTTjm6VFKTaOBxTCBwjAOBgNVHQ8B\nAf8EBAMCB4AwDAYDVR0TAQH/BAIwADAdBgNVHQ4EFgQU7xDaa5+txo2Z3l0tJnEs\nT2ME5+4wKwYDVR0jBCQwIoAgvA1FMa9xMa1quD3Puakv47jkPAOVf1An01r0WdQo\nTmowVgYIKgMEBQYHCAEESnsiYXR0cnMiOnsiaGYuQWZmaWxpYXRpb24iOiIiLCJo\nZi5FbnJvbGxtZW50SUQiOiJKaW0iLCJoZi5UeXBlIjoiY2xpZW50In19MAoGCCqG\nSM49BAMCA0gAMEUCIQC4VPFMNOOARPIuMft4bOtPUmJvhvukEocN5SAzDFc2JwIg\nEnhmK1UFWgxyk36XL9WqGf5zhCw5qbsG+CWT8p2t+Jk=\n-----END CERTIFICATE-----\n",
+  "signature":"3045022100d4e473822634da78affc8567a57ce5cd6dead90997e05e9a4ebe1582d034b72b02206cb7cda0aa7573b3c417ef9ae203ac6d4760a70fe06593f8dc34eb2dd72bbfa0"
+}'
+```
 
+### Register Request
 * Register and enroll new users in Organization - **OrgA**:
 
-`curl -s -X POST http://localhost:4000/users -H "content-type: application/x-www-form-urlencoded" -d 'username=Jim&orgName=OrgA'`
+```
+curl -s -X POST http://localhost:4000/users \
+-H "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1NDgwOTcxNjYsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Ik9yZ0EiLCJpYXQiOjE1NDgwNjExNjZ9.Msa1s3fRzKSshWA8l0O62gQ1pkSB2StU-bRL-8jomAk" \
+-H "content-type: application/json" \
+-d '{
+  "username":"Jim",
+  "orgName":"OrgA"
+}'
+```
 
 **OUTPUT:**
 
@@ -139,13 +159,46 @@ curl -s -X POST \
 	"fcn":"move",
 	"args":["a","b","10"]
 }'
+
+curl -s -X POST \
+  http://localhost:4000/channels/atlchannel/chaincodes/atlchainCC \
+  -H "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1NDgwOTcxNjYsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Ik9yZ0EiLCJpYXQiOjE1NDgwNjExNjZ9.Msa1s3fRzKSshWA8l0O62gQ1pkSB2StU-bRL-8jomAk" \
+  -H "content-type: application/json" \
+  -d '{
+	"peers": ["127.0.0.1"],
+	"fcn":"Put",
+	"args":["{\"AddrReceive\":\"addrAAA\", \"AddrSend\":\"addrBBB\"}", "signagureAAA", "pubKeyAAA"],
+  "cert":"certfile",
+  "signature":"sign",
+  "storageType":"onchain",
+  "username":"Jim",
+  "orgname":"OrgA"
+}'
+
+curl -s -X POST http://localhost:4000/users \
+-H "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1NDgwOTcxNjYsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Ik9yZ0EiLCJpYXQiOjE1NDgwNjExNjZ9.Msa1s3fRzKSshWA8l0O62gQ1pkSB2StU-bRL-8jomAk" \
+-H "content-type: application/json" \
+-d '{
+  "username":"Jim",
+  "orgName":"OrgA"
+}'
 ```
 **NOTE:** Ensure that you save the Transaction ID from the response in order to pass this string in the subsequent query transactions.
 
 ### Chaincode Query
 
 ```
-curl -s -X POST http://localhost:4000/atlchannel/atlchain/putRecord -H "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1NDMyNjcyODgsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Ik9yZ0EiLCJpYXQiOjE1NDMyMzEyODh9.uBolTI5I66xEn43IFZ06O6QdaqIGn1wnCT65vQG-6yU" -H "content-type: application/json" -d '{"peers":["peer0.orga.atlchain.com"], "args":["addE","addA","44", "20181122", "0a3fcd18a3d28960fa13fbe3ef1f5dcab885f51f"] }'
+curl -s -X POST http://localhost:4000/channels/atlchannel/chaincodes/atlchainCC \
+-H "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1NDgwOTcxNjYsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Ik9yZ0EiLCJpYXQiOjE1NDgwNjExNjZ9.Msa1s3fRzKSshWA8l0O62gQ1pkSB2StU-bRL-8jomAk" \
+-H "content-type: application/json" \
+-d '{
+  "fcn":"Get",
+  "peers":["127.0.0.1"], 
+  "args":["Get", "{\"AddrSend\":\"addrB\", \"AddrReceive\":\"addrA\"}"],
+  "storageType":"onchain",
+  "username":"Jim",
+  "orgname":"OrgA"
+}'
 
 curl -s -X GET "http://localhost:4000/atlchannel/atlchain/getHistoryByAddr?peer=peer0.orga.atlchain.com&args=%5B%22addE%22%5D" -H "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1NDMzMjYyNDksInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Ik9yZ0EiLCJpYXQiOjE1NDMyOTAyNDl9.-MfuurrLCVN7ET2pXDL0kA39YScyLMlHH9DvHMkJDMw" -H "content-type: application/json"
 

@@ -98,7 +98,7 @@ channels:
 #
 organizations:
   OrgA:
-    mspid: OrgA
+    mspid: TestOrgA
 
     peers:
       - peer0.orga.atlchain.com
@@ -120,7 +120,7 @@ organizations:
     # this way. The SDK should allow applications to set the org admin identity via APIs, and only use
     # this route as an alternative when it exists.
     adminPrivateKey:
-      path: ./config/crypto-config/peerOrganizations/orga.atlchain.com/users/Admin@orga.atlchain.com/msp/keystore/5b28170ee427c7158fe48abe35880478adf45faba5d9576cef959849c6510cdb_sk
+      path: ./config/crypto-config/peerOrganizations/orga.atlchain.com/users/Admin@orga.atlchain.com/msp/keystore/4a223c12d0883a72ccfccb3b0a06c7c525e535c99a6a663ca43e31136cea1ef7_sk
     signedCert:
       path: ./config/crypto-config/peerOrganizations/orga.atlchain.com/users/Admin@orga.atlchain.com/msp/signcerts/Admin@orga.atlchain.com-cert.pem
 
@@ -137,7 +137,7 @@ organizations:
     certificateAuthorities:
       - ca-orgb
     adminPrivateKey:
-      path: ./config/crypto-config/peerOrganizations/orgb.atlchain.com/users/Admin@orgb.atlchain.com/msp/keystore/fd394bc8ffdfafc41f69c4df36d237faf7321b14dd6bfb5b48787c7b37d7fe02_sk
+      path: ./config/crypto-config/peerOrganizations/orgb.atlchain.com/users/Admin@orgb.atlchain.com/msp/keystore/83a6e73c3b6cae1c362f494f5c2a7ff0689e37e6d81528985235d2660d342ee7_sk
     signedCert:
       path: ./config/crypto-config/peerOrganizations/orgb.atlchain.com/users/Admin@orgb.atlchain.com/msp/signcerts/Admin@orgb.atlchain.com-cert.pem
 
@@ -156,7 +156,7 @@ orderers:
       ssl-target-name-override: orderer.atlchain.com
 
     tlsCACerts:
-      path: ./config/crypto-config/ordererOrganizations/atlchain.com/orderers/orderer.atlchain.com/tls/ca.crt
+      path: 
 
 #
 # List of peers to send various requests to, including endorsement, query
@@ -170,21 +170,21 @@ peers:
     grpcOptions:
       ssl-target-name-override: peer0.orga.atlchain.com
     tlsCACerts:
-      path: ./config/crypto-config/peerOrganizations/orga.atlchain.com/peers/peer0.orga.atlchain.com/tls/ca.crt
+      path: 
 
   peer1.orga.atlchain.com:
     url: grpcs://localhost:7056
     grpcOptions:
       ssl-target-name-override: peer1.orga.atlchain.com
     tlsCACerts:
-      path: ./config/crypto-config/peerOrganizations/orga.atlchain.com/peers/peer1.orga.atlchain.com/tls/ca.crt
+      path: 
 
   peer0.orgb.atlchain.com:
     url: grpcs://localhost:8051
     grpcOptions:
       ssl-target-name-override: peer0.orgb.atlchain.com
     tlsCACerts:
-      path: ./config/crypto-config/peerOrganizations/orgb.atlchain.com/peers/peer0.orgb.atlchain.com/tls/ca.crt
+      path: 
 
   peer1.orgb.atlchain.com:
     url: grpcs://localhost:8056
@@ -192,7 +192,7 @@ peers:
     grpcOptions:
       ssl-target-name-override: peer1.orgb.atlchain.com
     tlsCACerts:
-      path: ./config/crypto-config/peerOrganizations/orgb.atlchain.com/peers/peer1.orgb.atlchain.com/tls/ca.crt
+      path: 
 
 #
 # Fabric-CA is a special kind of Certificate Authority provided by Hyperledger Fabric which allows
@@ -207,7 +207,7 @@ certificateAuthorities:
     httpOptions:
       verify: false
     tlsCACerts:
-      path: ./config/crypto-config/peerOrganizations/orga.atlchain.com/ca/ca.orga.atlchain.com-cert.pem
+      path: 
 
     # Fabric-CA supports dynamic user enrollment via REST APIs. A "root" user, a.k.a registrar, is
     # needed to enroll and invoke new users.
@@ -222,7 +222,7 @@ certificateAuthorities:
     httpOptions:
       verify: false
     tlsCACerts:
-      path: ./config/crypto-config/peerOrganizations/orgb.atlchain.com/ca/ca.orgb.atlchain.com-cert.pem
+      path: 
     registrar:
       - enrollId: admin
         enrollSecret: adminpw

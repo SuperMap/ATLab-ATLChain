@@ -11,7 +11,7 @@ var hbaseClient = require('hbase');
 
 class HBase {
     constructor(host, port) {
-        this.client = hbase({
+        this.client = hbaseClient({
             host: host, 
             port: port 
         })
