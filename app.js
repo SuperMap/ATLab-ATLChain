@@ -221,11 +221,11 @@ app.post('/channels/:channelName/chaincodes/:chaincodeName/get', async function(
 });
 
 // Invoke transaction on chaincode on target peers
-app.post('/channels/:channelName/chaincodes/:chaincodeName/put', async function(req, res) {
+app.post('/channels/:channelName/chaincodes/:chaincodeName/putTx', async function(req, res) {
 	logger.debug('==================== INVOKE ON CHAINCODE ==================');
 	var peers = req.body.peers;
     var channel = req.params.channelName;     // atlchannel
-    var chaincode = req.params.chaincodeName; // atlchain
+    var chaincode = req.params.chaincodeName; // atlchainCC
     var fcn = req.body.fcn; // Put
 	var args = req.body.args;
     var cert = req.body.cert;
@@ -260,6 +260,63 @@ app.post('/channels/:channelName/chaincodes/:chaincodeName/put', async function(
             })
             break;
         case "hdfs" :
+            hdfsClient.put("/tmp/" + signature, hdfsDir + signature, function(){
+                logger.info("Put into HDFS finish");
+            });
+            break;
+        default:
+            break;
+    }
+    
+	// invoke
+    console.log(storageType);
+	let message = await invoke.invokeChaincode(peers, channel, chaincode, fcn, args, username, orgname);
+	res.send(message);
+});
+
+app.post('/channels/:channelName/chaincodes/:chaincodeName/putEstate', async function(req, res) {
+	logger.debug('==================== INVOKE ON CHAINCODE ==================');
+	var peers = req.body.peers;
+    var channel = req.params.channelName;     // atlchannel
+    var chaincode = req.params.chaincodeName; // atlchainCC
+    var fcn = req.body.fcn; // Put
+	var args = req.body.args; //TODO: 包含图片Hash
+    var image = req.body.image; //TODO:二进制方式传输
+    var cert = req.body.cert;
+    var signature = req.body.signature;
+    var storageType = req.body.storageType;
+    var username = req.body.username;
+    var orgname = req.body.orgname;
+
+	if (!args) {
+		res.json(getErrorMessage('\'args\''));
+		return;
+	}
+
+    var argStr = JSON.stringify(args);
+
+    //TODO:图片base64编码
+   
+    // TODO: 验证参数中的证书和签名，通过后再执行交易
+    if (!crypto.certCheck(cert) || !crypto.signatureVerify(cert, args, signature)){
+		res.json(getErrorMessage('\'signature\''));
+		return;
+    }
+
+    switch(storageType) {
+        case "onchain":
+            break;
+        case "hbase" :
+	        // Put data into HBase
+	        // statement about create database:
+	        // 1. create 'atlchain', 'data'
+	        // 2. put 'atlchain', 'hash1', 'data:data', "json string value"
+	        hbaseClient.put(hbaseTable, signature, hbaseCF, argStr, function(){
+                logger.info("Put into hbase finish");
+            })
+            break;
+        case "hdfs" :
+            // TODO: 现将图片存至 /tmp ，再保存到HDFS
             hdfsClient.put("/tmp/" + signature, hdfsDir + signature, function(){
                 logger.info("Put into HDFS finish");
             });
