@@ -38,7 +38,7 @@ class HBase {
             .table(tableName)
             .row(rowName)
             .get(columnFamilyName, (error, value) => {
-                console.info(value)
+                callback(error, value);
             });
     }
 
@@ -46,9 +46,7 @@ class HBase {
         this.client
             .table(tableName)
             .row(rowName)
-            .put(listColumnFamilyName, listValue, (error, value) => {
-                assert.strictEqual(true, success)
-            });
+            .put(listColumnFamilyName, listValue, callback);
     }
 }
 

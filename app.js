@@ -32,8 +32,11 @@ var crypto = require('./app/crypto.js');
 
 var port = process.env.PORT || hfc.getConfigSetting('port');
 var host = process.env.HOST || hfc.getConfigSetting('host');
-var hbaseClient = new hbase('127.0.0.1', '8080');
+var hbaseClient = new hbase('148.70.109.243', '8080');
+var hbaseTable = 'atlchain';
+var hbaseCF = 'data:data';
 var hdfsClient = new hdfs('chengyang', 'localhost', '50070');
+var hdfsDir = '/atlchain/';
 
 ///////////////////////////////////////////////////////////////////////////////
 //////////////////////////////// SET CONFIGURATONS ////////////////////////////
@@ -179,13 +182,13 @@ app.post('/users', async function(req, res) {
 
 ////////////////////////////////////////// APIs about operate chaincode //////////////////////////////////////////
 // Query on chaincode on target peers
-app.get('/channels/:channelName/chaincodes/:chaincodeName', async function(req, res) {
+app.post('/channels/:channelName/chaincodes/:chaincodeName/get', async function(req, res) {
 	logger.debug('==================== QUERY BY CHAINCODE ==================');
 	var channelName = req.params.channelName;
 	var chaincodeName = req.params.chaincodeName;
 	var fcn = req.body.fcn;
 	let args = req.body.args;
-	let peers = req.body.peers;
+	let peer = req.body.peer;
     let storageType = req.body.storageType;
     let username = req.body.username;
     let orgname = req.body.orgname;
@@ -206,35 +209,13 @@ app.get('/channels/:channelName/chaincodes/:chaincodeName', async function(req, 
 		res.json(getErrorMessage('\'args\''));
 		return;
 	}
-	args = args.replace(/'/g, '"');
-	args = JSON.parse(args);
 
-    switch(storageType) {
-        case "onchain":
-            break;
-        case "hbase":
-            hbaseClient
-                .table('atlchain')
-                .scan({
-                  startRow: hash,
-                  endRow: hash,
-                  maxVersions: 1
-                }, (err, rows) => {
-                    res.send(rows);
-                })
-            break;
-        case "hdfs":
-            break;
-        default:
-            break;
-    }
-
-	let message = await query.queryChaincode(peer, channelName, chaincodeName, args, fcn, username, orgname);
+	let message = await query.queryChaincode(peers, channelName, chaincodeName, args, fcn, username, orgname);
 	res.send(message);
 });
 
 // Invoke transaction on chaincode on target peers
-app.post('/channels/:channelName/chaincodes/:chaincodeName', async function(req, res) {
+app.post('/channels/:channelName/chaincodes/:chaincodeName/put', async function(req, res) {
 	logger.debug('==================== INVOKE ON CHAINCODE ==================');
 	var peers = req.body.peers;
     var channel = req.params.channelName;     // atlchannel
@@ -251,34 +232,31 @@ app.post('/channels/:channelName/chaincodes/:chaincodeName', async function(req,
 		res.json(getErrorMessage('\'args\''));
 		return;
 	}
+
+    var argStr = JSON.stringify(args);
    
-    
     // TODO: 验证参数中的证书和签名，通过后再执行交易
     if (!crypto.certCheck(cert) || !crypto.signatureVerify(cert, args, signature)){
 		res.json(getErrorMessage('\'signature\''));
 		return;
     }
 
-    // TODO: parse JSON string to get data and hash for hbase storage
     switch(storageType) {
         case "onchain":
             break;
         case "hbase" :
-            var data = jsonObj.data;
-            var hash = jsonObj.hash;
-
 	        // Put data into HBase
 	        // statement about create database:
 	        // 1. create 'atlchain', 'data'
 	        // 2. put 'atlchain', 'hash1', 'data:data', "json string value"
-	        hbaseClient
-                .table('atlchain')
-	        	.row(hash)
-	        	.put('data:data', data, (error, success) => {
-	        		console.log("hbaseClient put: ", success);
-	        	  })
+	        hbaseClient.put(hbaseTable, signature, hbaseCF, argStr, function(){
+                logger.info("Put into hbase finish");
+            })
             break;
         case "hdfs" :
+            hdfsClient.put("/tmp/" + signature, hdfsDir + signature, function(){
+                logger.info("Put into HDFS finish");
+            });
             break;
         default:
             break;
@@ -290,29 +268,34 @@ app.post('/channels/:channelName/chaincodes/:chaincodeName', async function(req,
 	res.send(message);
 });
 
-// TODO: Get data from HDFS
-
-// Get data from HBase by hash
-app.get('/getDataByHash', async function(req, res) {
-	logger.debug('==================== GET HBASE DATA ==================');
-	let hash = req.query.hash;
-
-	logger.debug('hash: ' + hash);
-
-	if (!hash) {
-		res.json(getErrorMessage('\'hash\''));
+// TODO: Get data from remote HDFS, now it is only avaliable for localhost hdfs
+app.get('/getFileFromHDFS', async function(req, res) {
+	logger.debug('==================== GET HDFS DATA ==================');
+    let filename = req.query.filename;
+	if (!filename) {
+		res.json(getErrorMessage('\'getDataFromHDFS\''));
 		return;
 	}
 
-    hbaseClient
-        .table('atlchain')
-        .scan({
-          startRow: hash,
-          endRow: hash,
-          maxVersions: 1
-        }, (err, rows) => {
-            res.send(rows);
-        })
+    hdfsClient.get(hdfsDir + filename, "/tmp/" + filename, function(){
+        res.json(filename);
+        logger.info("Got file from HDFS");
+    });
+});
+
+// Get data from HBase by hash
+app.get('/getDataFromHBase', async function(req, res) {
+	logger.debug('==================== GET HBASE DATA ==================');
+	let hash = req.query.hash;
+	if (!hash) {
+		res.json(getErrorMessage('\'getDataFromHBase\''));
+		return;
+	}
+
+    hbaseClient.get(hbaseTable, hash, hbaseCF, (err, value) => {
+        logger.info("Got file from HBase");
+        res.json(value);
+    })
 });
 
 
