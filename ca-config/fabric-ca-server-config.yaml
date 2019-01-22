@@ -237,7 +237,7 @@ ldap:
 # which are always stored in lower case.
 #############################################################################
 affiliations:
-   OrgA:
+   TestOrgA:
       - department1
       - department2
    org2:

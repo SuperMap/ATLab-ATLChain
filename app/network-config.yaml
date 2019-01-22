@@ -98,7 +98,7 @@ channels:
 #
 organizations:
   OrgA:
-    mspid: TestOrgA
+    mspid: OrgA
 
     peers:
       - peer0.orga.atlchain.com
@@ -173,22 +173,22 @@ peers:
       path: 
 
   peer1.orga.atlchain.com:
-    url: grpcs://localhost:7056
+    url: grpc://localhost:7056
     grpcOptions:
       ssl-target-name-override: peer1.orga.atlchain.com
     tlsCACerts:
       path: 
 
   peer0.orgb.atlchain.com:
-    url: grpcs://localhost:8051
+    url: grpc://localhost:8051
     grpcOptions:
       ssl-target-name-override: peer0.orgb.atlchain.com
     tlsCACerts:
       path: 
 
   peer1.orgb.atlchain.com:
-    url: grpcs://localhost:8056
-    eventUrl: grpcs://localhost:8058
+    url: grpc://localhost:8056
+    eventUrl: grpc://localhost:8058
     grpcOptions:
       ssl-target-name-override: peer1.orgb.atlchain.com
     tlsCACerts:
