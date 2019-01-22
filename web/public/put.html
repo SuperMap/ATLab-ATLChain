@@ -4,6 +4,8 @@
     <script src="jquery-2.1.4.min.js"></script>
     <script src="sha256.js"></script>
     <script src="js.js"></script>
+    <script src="crypto.js"></script>
+    <script src="jsrsasign-all-min.js"></script>
      
     <link rel="stylesheet" href="css.css">
     <meta charset="utf-8">
@@ -50,15 +52,19 @@
                 </p>
                 <p>
                     <label for="Stroage_op0_put_label">存储方式:</label>
+                    <input type="radio" id="onchain_op0_put_label" name="storageType" value="onchain" style="width:20px; height:15px">onchain
                     <input type="radio" id="hbase_op0_put_label" name="storageType" value="hbase" style="width:20px; height:15px">HBase
                     <input type="radio" id="hdfs_op0_put_label" name="storageType" value="hdfs" style="width:20px; height:15px">HDFS
                 </p>
-
             </div>
             
             <p>
                 <label for="Prvkey_put_label">签名密钥:</label>
-                <input type="file" id="File_op0_put_input">
+                <input type="file" id="Prvkey_put_input">
+            </p>
+            <p>
+                <label for="Pubkey_put_label">公钥文件:</label>
+                <input type="file" id="Pubkey_put_input">
             </p>
             <p>
                 <button type="button" id="put_btn">提交</button>
@@ -71,8 +77,8 @@
 
     <div id="result_div">
         <p style="text-align: center">
-            <label for="txID_label">交易ID:</label>
-            <textarea id="txID_input"  rows="3" cols="50" readonly="readonly" style="vertical-align: top;">交易ID </textarea>
+            <label for="txID_put_label">交易ID:</label>
+            <textarea id="txID_put_input"  rows="3" cols="50" readonly="readonly" style="vertical-align: top;">交易ID </textarea>
         </p>
     </div>
 </body>

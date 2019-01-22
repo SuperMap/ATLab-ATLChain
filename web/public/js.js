@@ -1,11 +1,12 @@
 // enroll
 
-// var RESTURL = "http://148.70.109.243:4000";
-// var FileURL = "http://148.70.109.243:8080";
-var RESTURL = "http://127.0.0.1:4000";
-var FileURL = "http://127.0.0.1:8080";
+var RESTURL = "http://148.70.109.243:4000";
+var FileURL = "http://148.70.109.243:8080";
+// var RESTURL = "http://127.0.0.1:4000";
+// var FileURL = "http://127.0.0.1:8080";
 
 $(document).ready(function(){
+
     // 设置预设值
     $("#username_input").val(getCookie("username"));
     $("#orgname_input").val(getCookie("orgname"));
@@ -117,20 +118,14 @@ $(document).ready(function(){
             success:function(data){
                 console.log(data);
                 if(data.success){
-                    alert("login success");
-                    window.location.href="./putRecord.html";
+                    document.cookie = "token=" + data.message.token;
+                    //document.cookie = "address=" + data.address;
+                    document.cookie = "username=" + "user";
+                    document.cookie = "orgname=" + "OrgA";
+                    window.location.href="./put.html";
                 } else {
                     alert("login failed");
                 }
-                //document.cookie = "token=" + data.token;
-                //document.cookie = "address=" + data.address;
-                //document.cookie = "username=" + fileName;
-                //document.cookie = "orgname=" + "OrgA";
-                //if(data.address == undefined){
-                //    alert("证书有误");
-                //} else {
-                //    window.location.href="./putRecord.html";
-                //}
             },
             error:function(err){
                 console.log(err)
@@ -138,15 +133,14 @@ $(document).ready(function(){
         });
     })
 
-    $("#File_tx_input").change(function(){
-        console.log("button click");
-        var objFiles = document.getElementById("File_tx_input");
+    $("#File_op0_put_input").change(function(){
+        var objFiles = document.getElementById("File_op0_put_input");
         // 读取文件内容
         var reader = new FileReader();//新建一个FileReader
         reader.readAsText(objFiles.files[0], "UTF-8");//读取文件 
         reader.onload = function(evt){ //读取完文件之后会回来这里
             var fileString = evt.target.result; // 读取文件内容
-            $("#Hash_tx_input").val(hex_sha256(fileString)); // 计算hash
+            $("#Hash_op0_put_input").val(hex_sha256(fileString)); // 计算hash
         }
     })
     
@@ -241,39 +235,52 @@ $(document).ready(function(){
     
     // TODO: 1. put data into HBase and HDFS. 2. parent txID
     $("#put_btn").click(function(){
-        var objFiles = document.getElementById("File_put_input");
-        // 读取文件内容
-        var reader = new FileReader();//新建一个FileReader
-        reader.readAsText(objFiles.files[0], "UTF-8");//读取文件 
-        reader.onload = function(evt){ //读取完文件之后会回来这里
-            var fileString = evt.target.result; // 读取文件内容
-        var args = '{"addrsend:"' + $("#AddrSend_op0_put_input").val() + '",addrrec:"' + $("#AddrRec_op0_put_input").val() + '",price:"' + $("#Price_op0_put_input").val()+ '",hash:"' + $("#Hash_op0_put_input").val() + '}';
-        
-            $.ajax({
-                type:'post',
-                
-                url: RESTURL + '/atlchannel/atlchain/putRecord',
-                data:JSON.stringify({
-                    'peers': ['peer0.orga.atlchain.com'],
-                    'args':[args],
-                    'hash':$("#Hash_tx_input").val(),
-                    // TODO: 在交易内容上附上签名和公钥
-                    // ,'signature':signature
-                    // ,'Cert':file1
-                }),
-                headers: {
-                    "authorization": "Bearer " + getCookie("token"),
-                    "content-type": "application/json"
-                },
-                success:function(data){
-                    console.log(data);
-                    alert(data + ": 写入成功");
-                    $("#txID_input").val(data);
-                },
-                error:function(err){
-                    console.log(err);
-                }
-            });
+        var objFiles_PrvkeyPEM = document.getElementById("Prvkey_put_input");
+        var reader_PrvkeyPEM = new FileReader();
+        reader_PrvkeyPEM.readAsText(objFiles_PrvkeyPEM.files[0], "UTF-8");
+        reader_PrvkeyPEM.onload = function(evt_Prvkey){
+            var fileString_PrvkeyPEM = evt_Prvkey.target.result;
+            var Prvkey = getPrvKeyFromPEM(fileString_PrvkeyPEM);
+
+            var args = '{"addrsend:"' + $("#AddrSend_op0_put_input").val() + '",addrrec:"' + $("#AddrRec_op0_put_input").val() + '",price:"' + $("#Price_op0_put_input").val()+ '",hash:"' + $("#Hash_op0_put_input").val() + '}';
+
+            var signature = ECSign(Prvkey, args);
+
+            var objFiles_PubkeyPEM = document.getElementById("Pubkey_put_input");
+            var reader_PubkeyPEM = new FileReader();
+            reader_PubkeyPEM.readAsText(objFiles_PubkeyPEM.files[0], "UTF-8");
+            reader_PubkeyPEM.onload = function(evt_Pubkey){
+                var fileString_PubkeyPEM = evt_Pubkey.target.result;
+                var storageTypeChecked = $("[name='storageType']").filter(":checked");
+
+                $.ajax({
+                    type:'post',
+                    
+                    url: RESTURL + '/channels/atlchannel/chaincodes/atlchain/put',
+                    data:JSON.stringify({
+                        'fcn': 'Put',
+                        'peers': ['peer0.orga.atlchain.com'],
+                        'args':[args, signature, fileString_PubkeyPEM],
+                        'cert':fileString_PubkeyPEM,
+                        'signature':signature,
+                        'storageType':storageTypeChecked.attr("value"),
+                        'username':getCookie("username"),
+                        'orgname':getCookie("orgname")
+                    }),
+                    headers: {
+                        "authorization": "Bearer " + getCookie("token"),
+                        "content-type": "application/json"
+                    },
+                    success:function(data){
+                        console.log(data);
+                        alert(data + ": 写入成功");
+                        $("#txID_put_input").val(data);
+                    },
+                    error:function(err){
+                        console.log(err);
+                    }
+                });
+            }
         }
     });
 
@@ -514,10 +521,3 @@ function delCookie(name){
     if(cval!=null)
         document.cookie= name + "="+cval+";expires="+exp.toGMTString();
 }
-
-// {"key":"169d9703961ba0a947ea99a7d79ec889fbbba657","column":"geometry:Line_p2x","timestamp":1542712825171,"$":"115.9238454861111"},
-
-//{"key":"169d9703961ba0a947ea99a7d79ec889fbbba657","column":"attributes:a1","timestamp":1542712825171,"$":"110111"},{"key":"169d9703961ba0a947ea99a7d79ec889fbbba657","column":"attributes:a10","timestamp":1542712825171,"$":"-5187"},
-
-//{"Feature":4514,"geometry":{"Line":[[[115.9247200520833,39.67575303819444],[115.9243576388889,39.675625],[115.9238454861111,39.67543619791667],[115.9228472222222,39.675078125],[115.9220985243056,39.67479166666666]]]},"attributes":["","110111","110111","1","0","1","1","0","59554700376",-1,-5187,0,"3","59554705291","0401","1","1","1","1","0.248",-15410076,6,0.3,"595547",0,2,0,"","","0","1",null,"59554704858","60","40","3","3","0","5","0","1","2","0","","","","","11110001110000000000000000000000","55"]}
-//{"Feature":4514,"geometry":{"Line":[[[115.9247200520833,39.67575303819444],[115.9243576388889,39.675625],[115.9238454861111,39.67543619791667],[115.9228472222222,39.675078125],[115.9220985243056,39.67479166666666]]]},"attributes":["","110111","110111","1","0","1","1","0","59554700376","-1","-5187","0","3","59554705291","0401","1","1","1","1","0.248","-15410076","6","0.3","595547","0","2","0","","","0","1","null","59554704858","60","40","3","3","0","5","0","1","2","0","","","","","11110001110000000000000000000000","55"]}

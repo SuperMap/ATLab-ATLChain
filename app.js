@@ -107,8 +107,6 @@ function getErrorMessage(field) {
 ////////////////////////////////////////// APIs about user //////////////////////////////////////////
 // Login
 app.post('/login', async function(req, res) {
-	var username = req.body.username;
-	var orgName = req.body.orgname;
 	var cert = req.body.cert;
 	var signature = req.body.signature;
 
@@ -126,11 +124,15 @@ app.post('/login', async function(req, res) {
         return;
 	}
 
+    console.log(cert);
+    // var username = getUsernameFromCert();
+	// var orgname = getOrgnameFromCert();
+
     // Generate JWT
     var token = jwt.sign({
 		exp: Math.floor(Date.now() / 1000) + parseInt(hfc.getConfigSetting('jwt_expiretime')),
 		username: username,
-		orgName: orgName
+		orgname: orgname
 	}, app.get('secret'));
 
     var response = {

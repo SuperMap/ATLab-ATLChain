@@ -12,12 +12,12 @@ $ export CORE_PEER_MSPCONFIGPATH=$PWD/crypto-config/peerOrganizations/orga.atlch
 
 3. 安装链码
 ``` 
-$ peer chaincode install -n atlchain -v 1.0 -p ATLab-ATLChain
+$ peer chaincode install -n atlchainCC -v 0.3 -p ATLab-ATLChain
 ```
 
 4. 实例化链码
 ``` 
-$ peer chaincode instantiate -o 127.0.0.1:7050 -C atlchannel -n atlchain -v 1.0 -c '{"Args":["init"]}'
+$ peer chaincode instantiate -o 127.0.0.1:7050 -C atlchannel -n atlchainCC -v 0.3 -c '{"Args":["init"]}'
 ```
 
 5. 升级链码（先install再upgrade，不需要instantiate）

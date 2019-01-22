@@ -12,8 +12,8 @@ ATLChain
 curl -s -X POST http://localhost:4000/login \
 -H "content-type: application/json" \
 -d '{
-  "username":"Jim",
-  "orgname":"OrgA",
+  "username":"Tim",
+  "orgname":"TestOrgA",
   "cert":"-----BEGIN CERTIFICATE-----\nMIICXDCCAgKgAwIBAgIUJbmJPWgMfwhga0JCaifHyHsAhoMwCgYIKoZIzj0EAwIw\ndTELMAkGA1UEBhMCVVMxEzARBgNVBAgTCkNhbGlmb3JuaWExFjAUBgNVBAcTDVNh\nbiBGcmFuY2lzY28xGjAYBgNVBAoTEW9yZ2EuYXRsY2hhaW4uY29tMR0wGwYDVQQD\nExRjYS5vcmdhLmF0bGNoYWluLmNvbTAeFw0xODExMjkwMjMwMDBaFw0xOTExMjkw\nMjM1MDBaMB8xDzANBgNVBAsTBmNsaWVudDEMMAoGA1UEAxMDSmltMFkwEwYHKoZI\nzj0CAQYIKoZIzj0DAQcDQgAErvN7eXvvyReFtT1172ElhrrE5/qCUU+czcxKjMQC\nCvLBommXlHeC1Nlp5FtzZvTx5VxDV8lWcUjQTTjm6VFKTaOBxTCBwjAOBgNVHQ8B\nAf8EBAMCB4AwDAYDVR0TAQH/BAIwADAdBgNVHQ4EFgQU7xDaa5+txo2Z3l0tJnEs\nT2ME5+4wKwYDVR0jBCQwIoAgvA1FMa9xMa1quD3Puakv47jkPAOVf1An01r0WdQo\nTmowVgYIKgMEBQYHCAEESnsiYXR0cnMiOnsiaGYuQWZmaWxpYXRpb24iOiIiLCJo\nZi5FbnJvbGxtZW50SUQiOiJKaW0iLCJoZi5UeXBlIjoiY2xpZW50In19MAoGCCqG\nSM49BAMCA0gAMEUCIQC4VPFMNOOARPIuMft4bOtPUmJvhvukEocN5SAzDFc2JwIg\nEnhmK1UFWgxyk36XL9WqGf5zhCw5qbsG+CWT8p2t+Jk=\n-----END CERTIFICATE-----\n",
   "signature":"3045022100d4e473822634da78affc8567a57ce5cd6dead90997e05e9a4ebe1582d034b72b02206cb7cda0aa7573b3c417ef9ae203ac6d4760a70fe06593f8dc34eb2dd72bbfa0"
 }'
@@ -24,10 +24,10 @@ curl -s -X POST http://localhost:4000/login \
 
 ```
 curl -s -X POST http://localhost:4000/users \
--H "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1NDgwOTcxNjYsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Ik9yZ0EiLCJpYXQiOjE1NDgwNjExNjZ9.Msa1s3fRzKSshWA8l0O62gQ1pkSB2StU-bRL-8jomAk" \
+-H "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1NDgxNTgxMzUsInVzZXJuYW1lIjoiVGltIiwib3JnTmFtZSI6IlRlc3RPcmdBIiwiaWF0IjoxNTQ4MTIyMTM1fQ.LTzCDRRgONKEoE7XmuJRZzfKRMQrOnG293e80v7nvI0" \
 -H "content-type: application/json" \
 -d '{
-  "username":"Jim",
+  "username":"Tim",
   "orgName":"OrgA"
 }'
 ```
@@ -161,17 +161,47 @@ curl -s -X POST \
 }'
 
 curl -s -X POST \
-  http://localhost:4000/channels/atlchannel/chaincodes/atlchainCC \
-  -H "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1NDgwOTcxNjYsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Ik9yZ0EiLCJpYXQiOjE1NDgwNjExNjZ9.Msa1s3fRzKSshWA8l0O62gQ1pkSB2StU-bRL-8jomAk" \
+  http://localhost:4000/channels/atlchannel/chaincodes/atlchainCC/put \
+  -H "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1NDgxNTgxMzUsInVzZXJuYW1lIjoiVGltIiwib3JnTmFtZSI6IlRlc3RPcmdBIiwiaWF0IjoxNTQ4MTIyMTM1fQ.LTzCDRRgONKEoE7XmuJRZzfKRMQrOnG293e80v7nvI0" \
   -H "content-type: application/json" \
   -d '{
-	"peers": ["127.0.0.1"],
+	"peers": ["peer0.orga.atlchain.com"],
 	"fcn":"Put",
 	"args":["{\"AddrReceive\":\"addrAAA\", \"AddrSend\":\"addrBBB\"}", "signagureAAA", "pubKeyAAA"],
   "cert":"certfile",
   "signature":"sign",
   "storageType":"onchain",
-  "username":"Jim",
+  "username":"Tim",
+  "orgname":"OrgA"
+}'
+
+curl -s -X POST \
+  http://localhost:4000/channels/atlchannel/chaincodes/atlchainCC/put \
+  -H "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1NDgxNTgxMzUsInVzZXJuYW1lIjoiVGltIiwib3JnTmFtZSI6IlRlc3RPcmdBIiwiaWF0IjoxNTQ4MTIyMTM1fQ.LTzCDRRgONKEoE7XmuJRZzfKRMQrOnG293e80v7nvI0" \
+  -H "content-type: application/json" \
+  -d '{
+	"peers": ["peer0.orga.atlchain.com"],
+	"fcn":"Put",
+	"args":["{\"AddrReceive\":\"addrAAA\", \"AddrSend\":\"addrBBB\"}", "signagureAAA", "pubKeyAAA"],
+  "cert":"certfile",
+  "signature":"sign",
+  "storageType":"hbase",
+  "username":"Tim",
+  "orgname":"OrgA"
+}'
+
+curl -s -X POST \
+  http://localhost:4000/channels/atlchannel/chaincodes/atlchainCC/put \
+  -H "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1NDgxNTgxMzUsInVzZXJuYW1lIjoiVGltIiwib3JnTmFtZSI6IlRlc3RPcmdBIiwiaWF0IjoxNTQ4MTIyMTM1fQ.LTzCDRRgONKEoE7XmuJRZzfKRMQrOnG293e80v7nvI0" \
+  -H "content-type: application/json" \
+  -d '{
+	"peers": ["peer0.orga.atlchain.com"],
+	"fcn":"Put",
+	"args":["{\"AddrReceive\":\"addrAAA\", \"AddrSend\":\"addrBBB\"}", "signagureAAA", "pubKeyAAA"],
+  "cert":"certfile",
+  "signature":"sign",
+  "storageType":"hdfs",
+  "username":"Tim",
   "orgname":"OrgA"
 }'
 
@@ -188,41 +218,34 @@ curl -s -X POST http://localhost:4000/users \
 ### Chaincode Query
 
 ```
-curl -s -X POST http://localhost:4000/channels/atlchannel/chaincodes/atlchainCC \
--H "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1NDgwOTcxNjYsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Ik9yZ0EiLCJpYXQiOjE1NDgwNjExNjZ9.Msa1s3fRzKSshWA8l0O62gQ1pkSB2StU-bRL-8jomAk" \
--H "content-type: application/json" \
--d '{
-  "fcn":"Get",
-  "peers":["127.0.0.1"], 
-  "args":["Get", "{\"AddrSend\":\"addrB\", \"AddrReceive\":\"addrA\"}"],
-  "storageType":"onchain",
-  "username":"Jim",
-  "orgname":"OrgA"
+curl -s -X POST \
+http://localhost:4000/channels/atlchannel/chaincodes/atlchainCC/get \
+  -H "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1NDgxNTgxMzUsInVzZXJuYW1lIjoiVGltIiwib3JnTmFtZSI6IlRlc3RPcmdBIiwiaWF0IjoxNTQ4MTIyMTM1fQ.LTzCDRRgONKEoE7XmuJRZzfKRMQrOnG293e80v7nvI0" \
+  -H "content-type: application/json" \
+  -d '{ 
+    "fcn":"Get",
+    "peer":"peer0.orga.atlchain.com", 
+    "args":["{\"AddrSend\":\"addrBBB\", \"AddrReceive\":\"addrAAA\"}"],
+    "storageType":"onchain",
+    "username":"Tim",
+    "orgname":"OrgA"
 }'
-
-curl -s -X GET "http://localhost:4000/atlchannel/atlchain/getHistoryByAddr?peer=peer0.orga.atlchain.com&args=%5B%22addE%22%5D" -H "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1NDMzMjYyNDksInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Ik9yZ0EiLCJpYXQiOjE1NDMyOTAyNDl9.-MfuurrLCVN7ET2pXDL0kA39YScyLMlHH9DvHMkJDMw" -H "content-type: application/json"
-
-curl -s -X GET "http://localhost:4000/atlchannel/atlchain/getHistoryByHash?peer=peer0.orga.atlchain.com&args=%5B%220a3fcd18a3d28960fa13fbe3ef1f5dcab885f51f%22%5D" -H "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1NDMyNjcyODgsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Ik9yZ0EiLCJpYXQiOjE1NDMyMzEyODh9.uBolTI5I66xEn43IFZ06O6QdaqIGn1wnCT65vQG-6yU" -H "content-type: application/json"
-
-curl -s -X GET "http://localhost:4000/atlchannel/atlchain/getHistoryByHashAndBuyerAddr?peer=peer0.orga.atlchain.com&args=%5B%220a3fcd18a3d28960fa13fbe3ef1f5dcab885f51f%22%2c%22addE%22%5D" -H "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1NDMyNjcyODgsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Ik9yZ0EiLCJpYXQiOjE1NDMyMzEyODh9.uBolTI5I66xEn43IFZ06O6QdaqIGn1wnCT65vQG-6yU" -H "content-type: application/json"
-
-curl -s -X GET "http://localhost:4000/getDataByHash?hash=169d9703961ba0a947ea99a7d79ec889fbbba657" -H "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1NDMzMjYyNDksInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Ik9yZ0EiLCJpYXQiOjE1NDMyOTAyNDl9.-MfuurrLCVN7ET2pXDL0kA39YScyLMlHH9DvHMkJDMw" -H "content-type: application/json"
-
-// putRecord
-curl -s -X POST http://localhost:4000/atlchannel/atlchain/putRecord -H "authorization: Bearer <put JSON Web Token here>" -H "content-type: application/json" -d '{"peers":["peer0.orga.atlchain.com"], "args":["addE","addA","44", "20181122", "0a3fcd18a3d28960fa13fbe3ef1f5dcab885f51f"] }'
-
-// getHistoryByBuyerAddr
-curl -s -X GET "http://localhost:4000/atlchannel/atlchain/getHistoryByBuyerAddr?peer=peer0.orga.atlchain.com&args=%5B%22addE%22%5D" -H "authorization: Bearer <put JSON Web Token here>" -H "content-type: application/json"
-
-// getHisrotyByHash
-curl -s -X GET "http://localhost:4000/atlchannel/atlchain/getHistoryByHash?peer=peer0.orga.atlchain.com&args=%5B%220a3fcd18a3d28960fa13fbe3ef1f5dcab885f51f%22%5D" -H "authorization: Bearer <put JSON Web Token here>" -H "content-type: application/json"
-
-// getHistoryByHashAndBuyerAddr
-curl -s -X GET "http://localhost:4000/atlchannel/atlchain/getHistoryByHashAndBuyerAddr?peer=peer0.orga.atlchain.com&args=%5B%220a3fcd18a3d28960fa13fbe3ef1f5dcab885f51f%22%2c%22addB%22%5D" -H "authorization: Bearer <put JSON Web Token here>" -H "content-type: application/json"
+```
 
 // getDataFromHBase
-curl -s -X GET "http://localhost:4000/getDataByHash?hash=021126a76bc471b41d0cd79f77095266b4f685de" -H "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1NDI4OTEyNTUsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Ik9yZ0EiLCJpYXQiOjE1NDI4NTUyNTV9.p-o799TCqBz3ri8C-FO5KVfllk6CzWC1I5wVbvd5hwg" -H "content-type: application/json"
 ```
+curl -s -X GET "http://localhost:4000/getDataFromHBase?hash=sign" \
+  -H "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1NDgxNTgxMzUsInVzZXJuYW1lIjoiVGltIiwib3JnTmFtZSI6IlRlc3RPcmdBIiwiaWF0IjoxNTQ4MTIyMTM1fQ.LTzCDRRgONKEoE7XmuJRZzfKRMQrOnG293e80v7nvI0" \
+  -H "content-type: application/json"
+```
+
+// getFileFromHDFS
+```
+curl -s -X GET "http://localhost:4000/getFileFromHDFS?filename=sign" \
+  -H "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1NDgxNTgxMzUsInVzZXJuYW1lIjoiVGltIiwib3JnTmFtZSI6IlRlc3RPcmdBIiwiaWF0IjoxNTQ4MTIyMTM1fQ.LTzCDRRgONKEoE7XmuJRZzfKRMQrOnG293e80v7nvI0" \
+  -H "content-type: application/json"
+```
+
 
 ### Query Block by BlockNumber
 
