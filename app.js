@@ -54,12 +54,12 @@ app.set('secret', 'thisismysecret');
 app.use(expressJWT({
  secret: 'thisismysecret'
 }).unless({
-	path: ['/login']
+	path: ['/login', '/users']
 }));
 app.use(bearerToken());
 app.use(function(req, res, next) {
 	logger.debug(' ------>>>>>> new request for %s',req.originalUrl);
-	if (req.originalUrl.indexOf('/login') >= 0) {
+	if (req.originalUrl.indexOf('/login') >= 0 || req.originalUrl.indexOf('/users') >= 0) {
 		return next();
 	}
 
@@ -146,6 +146,7 @@ app.post('/login', async function(req, res) {
 
 // Register and enroll user
 app.post('/users', async function(req, res) {
+	logger.debug('==================== REGISTER USERS ==================');
 	var username = req.body.username;
 	var orgName = req.body.orgName;
 	logger.debug('End point : /users');
@@ -167,6 +168,7 @@ app.post('/users', async function(req, res) {
         var fdata = fs.readFileSync('./fabric-client-kv-orga/' + username);
         var jsonObj = JSON.parse(fdata);
         var filename = jsonObj.enrollment.signingIdentity + "-priv";
+        var pubkeyFile = jsonObj.enrollment.signingIdentity + "-pub";
         
 		logger.debug("private key file: " + filename);
         
@@ -175,7 +177,7 @@ app.post('/users', async function(req, res) {
 
 		logger.debug('Successfully registered the username %s for organization %s',username,orgName);
         response.filename = filename;
-		response.address = account.getAddress('./fabric-client-kv-orga/' + filename);
+		response.address = account.getAddress('./fabric-client-kv-orga/' + pubkeyFile);
 		logger.debug("address: " + response.address);
 		res.json(response);
 	} else {

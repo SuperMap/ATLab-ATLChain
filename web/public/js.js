@@ -1,9 +1,9 @@
 // enroll
 
 var RESTURL = "http://148.70.109.243:4000";
-var FileURL = "http://148.70.109.243:8080";
+var FileURL = "http://148.70.109.243:8888";
 // var RESTURL = "http://127.0.0.1:4000";
-// var FileURL = "http://127.0.0.1:8080";
+// var FileURL = "http://127.0.0.1:4000";
 
 $(document).ready(function(){
 
@@ -31,8 +31,6 @@ $(document).ready(function(){
                 orgName:$("#orgName_input").val()
             },
             success:function(data){
-                
-
                 var username = $("#username_input").val();
                 $("#accountAddress_input").val(data.address);
                 alert($("#username_input").val() + "登记成功\n请保存好下载的证书和密钥文件\n请牢记账户地址:" + data.address);
@@ -268,7 +266,7 @@ $(document).ready(function(){
                 $.ajax({
                     type:'post',
                     
-                    url: RESTURL + '/channels/atlchannel/chaincodes/atlchain/put',
+                    url: RESTURL + '/channels/atlchannel/chaincodes/atlchainCC/put',
                     data:JSON.stringify({
                         'fcn': 'Put',
                         'peers': ['peer0.orga.atlchain.com'],
