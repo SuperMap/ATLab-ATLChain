@@ -124,9 +124,9 @@ app.post('/login', async function(req, res) {
         return;
 	}
 
-    console.log(cert);
-    // var username = getUsernameFromCert();
-	// var orgname = getOrgnameFromCert();
+    var certJsonObj = JSON.parse(cert);
+    var username = certJsonObj.name;
+	var orgname = certJsonObj.mspid;
 
     // Generate JWT
     var token = jwt.sign({
@@ -137,7 +137,9 @@ app.post('/login', async function(req, res) {
 
     var response = {
         token: token,
-        message: "login sucessfully",
+        username: username,
+        orgname: orgname,
+        message: "login sucessfully"
     }
     res.json({success: true, message: response});
 })

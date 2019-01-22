@@ -92,7 +92,6 @@ $(document).ready(function(){
 
     // login
     $("#login_btn").click(function(){
-        console.log("click Run");
         delCookie("token");
         delCookie("address");
         delCookie("username");
@@ -120,8 +119,8 @@ $(document).ready(function(){
                 if(data.success){
                     document.cookie = "token=" + data.message.token;
                     //document.cookie = "address=" + data.address;
-                    document.cookie = "username=" + "user";
-                    document.cookie = "orgname=" + "OrgA";
+                    document.cookie = "username=" + data.message.username;
+                    document.cookie = "orgname=" + data.message.orgname;
                     window.location.href="./put.html";
                 } else {
                     alert("login failed");
@@ -171,6 +170,7 @@ $(document).ready(function(){
                     </p> \
                     <p> \
                         <label for=\"Stroage_op0_put_label\">存储方式:</label> \
+                        <input type=\"radio\" id=\"onchain_op0_put_label\" name=\"storageType\" value=\"onchain\" style=\"width:20px; height:15px\">onchain \
                         <input type=\"radio\" id=\"hbase_op0_put_label\" name=\"storageType\" value=\"hbase\" style=\"width:20px; height:15px\">HBase \
                         <input type=\"radio\" id=\"hdfs_op0_put_label\" name=\"storageType\" value=\"hdfs\" style=\"width:20px; height:15px\">HDFS \
                     </p> \
@@ -203,7 +203,7 @@ $(document).ready(function(){
                         <input type=\"text\" id=\"rightType_op1_put_input\"> \
                     </p> \
                     <p> \
-                        <label for=\"rigthNature_op1_put_label\">权利性质:</label> \
+                        <label for=\"rightNature_op1_put_label\">权利性质:</label> \
                         <input type=\"text\" id=\"rightNature_op1_put_input\"> \
                     </p> \
                     <p> \
@@ -241,8 +241,21 @@ $(document).ready(function(){
         reader_PrvkeyPEM.onload = function(evt_Prvkey){
             var fileString_PrvkeyPEM = evt_Prvkey.target.result;
             var Prvkey = getPrvKeyFromPEM(fileString_PrvkeyPEM);
+            var storageTypeChecked = $("[name='storageType']").filter(":checked");
+            var storageType = storageTypeChecked.attr("value");
 
-            var args = '{"addrsend:"' + $("#AddrSend_op0_put_input").val() + '",addrrec:"' + $("#AddrRec_op0_put_input").val() + '",price:"' + $("#Price_op0_put_input").val()+ '",hash:"' + $("#Hash_op0_put_input").val() + '}';
+            var args = "";
+            switch ($("#put_select").val()) {
+                case "transaction":
+                    args = '{"addrsend:"' + $("#AddrSend_op0_put_input").val() + '",addrrec:"' + $("#AddrRec_op0_put_input").val() + '",price:"' + $("#Price_op0_put_input").val()+ '",hash:"' + $("#Hash_op0_put_input").val() + '}';
+                    break;
+                case "estate":
+                    args = '{"org:"'+ $("org_op1_put_input").val() + ',"ower:"' + $("#ower_op1_put_input").val() + ',"common:"' + $("#common_op1_put_input").val() + ',"position:"' + $("#position_op1_put_input").val() + ',"uniNum:"' + $("#unitNum_op1_put_input").val() + ',"rightType:"' + $("#rightType_op1_put_input").val() + ',"rightNature_op1_put_input:"' + $("#rightNature_op1_put_input").val() + ',"usage:"' + $("#usage_op1_put_input").val() + ',"area:"' + $("#area_op1_put_input").val() + ',"deadline:"' + $("#deadline_op1_put_input").val() + ',"other:"' + $("#other_op1_put_input").val() + ',"attachment:"' + $("#attachment_op1_put_input").val() +'}';
+                    storageType = "onchain";
+                    break;
+                default:
+                    break;
+            }
 
             var signature = ECSign(Prvkey, args);
 
@@ -251,7 +264,6 @@ $(document).ready(function(){
             reader_PubkeyPEM.readAsText(objFiles_PubkeyPEM.files[0], "UTF-8");
             reader_PubkeyPEM.onload = function(evt_Pubkey){
                 var fileString_PubkeyPEM = evt_Pubkey.target.result;
-                var storageTypeChecked = $("[name='storageType']").filter(":checked");
 
                 $.ajax({
                     type:'post',
@@ -263,7 +275,7 @@ $(document).ready(function(){
                         'args':[args, signature, fileString_PubkeyPEM],
                         'cert':fileString_PubkeyPEM,
                         'signature':signature,
-                        'storageType':storageTypeChecked.attr("value"),
+                        'storageType':storageType,
                         'username':getCookie("username"),
                         'orgname':getCookie("orgname")
                     }),
