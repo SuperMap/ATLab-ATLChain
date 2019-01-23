@@ -41,6 +41,9 @@ var hdfsDir = '/atlchain/';
 ///////////////////////////////////////////////////////////////////////////////
 //////////////////////////////// SET CONFIGURATONS ////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
+app.use(bodyParser.json({limit: '50mb'}));
+app.use(bodyParser.urlencoded({limit: '50mb', extended: 'true'}));
+
 app.options('*', cors());
 app.use(cors());
 //support parsing of application/json type post data
@@ -77,8 +80,8 @@ app.use(function(req, res, next) {
 			// add the decoded user name and org name to the request object
 			// for the downstream code to use
 			req.username = decoded.username;
-			req.orgname = decoded.orgName;
-			logger.debug(util.format('Decoded from JWT token: username - %s, orgname - %s', decoded.username, decoded.orgName));
+			req.orgname = decoded.orgname;
+			logger.debug(util.format('Decoded from JWT token: username - %s, orgname - %s', decoded.username, decoded.orgname));
 			return next();
 		}
 	});
@@ -195,9 +198,10 @@ app.post('/channels/:channelName/chaincodes/:chaincodeName/get', async function(
 	var fcn = req.body.fcn;
 	let args = req.body.args;
 	let peer = req.body.peer;
-    let storageType = req.body.storageType;
     let username = req.body.username;
     let orgname = req.body.orgname;
+
+    console.log(args);
 
 	if (!chaincodeName) {
 		res.json(getErrorMessage('\'chaincodeName\''));
@@ -216,7 +220,7 @@ app.post('/channels/:channelName/chaincodes/:chaincodeName/get', async function(
 		return;
 	}
 
-	let message = await query.queryChaincode(peers, channelName, chaincodeName, args, fcn, username, orgname);
+	let message = await query.queryChaincode(peer, channelName, chaincodeName, args, fcn, username, orgname);
 	res.send(message);
 });
 
@@ -230,6 +234,8 @@ app.post('/channels/:channelName/chaincodes/:chaincodeName/putTx', async functio
 	var args = req.body.args;
     var cert = req.body.cert;
     var signature = req.body.signature;
+    var hash = req.body.hash;
+    var data = req.body.txdata;
     var storageType = req.body.storageType;
     var username = req.body.username;
     var orgname = req.body.orgname;
@@ -239,8 +245,6 @@ app.post('/channels/:channelName/chaincodes/:chaincodeName/putTx', async functio
 		return;
 	}
 
-    var argStr = JSON.stringify(args);
-   
     // TODO: 验证参数中的证书和签名，通过后再执行交易
     if (!crypto.certCheck(cert) || !crypto.signatureVerify(cert, args, signature)){
 		res.json(getErrorMessage('\'signature\''));
@@ -249,18 +253,19 @@ app.post('/channels/:channelName/chaincodes/:chaincodeName/putTx', async functio
 
     switch(storageType) {
         case "onchain":
-            break;
         case "hbase" :
 	        // Put data into HBase
 	        // statement about create database:
 	        // 1. create 'atlchain', 'data'
 	        // 2. put 'atlchain', 'hash1', 'data:data', "json string value"
-	        hbaseClient.put(hbaseTable, signature, hbaseCF, argStr, function(){
+	        hbaseClient.put(hbaseTable, hash, hbaseCF, data, function(){
                 logger.info("Put into hbase finish");
             })
             break;
         case "hdfs" :
-            hdfsClient.put("/tmp/" + signature, hdfsDir + signature, function(){
+            await fs.writeFileSync('/tmp/' + hash, data);
+
+            hdfsClient.put("/tmp/" + hash, hdfsDir + hash, function(){
                 logger.info("Put into HDFS finish");
             });
             break;
@@ -274,14 +279,16 @@ app.post('/channels/:channelName/chaincodes/:chaincodeName/putTx', async functio
 	res.send(message);
 });
 
+// TODO: put estate 
 app.post('/channels/:channelName/chaincodes/:chaincodeName/putEstate', async function(req, res) {
 	logger.debug('==================== INVOKE ON CHAINCODE ==================');
 	var peers = req.body.peers;
     var channel = req.params.channelName;     // atlchannel
     var chaincode = req.params.chaincodeName; // atlchainCC
     var fcn = req.body.fcn; // Put
-	var args = req.body.args; //TODO: 包含图片Hash
-    var image = req.body.image; //TODO:二进制方式传输
+	var args = req.body.args; 
+    var hash = req.body.hash;
+    var imgdata = req.body.imgdata;
     var cert = req.body.cert;
     var signature = req.body.signature;
     var storageType = req.body.storageType;
@@ -293,9 +300,9 @@ app.post('/channels/:channelName/chaincodes/:chaincodeName/putEstate', async fun
 		return;
 	}
 
-    var argStr = JSON.stringify(args);
-
-    //TODO:图片base64编码
+    // base64 image data decode
+    // var img = new Buffer(imgdata, 'base64');
+    
    
     // TODO: 验证参数中的证书和签名，通过后再执行交易
     if (!crypto.certCheck(cert) || !crypto.signatureVerify(cert, args, signature)){
@@ -305,19 +312,19 @@ app.post('/channels/:channelName/chaincodes/:chaincodeName/putEstate', async fun
 
     switch(storageType) {
         case "onchain":
-            break;
         case "hbase" :
 	        // Put data into HBase
 	        // statement about create database:
 	        // 1. create 'atlchain', 'data'
 	        // 2. put 'atlchain', 'hash1', 'data:data', "json string value"
-	        hbaseClient.put(hbaseTable, signature, hbaseCF, argStr, function(){
+	        hbaseClient.put(hbaseTable, hash, hbaseCF, imgdata, function(){
                 logger.info("Put into hbase finish");
             })
             break;
         case "hdfs" :
-            // TODO: 现将图片存至 /tmp ，再保存到HDFS
-            hdfsClient.put("/tmp/" + signature, hdfsDir + signature, function(){
+            await fs.writeFileSync('/tmp/' + hash, imgdata);
+
+            hdfsClient.put("/tmp/" + hash, hdfsDir + hash, function(){
                 logger.info("Put into HDFS finish");
             });
             break;
@@ -340,7 +347,7 @@ app.get('/getFileFromHDFS', async function(req, res) {
 		return;
 	}
 
-    hdfsClient.get(hdfsDir + filename, "/tmp/" + filename, function(){
+    hdfsClient.get(hdfsDir + filename, "./web/public/tmp/" + filename, function(){
         res.json(filename);
         logger.info("Got file from HDFS");
     });
