@@ -267,8 +267,10 @@ $(document).ready(function(){
                         reader_Image.readAsText(objFiles_Image.files[0], "UTF-8");
                         reader_Image.onload = function(evt_Image){
                             var fileString_Image = evt_Image.target.result;
+                            console.log(fileString_Image);
                             var b = new Base64();  
                             var fileString_Image_Base64 = b.encode(fileString_Image);  
+                            console.log(fileString_Image_Base64);
 
                             args = '{"estateid":"'+ $("#estateid_op1_put_input").val() + '","ower":"' + $("#ower_op1_put_input").val() + '","position":"' + $("#position_op1_put_input").val() + '","area":"' + $("#area_op1_put_input").val() + '"hash":"' + hex_sha256(fileString_Image) + '"}';
                             signature = ECSign(Prvkey, args);
@@ -419,7 +421,6 @@ $(document).ready(function(){
                     },
                     success:function(data){
                         console.log(data);
-                        alert("查询成功");
                         
                         $("#result_input").html(FormatOutputTx(data));
                     },

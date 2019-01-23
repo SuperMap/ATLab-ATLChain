@@ -201,8 +201,6 @@ app.post('/channels/:channelName/chaincodes/:chaincodeName/get', async function(
     let username = req.body.username;
     let orgname = req.body.orgname;
 
-    console.log(args);
-
 	if (!chaincodeName) {
 		res.json(getErrorMessage('\'chaincodeName\''));
 		return;
@@ -223,6 +221,24 @@ app.post('/channels/:channelName/chaincodes/:chaincodeName/get', async function(
 	let message = await query.queryChaincode(peer, channelName, chaincodeName, args, fcn, username, orgname);
 	res.send(message);
 });
+
+// TODO:Traceable 溯源要唯一可以标识该数据的键来查询历史，必须使用历史查询，而不是couchdb。所以记录要以数据hash为Key
+app.post('/channels/:channelName/chaincodes/:chaincodeName/trace', async function(req, res) {
+	logger.info('==================== TRACING HISTORY ==================');
+	var channelName = req.params.channelName;
+	var chaincodeName = req.params.chaincodeName;
+    let username = req.body.username;
+    let orgname = req.body.orgname;
+    let traceID = req.body.traceid; 
+    let fcn = "getHistoryByKey";
+	if (!traceID) {
+		res.json(getErrorMessage('\'traceID\''));
+		return;
+	}
+
+	let message = await query.queryChaincode(peer, channelName, chaincodeName, args, fcn, username, orgname);
+	res.send(message);
+})
 
 // Invoke transaction on chaincode on target peers
 app.post('/channels/:channelName/chaincodes/:chaincodeName/putTx', async function(req, res) {
@@ -301,7 +317,8 @@ app.post('/channels/:channelName/chaincodes/:chaincodeName/putEstate', async fun
 	}
 
     // base64 image data decode
-    // var img = new Buffer(imgdata, 'base64');
+    var img = new Buffer(imgdata, 'base64');
+    console.log("=================================" + img);
     
    
     // TODO: 验证参数中的证书和签名，通过后再执行交易
@@ -317,12 +334,12 @@ app.post('/channels/:channelName/chaincodes/:chaincodeName/putEstate', async fun
 	        // statement about create database:
 	        // 1. create 'atlchain', 'data'
 	        // 2. put 'atlchain', 'hash1', 'data:data', "json string value"
-	        hbaseClient.put(hbaseTable, hash, hbaseCF, imgdata, function(){
+	        hbaseClient.put(hbaseTable, hash, hbaseCF, img, function(){
                 logger.info("Put into hbase finish");
             })
             break;
         case "hdfs" :
-            await fs.writeFileSync('/tmp/' + hash, imgdata);
+            await fs.writeFileSync('/tmp/' + hash, img, 'binary');
 
             hdfsClient.put("/tmp/" + hash, hdfsDir + hash, function(){
                 logger.info("Put into HDFS finish");
@@ -340,7 +357,7 @@ app.post('/channels/:channelName/chaincodes/:chaincodeName/putEstate', async fun
 
 // TODO: Get data from remote HDFS, now it is only avaliable for localhost hdfs
 app.get('/getFileFromHDFS', async function(req, res) {
-	logger.debug('==================== GET HDFS DATA ==================');
+	logger.info('==================== GET HDFS DATA ==================');
     let filename = req.query.filename;
 	if (!filename) {
 		res.json(getErrorMessage('\'getDataFromHDFS\''));

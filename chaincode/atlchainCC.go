@@ -49,7 +49,7 @@ func (a *AtlchainCC) Put(stub shim.ChaincodeStubInterface, args []string) pb.Res
     return shim.Success(nil)
 }
 
-// 根据各种条件查询交易历史
+// 根据各种条件查询当前状态
 // args: 0-{queryJsonString} 
 // eg: {"hash":"hashstring", "AddrSend":"addressstring"}
 func (t *AtlchainCC) Get(stub shim.ChaincodeStubInterface, args []string) pb.Response {
@@ -66,6 +66,68 @@ func (t *AtlchainCC) Get(stub shim.ChaincodeStubInterface, args []string) pb.Res
 		return shim.Error(err.Error())
 	}
 	return shim.Success(queryResults)
+}
+
+// 根据key查询交易历史
+func (t *txCC) getHistoryByKey(stub shim.ChaincodeStubInterface, args []string) pb.Response {
+	argsNeed := 1
+	argsLength := len(args)
+	if argsLength != argsNeed {
+		return shim.Error(strconv.Itoa(argsNeed) + " args wanted, but given " + strconv.Itoa(argsLength))
+	}
+
+	resultsIterator, error := stub.GetHistoryForKey(args[0])
+	if error != nil {
+		return shim.Error(error.Error())
+	}
+	defer resultsIterator.Close()
+
+	var buffer bytes.Buffer
+	buffer.WriteString("[")
+
+	bArrayMemberAlreadyWritten := false
+	for resultsIterator.HasNext() {
+		response, err := resultsIterator.Next()
+		if err != nil {
+			return shim.Error(err.Error())
+		}
+		// Add a comma before array members, suppress it for the first array member
+		if bArrayMemberAlreadyWritten == true {
+			buffer.WriteString(",")
+		}
+		buffer.WriteString("{\"TxId\":")
+		buffer.WriteString("\"")
+		buffer.WriteString(response.TxId)
+		buffer.WriteString("\"")
+
+		buffer.WriteString(", \"Value\":")
+		// if it was a delete operation on given key, then we need to set the
+		//corresponding value null. Else, we will write the response.Value
+		//as-is (as the Value itself a JSON marble)
+		if response.IsDelete {
+			buffer.WriteString("null")
+		} else {
+			buffer.WriteString(string(response.Value))
+		}
+
+		buffer.WriteString(", \"Timestamp\":")
+		buffer.WriteString("\"")
+		buffer.WriteString(time.Unix(response.Timestamp.Seconds, int64(response.Timestamp.Nanos)).String())
+		buffer.WriteString("\"")
+
+		buffer.WriteString(", \"IsDelete\":")
+		buffer.WriteString("\"")
+		buffer.WriteString(strconv.FormatBool(response.IsDelete))
+		buffer.WriteString("\"")
+
+		buffer.WriteString("}")
+		bArrayMemberAlreadyWritten = true
+	}
+	buffer.WriteString("]")
+
+	fmt.Printf("- getHistoryForMarble returning:\n%s\n", buffer.String())
+
+	return shim.Success(buffer.Bytes())
 }
 
 // 执行查询条件
