@@ -43,6 +43,8 @@ $ peer chaincode query -C atlchannel -n atlchain -c '{"Args":["getRecordByBuyerA
 
 // atlchainCC-v0.3 
 $ peer chaincode query -C atlchannel -n atlchainCC -c '{"Args":["Get", "{\"AddrSend\":\"addrB\", \"AddrReceive\":\"addrABC\"}"]}'
+
+$ peer chaincode query -C atlchannel -n atlchainCC -c '{"Args":["Get", "{\"price\":\"10000\"}"]}'
 ```
 
 8. 根据买方地址查询历史交易记录
