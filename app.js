@@ -317,8 +317,8 @@ app.post('/channels/:channelName/chaincodes/:chaincodeName/putEstate', async fun
 	}
 
     // base64 image data decode
-    var img = new Buffer(imgdata, 'base64');
-    console.log("=================================" + img);
+    // var img = new Buffer(imgdata, 'base64');
+    // console.log("=================================" + img);
     
    
     // TODO: 验证参数中的证书和签名，通过后再执行交易
@@ -334,12 +334,12 @@ app.post('/channels/:channelName/chaincodes/:chaincodeName/putEstate', async fun
 	        // statement about create database:
 	        // 1. create 'atlchain', 'data'
 	        // 2. put 'atlchain', 'hash1', 'data:data', "json string value"
-	        hbaseClient.put(hbaseTable, hash, hbaseCF, img, function(){
+	        hbaseClient.put(hbaseTable, hash, hbaseCF, imgdata, function(){
                 logger.info("Put into hbase finish");
             })
             break;
         case "hdfs" :
-            await fs.writeFileSync('/tmp/' + hash, img, 'binary');
+            await fs.writeFileSync('/tmp/' + hash, imgdata, 'binary');
 
             hdfsClient.put("/tmp/" + hash, hdfsDir + hash, function(){
                 logger.info("Put into HDFS finish");

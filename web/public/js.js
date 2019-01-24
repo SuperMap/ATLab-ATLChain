@@ -264,7 +264,7 @@ $(document).ready(function(){
                     case "estate":
                         var objFiles_Image = document.getElementById("Image_op0_put_input");
                         var reader_Image = new FileReader();
-                        reader_Image.readAsText(objFiles_Image.files[0], "UTF-8");
+                        reader_Image.readAsBinaryString(objFiles_Image.files[0]);
                         reader_Image.onload = function(evt_Image){
                             var fileString_Image = evt_Image.target.result;
                             console.log(fileString_Image);
@@ -273,6 +273,7 @@ $(document).ready(function(){
                             console.log(fileString_Image_Base64);
 
                             args = '{"estateid":"'+ $("#estateid_op1_put_input").val() + '","ower":"' + $("#ower_op1_put_input").val() + '","position":"' + $("#position_op1_put_input").val() + '","area":"' + $("#area_op1_put_input").val() + '"hash":"' + hex_sha256(fileString_Image) + '"}';
+
                             signature = ECSign(Prvkey, args);
 
                             args = '{"estateid":"'+ $("#estateid_op1_put_input").val() + '","ower":"' + $("#ower_op1_put_input").val() + '","position":"' + $("#position_op1_put_input").val() + '","area":"' + $("#area_op1_put_input").val() + '","hash":"' + hex_sha256(fileString_Image) + '","signature":"' + signature + '"}';
@@ -289,7 +290,7 @@ $(document).ready(function(){
                                     'cert':fileString_PubkeyPEM,
                                     'signature':signature,
                                     'hash':hex_sha256(fileString_Image),
-                                    'imgdata':fileString_Image_Base64,
+                                    'imgdata':fileString_Image,
                                     'storageType':storageType,
                                     'username':getCookie("username"),
                                     'orgname':getCookie("orgname")

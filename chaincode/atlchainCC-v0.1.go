@@ -1,3 +1,14 @@
+/*
+ *  Chaincode atlchainCC version 0.1 
+ *  Only support insert one type record and query by some fixed conditions
+ *  
+ *  Author: chengyang@supermap.com
+ *  Date:   2019-11-08
+ *  Log:    create
+ *
+ */
+
+
 package main
 
 import (
