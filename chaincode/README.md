@@ -51,6 +51,9 @@ $ peer chaincode query -C atlchannel -n atlchainCC -c '{"Args":["Get", "{\"price
 ```
 $ peer chaincode query -C atlchannel -n atlchain -c '{"Args":["getHistoryByBuyerAddr","addB"]}'
 // 结果示例 {"TxId":"3a198be789b60fb964141e4d4e24b47298f874b0378900ae5e33c98f401afbb9", "Value":{"Buyer":"addB","Seller":"addC","Price":100,"Time":"20181108","Hash":"hashcode2"}, "Timestamp":"2018-11-07 06:58:56.420657457 +0000 UTC", "IsDelete":"false"}
+
+// atlchainCC-v0.3 
+$ peer chaincode invoke -o 127.0.0.1:7050 -C atlchannel -n atlchainCC -c '{"Args":[" getHistoryByKey", "addrABC"]}'
 ```
 
 9. 根据hash查询交易记录 

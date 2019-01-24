@@ -1,3 +1,14 @@
+/*
+ *  Chaincode atlchainCC version 0.4 
+ *  1.Support insert customize type record and query by customize conditions.
+ *  2.Support get history transaction by key.(Note: the key should always be the id of the data)
+ *  
+ *  Author: chengyang@supermap.com
+ *  Date:   2019-01-24
+ *  Log:    update from v0.3
+ *
+ */
+
 package main
 
 import (
