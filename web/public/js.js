@@ -226,13 +226,14 @@ $(document).ready(function(){
 
                         signature = ECSign(Prvkey, args);
 
-                        args = '{"hash":"' + $("#Hash_op0_put_input").val() + '","addrrec":"' + $("#AddrRec_op0_put_input").val() + '","price":"' + $("#Price_op0_put_input").val() + '","storageType":"' + storageType + '","addrsend":"' + $("#AddrSend_op0_put_input").val() + '","parentTxID":"' + parentTxID + '","signature":'  + signature + '"}';
+                        args = '{"hash":"' + $("#Hash_op0_put_input").val() + '","addrrec":"' + $("#AddrRec_op0_put_input").val() + '","price":"' + $("#Price_op0_put_input").val() + '","storageType":"' + storageType + '","addrsend":"' + $("#AddrSend_op0_put_input").val() + '","parentTxID":"' + parentTxID + '","signature":"'  + signature + '"}';
 
                         var objFiles_Data = document.getElementById("File_op0_put_input");
                         var reader_Data = new FileReader();
                         reader_Data.readAsText(objFiles_Data.files[0], "UTF-8");
                         reader_Data.onload = function(evt_Data){
                             var fileString_Data = evt_Data.target.result;
+                            var hash = $("#Hash_op0_put_input").val();
                             $.ajax({
                                 type:'post',
                                 
@@ -240,10 +241,10 @@ $(document).ready(function(){
                                 data:JSON.stringify({
                                     'fcn': 'Put',
                                     'peers': ['peer0.orga.atlchain.com'],
-                                    'args':[args, signature, fileString_PubkeyPEM],
+                                    'args':[hash, args, signature, fileString_PubkeyPEM],
                                     'cert':fileString_PubkeyPEM,
                                     'signature':signature,
-                                    'hash':$("#Hash_op0_put_input").val(),
+                                    'hash':hash,
                                     'txdata':fileString_Data,
                                     'storageType':storageType,
                                     'username':getCookie("username"),
@@ -270,17 +271,19 @@ $(document).ready(function(){
                         reader_Image.readAsBinaryString(objFiles_Image.files[0]);
                         reader_Image.onload = function(evt_Image){
                             var fileString_Image = evt_Image.target.result;
+                            var estateid = $("#estateid_op1_put_input").val();
+
                             // console.log(fileString_Image);
                             // image base64 encode
                             // var b = new Base64();  
                             // var fileString_Image_Base64 = b.encode(fileString_Image);  
                             // console.log(fileString_Image_Base64);
 
-                            args = '{"estateid":"'+ $("#estateid_op1_put_input").val() + '","ower":"' + $("#ower_op1_put_input").val() + '","position":"' + $("#position_op1_put_input").val() + '","area":"' + $("#area_op1_put_input").val() + '","storageType":"' + storageType + '","hash":"' + hex_sha256(fileString_Image) + '","parentTxID":"' + parentTxID + '"}';
+                            args = '{"estateid":"'+ estateid + '","ower":"' + $("#ower_op1_put_input").val() + '","position":"' + $("#position_op1_put_input").val() + '","area":"' + $("#area_op1_put_input").val() + '","storageType":"' + storageType + '","hash":"' + hex_sha256(fileString_Image) + '","parentTxID":"' + parentTxID + '"}';
 
                             signature = ECSign(Prvkey, args);
 
-                            args = '{"estateid":"'+ $("#estateid_op1_put_input").val() + '","ower":"' + $("#ower_op1_put_input").val() + '","position":"' + $("#position_op1_put_input").val() + '","area":"' + $("#area_op1_put_input").val() + '","storageType":"' + storageType + '","hash":"' + hex_sha256(fileString_Image) + '","parentTxID":"' + parentTxID + '","signature":"' + signature + '"}';
+                            args = '{"estateid":"'+ estateid + '","ower":"' + $("#ower_op1_put_input").val() + '","position":"' + $("#position_op1_put_input").val() + '","area":"' + $("#area_op1_put_input").val() + '","storageType":"' + storageType + '","hash":"' + hex_sha256(fileString_Image) + '","parentTxID":"' + parentTxID + '","signature":"' + signature + '"}';
                             console.log(args);
 
                             $.ajax({
@@ -290,7 +293,7 @@ $(document).ready(function(){
                                 data:JSON.stringify({
                                     'fcn': 'Put',
                                     'peers': ['peer0.orga.atlchain.com'],
-                                    'args':[args, signature, fileString_PubkeyPEM],
+                                    'args':[estateid, args, signature, fileString_PubkeyPEM],
                                     'cert':fileString_PubkeyPEM,
                                     'signature':signature,
                                     'hash':hex_sha256(fileString_Image),

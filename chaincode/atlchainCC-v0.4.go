@@ -1,14 +1,3 @@
-/*
- *  Chaincode atlchainCC version 0.4 
- *  1.Support insert customize type record and query by customize conditions.
- *  2.Support get history transaction by key.(Note: the key should always be the id of the data)
- *  
- *  Author: chengyang@supermap.com
- *  Date:   2019-01-24
- *  Log:    update from v0.3
- *
- */
-
 package main
 
 import (
@@ -31,25 +20,31 @@ func (a *AtlchainCC) Init(stub shim.ChaincodeStubInterface) pb.Response {
     return shim.Success(nil)
 }
 
-// 写入账本，key => AddrReceive
-// args: 0-{jsonStr},1-{signatureStr},2-{pubkeyPemStr}
+// Put into ledger
+// args: 0-{key},1-{jsonStr},2-{signatureStr},3-{pubkeyPemStr}
+// key => for traceablity, key should always be the hash or id of the data for transaction.
+// jsonStr => content string in json format
 // eg:"{"AddrReceive":"addrA", "AddrSend":"addrB"}"
 func (a *AtlchainCC) Put(stub shim.ChaincodeStubInterface, args []string) pb.Response {
-    argsNeed := 3
+    argsNeed := 4
     argsLength := len(args)
 	if argsLength != argsNeed {
 		return shim.Error("Incorrect number of arguments. Expecting " + strconv.Itoa(argsNeed) + ", given " + strconv.Itoa(argsLength))
 	}
 
-    var jsonStr = args[0]
-    var signatureStr = args[1]
-    var pubkeyPemStr = args[2]
+    var putKey = args[0]
+    var jsonStr = args[1]
+    var signatureStr = args[2]
+    var pubkeyPemStr = args[3]
+
+    fmt.Println("++++++++++++++++jsonStr+++++++++++++++++++++++++++++")
+    fmt.Print(jsonStr)
 
     if !verify(jsonStr, signatureStr, pubkeyPemStr) {
         return shim.Error("Invalid signature")
     }
 
-    var putKey = getPutKeyFromJsonStr(jsonStr)
+    // var putKey = getPutKeyFromJsonStr(jsonStr)
 
     recordByte := []byte(jsonStr)
 
@@ -61,7 +56,7 @@ func (a *AtlchainCC) Put(stub shim.ChaincodeStubInterface, args []string) pb.Res
     return shim.Success(nil)
 }
 
-// 根据各种条件查询当前状态
+// Query by any conditions
 // args: 0-{queryJsonString} 
 // eg: {"hash":"hashstring", "AddrSend":"addressstring"}
 func (t *AtlchainCC) Get(stub shim.ChaincodeStubInterface, args []string) pb.Response {
@@ -80,7 +75,21 @@ func (t *AtlchainCC) Get(stub shim.ChaincodeStubInterface, args []string) pb.Res
 	return shim.Success(queryResults)
 }
 
-// 根据key查询交易历史
+func (t *AtlchainCC) getRecordByKey(stub shim.ChaincodeStubInterface, args []string) pb.Response {
+    argsNeed := 1
+    argsLength := len(args)
+	if len(args) != argsNeed {
+		return shim.Error("Incorrect number of arguments. Expecting " + strconv.Itoa(argsNeed) + ", given " + strconv.Itoa(argsLength))
+	}
+
+	queryResult, err := stub.GetState(args[0])
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+	return shim.Success(queryResult)
+}
+
+// Get history by key
 func (t *AtlchainCC) getHistoryByKey(stub shim.ChaincodeStubInterface, args []string) pb.Response {
 	argsNeed := 1
 	argsLength := len(args)
@@ -142,7 +151,6 @@ func (t *AtlchainCC) getHistoryByKey(stub shim.ChaincodeStubInterface, args []st
 	return shim.Success(buffer.Bytes())
 }
 
-// 执行查询条件
 func getQueryResult(stub shim.ChaincodeStubInterface, queryString string) ([]byte, error) {
 	resultsIterator, err := stub.GetQueryResult(queryString)
 	if err != nil {
@@ -160,7 +168,6 @@ func getQueryResult(stub shim.ChaincodeStubInterface, queryString string) ([]byt
 	return buffer.Bytes(), nil
 }
 
-// 格式化输出结果
 func constructQueryResponseFromIterator(resultsIterator shim.StateQueryIteratorInterface) (*bytes.Buffer, error) {
 	// buffer is a JSON array containing QueryResults
 	var buffer bytes.Buffer
@@ -221,6 +228,8 @@ func (a *AtlchainCC) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
         return a.Get(stub, args)
     case "getHistoryByKey":
         return a.getHistoryByKey(stub, args)
+    case "getRecordByKey":
+        return a.getRecordByKey(stub, args)
     default:
         return shim.Error("Invalid invoke function name")
     }
