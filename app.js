@@ -229,12 +229,9 @@ app.post('/channels/:channelName/chaincodes/:chaincodeName/trace', async functio
 	var chaincodeName = req.params.chaincodeName;
     let username = req.body.username;
     let orgname = req.body.orgname;
-    let traceID = req.body.traceid; 
+	let peer = req.body.peer;
+    let args = req.body.args; 
     let fcn = "getHistoryByKey";
-	if (!traceID) {
-		res.json(getErrorMessage('\'traceID\''));
-		return;
-	}
 
 	let message = await query.queryChaincode(peer, channelName, chaincodeName, args, fcn, username, orgname);
 	res.send(message);

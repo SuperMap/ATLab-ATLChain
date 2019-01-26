@@ -91,7 +91,7 @@ $(document).ready(function(){
         }
     });
 
-    // login
+    // login >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     $("#login_btn").click(function(){
         delCookie("token");
         delCookie("address");
@@ -143,8 +143,9 @@ $(document).ready(function(){
             $("#Hash_op0_put_input").val(hex_sha256(fileString)); // 计算hash
         }
     });
+    // login <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     
-    // put
+    // put >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     $("#put_select").change(function(){
         switch ($("#put_select").val()) {
             case "transaction":
@@ -324,15 +325,16 @@ $(document).ready(function(){
             }
         }
     });
+    // put <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
-    // trace
+    // trace >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     $("#trace_select").change(function(){
         switch ($("#trace_select").val()) {
             case "transaction":
                 $("#content_trace_div").html(" \
                     <p> \
                         <label for=\"Hash_op0_trace_label\">数据哈希:</label> \
-                        <textarea id=\"Hash_op0_trace_input\" rows=\"3\" cols=\"38\" readonly=\"readonly\" style=\"vertical-align: top;\"></textarea> \
+                        <textarea id=\"Hash_op0_trace_input\" rows=\"3\" cols=\"38\" style=\"vertical-align: top;\"></textarea> \
                     </p> \
                     <p> \
                         根据数据Hash值追溯数据交易历史 \
@@ -355,128 +357,67 @@ $(document).ready(function(){
         } 
     });
 
-    // TODO: implement trace function
     $("#trace_btn").click(function(){
-        var storageTypeChecked = $("[name='storageType']").filter(":checked");
-        var storageType = storageTypeChecked.attr("value");
-
-        var objFiles_PrvkeyPEM = document.getElementById("Prvkey_put_input");
-        var reader_PrvkeyPEM = new FileReader();
-        reader_PrvkeyPEM.readAsText(objFiles_PrvkeyPEM.files[0], "UTF-8");
-        reader_PrvkeyPEM.onload = function(evt_Prvkey){
-            var fileString_PrvkeyPEM = evt_Prvkey.target.result;
-            var Prvkey = getPrvKeyFromPEM(fileString_PrvkeyPEM);
-
-            var objFiles_PubkeyPEM = document.getElementById("Pubkey_put_input");
-            var reader_PubkeyPEM = new FileReader();
-            reader_PubkeyPEM.readAsText(objFiles_PubkeyPEM.files[0], "UTF-8");
-            reader_PubkeyPEM.onload = function(evt_Pubkey){
-                var fileString_PubkeyPEM = evt_Pubkey.target.result;
-
-                var args = "";
-                var signature = "";
-                switch ($("#put_select").val()) {
-                    case "transaction":
-                        args = '{"hash":"' + $("#Hash_op0_put_input").val() + '","addrrec":"' + $("#AddrRec_op0_put_input").val() + '","price":"' + $("#Price_op0_put_input").val()+ '","addrsend":"' + $("#AddrSend_op0_put_input").val() + '"}';
-
-                        signature = ECSign(Prvkey, args);
-
-                        args = '{"addrsend":"' + $("#AddrSend_op0_put_input").val() + '","addrrec":"' + $("#AddrRec_op0_put_input").val() + '","price":"' + $("#Price_op0_put_input").val()+ '","hash":"' + $("#Hash_op0_put_input").val() + '","signature":"' + signature + '"}';
-
-                        var objFiles_Data = document.getElementById("File_op0_put_input");
-                        var reader_Data = new FileReader();
-                        reader_Data.readAsText(objFiles_Data.files[0], "UTF-8");
-                        reader_Data.onload = function(evt_Data){
-                            var fileString_Data = evt_Data.target.result;
-                            $.ajax({
-                                type:'post',
-                                
-                                url: RESTURL + '/channels/atlchannel/chaincodes/atlchainCC/putTx',
-                                data:JSON.stringify({
-                                    'fcn': 'Put',
-                                    'peers': ['peer0.orga.atlchain.com'],
-                                    'args':[args, signature, fileString_PubkeyPEM],
-                                    'cert':fileString_PubkeyPEM,
-                                    'signature':signature,
-                                    'hash':$("#Hash_op0_put_input").val(),
-                                    'txdata':fileString_Data,
-                                    'storageType':storageType,
-                                    'username':getCookie("username"),
-                                    'orgname':getCookie("orgname")
-                                }),
-                                headers: {
-                                    "authorization": "Bearer " + getCookie("token"),
-                                    "content-type": "application/json"
-                                },
-                                success:function(data){
-                                    console.log(data);
-                                    alert(data + ": 写入成功");
-                                    $("#txID_put_input").val(data);
-                                },
-                                error:function(err){
-                                    console.log(err);
-                                }
-                            });
-                        }
-                        break;
-                    case "estate":
-                        var objFiles_Image = document.getElementById("Image_op0_put_input");
-                        var reader_Image = new FileReader();
-                        reader_Image.readAsBinaryString(objFiles_Image.files[0]);
-                        reader_Image.onload = function(evt_Image){
-                            var fileString_Image = evt_Image.target.result;
-                            console.log(fileString_Image);
-                            var b = new Base64();  
-                            var fileString_Image_Base64 = b.encode(fileString_Image);  
-                            console.log(fileString_Image_Base64);
-
-                            args = '{"estateid":"'+ $("#estateid_op1_put_input").val() + '","ower":"' + $("#ower_op1_put_input").val() + '","position":"' + $("#position_op1_put_input").val() + '","area":"' + $("#area_op1_put_input").val() + '"hash":"' + hex_sha256(fileString_Image) + '"}';
-
-                            signature = ECSign(Prvkey, args);
-
-                            args = '{"estateid":"'+ $("#estateid_op1_put_input").val() + '","ower":"' + $("#ower_op1_put_input").val() + '","position":"' + $("#position_op1_put_input").val() + '","area":"' + $("#area_op1_put_input").val() + '","hash":"' + hex_sha256(fileString_Image) + '","signature":"' + signature + '"}';
-                            console.log(args);
-
-                            $.ajax({
-                                type:'post',
-                                
-                                url: RESTURL + '/channels/atlchannel/chaincodes/atlchainCC/putEstate',
-                                data:JSON.stringify({
-                                    'fcn': 'Put',
-                                    'peers': ['peer0.orga.atlchain.com'],
-                                    'args':[args, signature, fileString_PubkeyPEM],
-                                    'cert':fileString_PubkeyPEM,
-                                    'signature':signature,
-                                    'hash':hex_sha256(fileString_Image),
-                                    'imgdata':fileString_Image,
-                                    'storageType':storageType,
-                                    'username':getCookie("username"),
-                                    'orgname':getCookie("orgname")
-                                }),
-                                headers: {
-                                    "authorization": "Bearer " + getCookie("token"),
-                                    "content-type": "application/json"
-                                },
-                                success:function(data){
-                                    console.log(data);
-                                    alert(data + ": 写入成功");
-                                    $("#txID_put_input").val(data);
-                                },
-                                error:function(err){
-                                    console.log(err);
-                                }
-                            });
-                        }
-                        break;
-                    default:
-                        break;
-                }
-
-            }
+        switch($("#trace_select").val()){
+            case "transaction":
+                
+                $.ajax({
+                    type:'post',
+                    url: RESTURL + '/channels/atlchannel/chaincodes/atlchainCC/trace',
+                    data:JSON.stringify({
+                        'fcn': 'getHistoryByKey',
+                        'peer': 'peer0.orga.atlchain.com',
+                        'args':[$("#Hash_op0_trace_input").val()],
+                        'username':getCookie("username"),
+                        'orgname':getCookie("orgname")
+                    }),
+                    headers: {
+                        "authorization": "Bearer " + getCookie("token") ,
+                        "content-type": "application/json"
+                    },
+                    success:function(data){
+                        console.log(data);
+                        
+                        $("#result_input").html(FormatOutputUsual(data));
+                    },
+                    error:function(err){
+                        console.log(err);
+                    }
+                });
+                break;
+            case "estate":
+                
+                $.ajax({
+                    type:'post',
+                    url: RESTURL + '/channels/atlchannel/chaincodes/atlchainCC/trace',
+                    data:JSON.stringify({
+                        'fcn': 'getHistoryByKey',
+                        'peer': 'peer0.orga.atlchain.com',
+                        'args':[$("#estateid_op1_trace_input").val()],
+                        'username':getCookie("username"),
+                        'orgname':getCookie("orgname")
+                    }),
+                    headers: {
+                        "authorization": "Bearer " + getCookie("token") ,
+                        "content-type": "application/json"
+                    },
+                    success:function(data){
+                        console.log(data);
+                        
+                        $("#result_input").html(FormatOutputUsual(data));
+                    },
+                    error:function(err){
+                        console.log(err);
+                    }
+                });
+                break;
+            default:
+                break;
         }
     });
+    // trace <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
-    // get
+    // get >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     $("#get_select").change(function(){
         switch ($("#get_select").val()) {
             case "transaction":
@@ -656,11 +597,11 @@ $(document).ready(function(){
     });
 
     // TODO: get image from hbase
-    $("#get_hbase_data_btn").click(function(){
+    $("#hbase_btn").click(function(){
         $.ajax({
             type:'get',
             
-            url: RESTURL + '/getDataByHash?hash=' + $("#get_hbase_data_input").val(),
+            url: RESTURL + '/getDataFromHBase?hash=' + $("#key_hbase_input").val(),
             data:JSON.stringify({}),
             headers: {
                 "authorization": "Bearer " + getCookie("token"),
@@ -668,9 +609,7 @@ $(document).ready(function(){
             },
             success:function(data){
                 console.log(JSON.stringify(data));
-                alert("查询成功");
-                //$("#result_input").html(FormatOutputForHBaseData(data));
-                $("#result_input").html(data[0].$);
+                $("#result_input").html(FormatOutputUsual(data[0].$));
             },
             error:function(err){
                 console.log(err);
@@ -679,6 +618,26 @@ $(document).ready(function(){
     });
 
     // TODO: get image from hdfs
+    $("#hdfs_btn").click(function(){
+        $.ajax({
+            type:'get',
+            
+            url: RESTURL + '/getFileFromHDFS?filename=' + $("#fileName_hdfs_input").val(),
+            data:JSON.stringify({}),
+            headers: {
+                "authorization": "Bearer " + getCookie("token"),
+                "content-type": "application/json"
+            },
+            success:function(data){
+                console.log(data);
+                $("#result_input").html(FormatOutputHDFS(data));
+            },
+            error:function(err){
+                console.log(err);
+            }
+        });
+    });
+
     $("#quit_btn").click(function(){
         var res = confirm("您确定要退出么？");
         if(res == true){
@@ -691,6 +650,7 @@ $(document).ready(function(){
             return;
         }
     });
+    // get <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 });
 
 // window.onbeforeunload= function(event){ 
@@ -772,6 +732,16 @@ function FormatOutputForHBaseData(data){
         }
     }
     str = str + "]}";
+    return str;
+}
+
+function FormatOutputHDFS(data){
+    var str = "<a href=tmp/" + data + ">" + data + "</a>";
+    return str;
+}
+
+function FormatOutputUsual(data){
+    var str = "<p>" + data + "</p>";
     return str;
 }
 
