@@ -222,7 +222,7 @@ app.post('/channels/:channelName/chaincodes/:chaincodeName/get', async function(
 	res.send(message);
 });
 
-// TODO:Traceable 溯源要唯一可以标识该数据的键来查询历史，必须使用历史查询，而不是couchdb。所以记录要以数据hash为Key
+// Trace
 app.post('/channels/:channelName/chaincodes/:chaincodeName/trace', async function(req, res) {
 	logger.info('==================== TRACING HISTORY ==================');
 	var channelName = req.params.channelName;
@@ -240,7 +240,7 @@ app.post('/channels/:channelName/chaincodes/:chaincodeName/trace', async functio
 	res.send(message);
 })
 
-// Invoke transaction on chaincode on target peers
+// Put transcation
 app.post('/channels/:channelName/chaincodes/:chaincodeName/putTx', async function(req, res) {
 	logger.debug('==================== INVOKE ON CHAINCODE ==================');
 	var peers = req.body.peers;
@@ -260,6 +260,10 @@ app.post('/channels/:channelName/chaincodes/:chaincodeName/putTx', async functio
 		res.json(getErrorMessage('\'args\''));
 		return;
 	}
+
+    logger.info("+++++++++++++++++++++++++++++++++++++++++++");
+    logger.info(args);
+    logger.info("+++++++++++++++++++++++++++++++++++++++++++");
 
     // TODO: 验证参数中的证书和签名，通过后再执行交易
     if (!crypto.certCheck(cert) || !crypto.signatureVerify(cert, args, signature)){
@@ -295,7 +299,7 @@ app.post('/channels/:channelName/chaincodes/:chaincodeName/putTx', async functio
 	res.send(message);
 });
 
-// TODO: put estate 
+// Put estate
 app.post('/channels/:channelName/chaincodes/:chaincodeName/putEstate', async function(req, res) {
 	logger.debug('==================== INVOKE ON CHAINCODE ==================');
 	var peers = req.body.peers;
@@ -316,6 +320,7 @@ app.post('/channels/:channelName/chaincodes/:chaincodeName/putEstate', async fun
 		return;
 	}
 
+    // decode based64 image
     // base64 image data decode
     // var img = new Buffer(imgdata, 'base64');
     // console.log("=================================" + img);

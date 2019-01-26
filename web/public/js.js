@@ -20,7 +20,9 @@ $(document).ready(function(){
         <li><a href=\"put.html\" id=\"tx_bar\">写入</a></li> \
         <li><a href=\"get.html\" id=\"query_bar\">查询</a></li> \
         <li><a href=\"trace.html\" id=\"trace_bar\">追溯</a></li> \
-        <li><a href=\"userCenter.html\" id=\"query_addr_hash_bar\">个人信息</a></li> \
+        <li><a href=\"getDataFromHBase.html\" id=\"getDataFromHBase_bar\">获取HBASE数据</a></li> \
+        <li><a href=\"getDataFromHDFS.html\" id=\"getDataFromHDFS_bar\">获取HDFS数据</a></li> \
+        <li><a href=\"userCenter.html\" id=\"userCenter_bar\">个人信息</a></li> \
         </ul>"); 
 
     $("#enroll_btn").click(function(){
@@ -201,6 +203,7 @@ $(document).ready(function(){
     $("#put_btn").click(function(){
         var storageTypeChecked = $("[name='storageType']").filter(":checked");
         var storageType = storageTypeChecked.attr("value");
+        var parentTxID = "parentTxIDHashString";
 
         var objFiles_PrvkeyPEM = document.getElementById("Prvkey_put_input");
         var reader_PrvkeyPEM = new FileReader();
@@ -219,11 +222,11 @@ $(document).ready(function(){
                 var signature = "";
                 switch ($("#put_select").val()) {
                     case "transaction":
-                        args = '{"hash":"' + $("#Hash_op0_put_input").val() + '","addrrec":"' + $("#AddrRec_op0_put_input").val() + '","price":"' + $("#Price_op0_put_input").val()+ '","addrsend":"' + $("#AddrSend_op0_put_input").val() + '"}';
+                        args = '{"hash":"' + $("#Hash_op0_put_input").val() + '","addrrec":"' + $("#AddrRec_op0_put_input").val() + '","price":"' + $("#Price_op0_put_input").val() + '","storageType":"' + storageType + '","addrsend":"' + $("#AddrSend_op0_put_input").val() + '","parentTxID":"'+ parentTxID  +'"}';
 
                         signature = ECSign(Prvkey, args);
 
-                        args = '{"addrsend":"' + $("#AddrSend_op0_put_input").val() + '","addrrec":"' + $("#AddrRec_op0_put_input").val() + '","price":"' + $("#Price_op0_put_input").val()+ '","hash":"' + $("#Hash_op0_put_input").val() + '","signature":"' + signature + '"}';
+                        args = '{"hash":"' + $("#Hash_op0_put_input").val() + '","addrrec":"' + $("#AddrRec_op0_put_input").val() + '","price":"' + $("#Price_op0_put_input").val() + '","storageType":"' + storageType + '","addrsend":"' + $("#AddrSend_op0_put_input").val() + '","parentTxID":"' + parentTxID + '","signature":'  + signature + '"}';
 
                         var objFiles_Data = document.getElementById("File_op0_put_input");
                         var reader_Data = new FileReader();
@@ -267,16 +270,17 @@ $(document).ready(function(){
                         reader_Image.readAsBinaryString(objFiles_Image.files[0]);
                         reader_Image.onload = function(evt_Image){
                             var fileString_Image = evt_Image.target.result;
-                            console.log(fileString_Image);
-                            var b = new Base64();  
-                            var fileString_Image_Base64 = b.encode(fileString_Image);  
-                            console.log(fileString_Image_Base64);
+                            // console.log(fileString_Image);
+                            // image base64 encode
+                            // var b = new Base64();  
+                            // var fileString_Image_Base64 = b.encode(fileString_Image);  
+                            // console.log(fileString_Image_Base64);
 
-                            args = '{"estateid":"'+ $("#estateid_op1_put_input").val() + '","ower":"' + $("#ower_op1_put_input").val() + '","position":"' + $("#position_op1_put_input").val() + '","area":"' + $("#area_op1_put_input").val() + '"hash":"' + hex_sha256(fileString_Image) + '"}';
+                            args = '{"estateid":"'+ $("#estateid_op1_put_input").val() + '","ower":"' + $("#ower_op1_put_input").val() + '","position":"' + $("#position_op1_put_input").val() + '","area":"' + $("#area_op1_put_input").val() + '","storageType":"' + storageType + '","hash":"' + hex_sha256(fileString_Image) + '","parentTxID":"' + parentTxID + '"}';
 
                             signature = ECSign(Prvkey, args);
 
-                            args = '{"estateid":"'+ $("#estateid_op1_put_input").val() + '","ower":"' + $("#ower_op1_put_input").val() + '","position":"' + $("#position_op1_put_input").val() + '","area":"' + $("#area_op1_put_input").val() + '","hash":"' + hex_sha256(fileString_Image) + '","signature":"' + signature + '"}';
+                            args = '{"estateid":"'+ $("#estateid_op1_put_input").val() + '","ower":"' + $("#ower_op1_put_input").val() + '","position":"' + $("#position_op1_put_input").val() + '","area":"' + $("#area_op1_put_input").val() + '","storageType":"' + storageType + '","hash":"' + hex_sha256(fileString_Image) + '","parentTxID":"' + parentTxID + '","signature":"' + signature + '"}';
                             console.log(args);
 
                             $.ajax({
@@ -635,7 +639,6 @@ $(document).ready(function(){
                     },
                     success:function(data){
                         console.log(data);
-                        alert("查询成功");
                         
                         $("#result_input").html(FormatOutputEstate(data));
                     },
