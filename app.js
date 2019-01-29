@@ -111,7 +111,9 @@ function getErrorMessage(field) {
 // Login
 app.post('/login', async function(req, res) {
 	var cert = req.body.cert;
-	var signature = req.body.signature;
+
+    // login with Certificate
+	// var signature = req.body.signature;
 
     console.log("==========lognin========");
 
@@ -122,10 +124,10 @@ app.post('/login', async function(req, res) {
 	}
 
     // Verify the signature by cert
-	if(!crypto.signatureVerify(cert, cert, signature)) {
-	 	res.json({success: false, message: "Invalid Signature"});
-        return;
-	}
+	// if(!crypto.signatureVerify(cert, cert, signature)) {
+	//  	res.json({success: false, message: "Invalid Signature"});
+    //     return;
+	// }
 
     var certJsonObj = JSON.parse(cert);
     var username = certJsonObj.name;

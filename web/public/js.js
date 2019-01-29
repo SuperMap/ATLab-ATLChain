@@ -98,21 +98,23 @@ $(document).ready(function(){
         delCookie("username");
         delCookie("orgname");
 
-        if($("#ECert_text").val() == "" || $("#pkey_text").val() == ""){
-            alert("请选择证书和私钥文件");
+        // 只使用证书登录
+        // if($("#ECert_text").val() == "" || $("#pkey_text").val() == ""){
+        if($("#ECert_text").val() == ""){
+            alert("请选择证书文件");
             return;
         }
 
-        var prvKey = getPrvKeyFromPEM($("#pkey_text").val());
-        console.log("prvKey: ", prvKey);
-        var signature = ECSign(prvKey, $("#ECert_text").val());
-        console.log("signature: ", signature);
+        // var prvKey = getPrvKeyFromPEM($("#pkey_text").val());
+        // console.log("prvKey: ", prvKey);
+        // var signature = ECSign(prvKey, $("#ECert_text").val());
+        // console.log("signature: ", signature);
 
         $.ajax({
             type:'post',
             url: RESTURL + '/login',
             data:{
-                signature: signature,
+                // signature: signature,
                 cert: $("#ECert_text").val()
             },
             success:function(data){
