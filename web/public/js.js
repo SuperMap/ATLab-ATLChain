@@ -172,7 +172,20 @@ $(document).ready(function(){
                         <label for=\"Hash_op0_put_label\">数据哈希:</label> \
                         <textarea id=\"Hash_op0_put_input\" rows=\"3\" cols=\"38\" readonly=\"readonly\" style=\"vertical-align: top;\"></textarea> \
                     </p> \
-                ")
+                    <p> \
+                        <label for=\"ParentID_op0_put_label\">父记录号:</label> \
+                        <textarea id=\"ParentID_op0_put_input\" rows=\"3\" cols=\"38\" style=\"vertical-align: top;\"></textarea> \
+                    </p>");
+                $("#File_op0_put_input").change(function(){
+                    var objFiles = document.getElementById("File_op0_put_input");
+                    // 读取文件内容
+                    var reader = new FileReader();//新建一个FileReader
+                    reader.readAsText(objFiles.files[0], "UTF-8");//读取文件 
+                    reader.onload = function(evt){ //读取完文件之后会回来这里
+                    var fileString = evt.target.result; // 读取文件内容
+                    $("#Hash_op0_put_input").val(hex_sha256(fileString)); // 计算hash
+                }
+            });
                 break;
             case "estate":
                 $("#content_put_div").html(" \
@@ -225,29 +238,31 @@ $(document).ready(function(){
                 var signature = "";
                 switch ($("#put_select").val()) {
                     case "transaction":
-                        args = '{"hash":"' + $("#Hash_op0_put_input").val() + '","addrrec":"' + $("#AddrRec_op0_put_input").val() + '","price":"' + $("#Price_op0_put_input").val() + '","storageType":"' + storageType + '","addrsend":"' + $("#AddrSend_op0_put_input").val() + '","parentTxID":"'+ parentTxID  +'"}';
+                        args = '{"hash":"' + $("#Hash_op0_put_input").val() + '","addrrec":"' + $("#AddrRec_op0_put_input").val() + '","price":"' + $("#Price_op0_put_input").val() + '","storageType":"' + storageType + '","addrsend":"' + $("#AddrSend_op0_put_input").val() + '","parentTxID":"'+ $("#ParentID_op0_put_input").val() +'"}';
 
                         signature = ECSign(Prvkey, args);
+                        var argsHash = hex_sha256(args);
 
-                        args = '{"hash":"' + $("#Hash_op0_put_input").val() + '","addrrec":"' + $("#AddrRec_op0_put_input").val() + '","price":"' + $("#Price_op0_put_input").val() + '","storageType":"' + storageType + '","addrsend":"' + $("#AddrSend_op0_put_input").val() + '","parentTxID":"' + parentTxID + '","signature":"'  + signature + '"}';
+                        args = '{"hash":"' + $("#Hash_op0_put_input").val() + '","recordID":"' + argsHash + '","addrrec":"' + $("#AddrRec_op0_put_input").val() + '","price":"' + $("#Price_op0_put_input").val() + '","storageType":"' + storageType + '","addrsend":"' + $("#AddrSend_op0_put_input").val() + '","parentTxID":"' + $("#ParentID_op0_put_input").val() + '","signature":"'  + signature + '"}';
+
 
                         var objFiles_Data = document.getElementById("File_op0_put_input");
                         var reader_Data = new FileReader();
                         reader_Data.readAsText(objFiles_Data.files[0], "UTF-8");
                         reader_Data.onload = function(evt_Data){
                             var fileString_Data = evt_Data.target.result;
-                            var hash = $("#Hash_op0_put_input").val();
+                            var dataHash = $("#Hash_op0_put_input").val();
                             $.ajax({
                                 type:'post',
                                 
                                 url: RESTURL + '/channels/atlchannel/chaincodes/atlchainCC/putTx',
                                 data:JSON.stringify({
                                     'fcn': 'Put',
-                                    'peers': ['peer0.orga.atlchain.com'],
-                                    'args':[hash, args, signature, fileString_PubkeyPEM],
+                                    'peers':['peer0.orga.atlchain.com'],
+                                    'args':[argsHash, args, signature, fileString_PubkeyPEM],
                                     'cert':fileString_PubkeyPEM,
                                     'signature':signature,
-                                    'hash':hash,
+                                    'hash':dataHash,
                                     'txdata':fileString_Data,
                                     'storageType':storageType,
                                     'username':getCookie("username"),
@@ -294,14 +309,8 @@ $(document).ready(function(){
                                 
                                 url: RESTURL + '/channels/atlchannel/chaincodes/atlchainCC/putEstate',
                                 data:JSON.stringify({
-                                    'fcn': 'Put',
-                                    'peers': ['peer0.orga.atlchain.com'],
                                     'args':[estateid, args, signature, fileString_PubkeyPEM],
-                                    'cert':fileString_PubkeyPEM,
-                                    'signature':signature,
-                                    'hash':hex_sha256(fileString_Image),
                                     'imgdata':fileString_Image,
-                                    'storageType':storageType,
                                     'username':getCookie("username"),
                                     'orgname':getCookie("orgname")
                                 }),
@@ -335,11 +344,11 @@ $(document).ready(function(){
             case "transaction":
                 $("#content_trace_div").html(" \
                     <p> \
-                        <label for=\"Hash_op0_trace_label\">数据哈希:</label> \
-                        <textarea id=\"Hash_op0_trace_input\" rows=\"3\" cols=\"38\" style=\"vertical-align: top;\"></textarea> \
+                        <label for=\"txid_op0_trace_label\">记录号:</label> \
+                        <textarea id=\"txid_op0_trace_input\" rows=\"3\" cols=\"38\" style=\"vertical-align: top;\"></textarea> \
                     </p> \
                     <p> \
-                        根据数据Hash值追溯数据交易历史 \
+                        根据记录号追溯数据交易历史 \
                     </p> \
                 ")
                 break;
@@ -369,7 +378,7 @@ $(document).ready(function(){
                     data:JSON.stringify({
                         'fcn': 'getHistoryByKey',
                         'peer': 'peer0.orga.atlchain.com',
-                        'args':[$("#Hash_op0_trace_input").val()],
+                        'args':[$("#txid_op0_trace_input").val()],
                         'username':getCookie("username"),
                         'orgname':getCookie("orgname")
                     }),
@@ -378,7 +387,7 @@ $(document).ready(function(){
                         "content-type": "application/json"
                     },
                     success:function(data){
-                        console.log(data);
+                        // console.log(data);
                         
                         $("#result_input").html(FormatOutputUsual(data));
                     },
@@ -404,7 +413,7 @@ $(document).ready(function(){
                         "content-type": "application/json"
                     },
                     success:function(data){
-                        console.log(data);
+                        // console.log(data);
                         
                         $("#result_input").html(FormatOutputUsual(data));
                     },
@@ -524,7 +533,7 @@ $(document).ready(function(){
                     success:function(data){
                         console.log(data);
                         
-                        $("#result_input").html(FormatOutputTx(data));
+                        $("#result_input").html(FormatOutputUsual(data));
                     },
                     error:function(err){
                         console.log(err);
@@ -586,7 +595,7 @@ $(document).ready(function(){
                     success:function(data){
                         console.log(data);
                         
-                        $("#result_input").html(FormatOutputEstate(data));
+                        $("#result_input").html(FormatOutputUsual(data));
                     },
                     error:function(err){
                         console.log(err);
@@ -598,7 +607,6 @@ $(document).ready(function(){
         }
     });
 
-    // TODO: get image from hbase
     $("#hbase_btn").click(function(){
         $.ajax({
             type:'get',
@@ -611,7 +619,7 @@ $(document).ready(function(){
             },
             success:function(data){
                 console.log(JSON.stringify(data));
-                $("#result_input").html(FormatOutputUsual(data[0].$));
+                $("#result_input").html(FormatOutputText(data[0].$));
             },
             error:function(err){
                 console.log(err);
@@ -619,7 +627,6 @@ $(document).ready(function(){
         });
     });
 
-    // TODO: get image from hdfs
     $("#hdfs_btn").click(function(){
         $.ajax({
             type:'get',
@@ -742,8 +749,94 @@ function FormatOutputHDFS(data){
     return str;
 }
 
+function FormatOutputText(data){
+    return "<p>" + data + "</p>"
+
+}
+
 function FormatOutputUsual(data){
-    var str = "<p>" + data + "</p>";
+    var jsonData = JSON.parse(data);
+    // console.log(jsonData);
+
+    var str = "";
+    var keyName = "";
+    for(var i = 0; i < jsonData.length; i++){
+        str += "<p><label><b>序号： </b></label>" + (i+1) + "</p>";
+        for(var key in jsonData[i]){
+            if(key == "Key"){
+                continue;
+            }
+            switch(key) {
+                case "TxId":
+                    keyName = "交易ID";
+                    break;
+                case "Timestamp":
+                    keyName = "时间戳";
+                    break;
+                case "IsDelete":
+                    keyName = "是否删除";
+                    break;
+                default:
+                    break;
+            }
+            if(key == "Value" || key == "Record"){
+                for(var key2 in jsonData[i][key]){
+                    switch(key2) {
+                        // transaction
+                        case "hash":
+                            keyName = "数据哈希";
+                            break;
+                        case "parentTxID":
+                            keyName = "父记录号";
+                            break;
+                        case "price":
+                            keyName = "价格";
+                            break;
+                        case "addrrec":
+                            keyName = "接收方地址";
+                            break;
+                        case "addrsend":
+                            keyName = "发送方地址";
+                            break;
+                        case "storageType":
+                            keyName = "存储类型";
+                            break;
+                        case "recordID":
+                            keyName = "记录号";
+                            break;
+                        // estate
+                        case "estateid":
+                            keyName = "证书编号";
+                            break;
+                        case "ower":
+                            keyName = "权利人";
+                            break;
+                        case "position":
+                            keyName = "坐落";
+                            break;
+                        case "area":
+                            keyName = "面积";
+                            break;
+                        case "hash":
+                            keyName = "数据哈希";
+                            break;
+                        case "signature":
+                            keyName = "签名";
+                            break;
+                        default:
+                            break;
+                    }
+
+                    str += "<p><label><b>" + keyName + ":</b></label>" + jsonData[i][key][key2] + "</p>";
+                    keyName = "null";
+                }
+            } else {
+                str += "<p><label><b>" + keyName + ":</b></label>" + jsonData[i][key] + "</p>";
+                keyName = "null";
+            }
+        }
+    str += "<hr><p></p>"
+    }
     return str;
 }
 
