@@ -62,7 +62,7 @@ app.use(expressJWT({
 app.use(bearerToken());
 app.use(function(req, res, next) {
 	logger.debug(' ------>>>>>> new request for %s',req.originalUrl);
-	if (req.originalUrl.indexOf('/login') >= 0 || req.originalUrl.indexOf('/users') >= 0) {
+	if (req.originalUrl.indexOf('/login')>= 0 || req.originalUrl.indexOf('/users') >= 0) {
 		return next();
 	}
 
@@ -299,7 +299,8 @@ app.post('/channels/:channelName/chaincodes/:chaincodeName/putTx', async functio
 });
 
 // Put estate
-app.post('/channels/:channelName/chaincodes/:chaincodeName/putEstate', async function(req, res) {
+// Define: RecordID AddRecord(string strRecord, Signature sig, PublicKey key)
+app.post('/channels/:channelName/chaincodes/:chaincodeName/AddRecord', async function(req, res) {
 	logger.debug('==================== INVOKE ON CHAINCODE ==================');
     var channel = req.params.channelName;     // atlchannel
     var chaincode = req.params.chaincodeName; // atlchainCC
@@ -321,6 +322,8 @@ app.post('/channels/:channelName/chaincodes/:chaincodeName/putEstate', async fun
     var signature = jsonArgs.signature;
     var storageType = jsonArgs.storageType;
     var hash = jsonArgs.hash;
+    var recordID = jsonArgs.recordID;
+    console.log("recordID: " + recordID);
     var cert = args[3];
 
     if(storageType == "onchain") {
@@ -343,7 +346,6 @@ app.post('/channels/:channelName/chaincodes/:chaincodeName/putEstate', async fun
     }
 
     switch(storageType) {
-        case "onchain":
         case "hbase" :
 	        // Put data into HBase
 	        // statement about create database:
@@ -365,70 +367,8 @@ app.post('/channels/:channelName/chaincodes/:chaincodeName/putEstate', async fun
     }
     
 	// invoke
-    console.log(storageType);
 	let message = await invoke.invokeChaincode(peers, channel, chaincode, fcn, args, username, orgname);
-	res.send(message);
-});
-
-// Define: RecordID AddRecord(string strRecord, Signature sig, PublicKey key)
-app.post('/channels/:channelName/chaincodes/:chaincodeName/AddRecord', async function(req, res) {
-	logger.debug('==================== INVOKE ON CHAINCODE ==================');
-	var peers = req.body.peers;
-    var channel = req.params.channelName;     // atlchannel
-    var chaincode = req.params.chaincodeName; // atlchainCC
-    var fcn = req.body.fcn; // Put
-	var args = req.body.args; 
-    var hash = req.body.hash;
-    var imgdata = req.body.imgdata;
-    var cert = req.body.cert;
-    var signature = req.body.signature;
-    var storageType = req.body.storageType;
-    var username = req.body.username;
-    var orgname = req.body.orgname;
-
-	if (!args) {
-		res.json(getErrorMessage('\'args\''));
-		return;
-	}
-
-    // decode based64 image
-    // base64 image data decode
-    // var img = new Buffer(imgdata, 'base64');
-    // console.log("=================================" + img);
-    
-   
-    // TODO: 验证参数中的证书和签名，通过后再执行交易
-    if (!crypto.certCheck(cert) || !crypto.signatureVerify(cert, args, signature)){
-		res.json(getErrorMessage('\'signature\''));
-		return;
-    }
-
-    switch(storageType) {
-        case "onchain":
-        case "hbase" :
-	        // Put data into HBase
-	        // statement about create database:
-	        // 1. create 'atlchain', 'data'
-	        // 2. put 'atlchain', 'hash1', 'data:data', "json string value"
-	        hbaseClient.put(hbaseTable, hash, hbaseCF, imgdata, function(){
-                logger.info("Put into hbase finish");
-            })
-            break;
-        case "hdfs" :
-            await fs.writeFileSync('/tmp/' + hash, imgdata, 'binary');
-
-            hdfsClient.put("/tmp/" + hash, hdfsDir + hash, function(){
-                logger.info("Put into HDFS finish");
-            });
-            break;
-        default:
-            break;
-    }
-    
-	// invoke
-    console.log(storageType);
-	let message = await invoke.invokeChaincode(peers, channel, chaincode, fcn, args, username, orgname);
-	res.send(message);
+	res.send(recordID);
 });
 
 // TODO: Get data from remote HDFS, now it is only avaliable for localhost hdfs

@@ -300,14 +300,15 @@ $(document).ready(function(){
                             args = '{"estateid":"'+ estateid + '","ower":"' + $("#ower_op1_put_input").val() + '","position":"' + $("#position_op1_put_input").val() + '","area":"' + $("#area_op1_put_input").val() + '","storageType":"' + storageType + '","hash":"' + hex_sha256(fileString_Image) + '","parentTxID":"' + parentTxID + '"}';
 
                             signature = ECSign(Prvkey, args);
+                            var argsHash = hex_sha256(args);
 
-                            args = '{"estateid":"'+ estateid + '","ower":"' + $("#ower_op1_put_input").val() + '","position":"' + $("#position_op1_put_input").val() + '","area":"' + $("#area_op1_put_input").val() + '","storageType":"' + storageType + '","hash":"' + hex_sha256(fileString_Image) + '","parentTxID":"' + parentTxID + '","signature":"' + signature + '"}';
+                            args = '{"estateid":"'+ estateid + '","recordID":"' + argsHash + '","ower":"' + $("#ower_op1_put_input").val() + '","position":"' + $("#position_op1_put_input").val() + '","area":"' + $("#area_op1_put_input").val() + '","storageType":"' + storageType + '","hash":"' + hex_sha256(fileString_Image) + '","parentTxID":"' + parentTxID + '","signature":"' + signature + '"}';
                             console.log(args);
 
                             $.ajax({
                                 type:'post',
                                 
-                                url: RESTURL + '/channels/atlchannel/chaincodes/atlchainCC/putEstate',
+                                url: RESTURL + '/channels/atlchannel/chaincodes/atlchainCC/AddRecord',
                                 data:JSON.stringify({
                                     'args':[estateid, args, signature, fileString_PubkeyPEM],
                                     'imgdata':fileString_Image,
