@@ -33,10 +33,10 @@ var crypto = require('./app/crypto.js');
 var port = process.env.PORT || hfc.getConfigSetting('port');
 var host = process.env.HOST || hfc.getConfigSetting('host');
 var hbaseClient = new hbase('148.70.109.243', '8080');
-var hbaseTable = 'atl';
+var hbaseTable = 'atlc';
 var hbaseCF = 'data:data';
 var hdfsClient = new hdfs('chengyang', 'localhost', '50070');
-var hdfsDir = '/atlchain/';
+var hdfsDir = '/atl/';
 
 ///////////////////////////////////////////////////////////////////////////////
 //////////////////////////////// SET CONFIGURATONS ////////////////////////////
