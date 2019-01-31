@@ -71,7 +71,7 @@ $(document).ready(function(){
             try {
                 var jsonFile = JSON.parse(fileString);
             } catch(err){
-                alert("请选择正确的证书文件");
+                alert("请选择正确的证书");
                 return;
             }
             $("#ECert_text").val(fileString);
@@ -124,6 +124,7 @@ $(document).ready(function(){
                     //document.cookie = "address=" + data.address;
                     document.cookie = "username=" + data.message.username;
                     document.cookie = "orgname=" + data.message.orgname;
+                    // document.cookie = "cert=" + $("#ECert_text");
                     window.location.href="./put.html";
                 } else {
                     alert("login failed");
@@ -190,24 +191,40 @@ $(document).ready(function(){
             case "estate":
                 $("#content_put_div").html(" \
                     <p> \
-                        <label for=\"estateid_op1_put_label\">证书编号:</label> \
-                        <input type=\"text\" id=\"estateid_op1_put_input\"> \
+                        <label for=\"ZZBH_op1_put_label\">证照编号:</label> \
+                        <input type=\"text\" id=\"ZZBH_op1_put_input\"> \
                     </p> \
                     <p> \
-                        <label for=\"ower_op1_put_label\">权利人:</label> \
-                        <input type=\"text\" id=\"ower_op1_put_input\"> \
+                        <label for=\"KZ_BDCQZH_op1_put_label\">不动产权证号:</label> \
+                        <input type=\"text\" id=\"KZ_BDCQZH_op1_put_input\" value=\"蒙(2016)XXXX旗不动产证明第0000118号\"> \
                     </p> \
                     <p> \
-                        <label for=\"position_op1_put_label\">坐落:</label> \
-                        <input type=\"text\" id=\"position_op1_put_input\"> \
+                        <label for=\"CZZT_op1_put_label\">持证主体:</label> \
+                        <input type=\"text\" id=\"CZZT_op1_put_input\" value=\"张三\"> \
                     </p> \
                     <p> \
-                        <label for=\"area_op1_put_label\">面积:</label> \
-                        <input type=\"text\" id=\"area_op1_put_input\"> \
+                        <label for=\"KZ_QLRZJH_op1_put_label\">权利人证件号:</label> \
+                        <input type=\"text\" id=\"KZ_QLRZJH_op1_put_input\" value=\"121522********727E\"> \
                     </p> \
                     <p> \
-                        <label for=\"Image_op0_put_label\">上传图片:</label> \
-                        <input type=\"file\" id=\"Image_op0_put_input\"> \
+                        <label for=\"ZZBFJG_op1_put_label\">证照颁发机构:</label> \
+                        <input type=\"text\" id=\"ZZBFJG_op1_put_input\" value=\"XXX不动产登记机构\"> \
+                    </p> \
+                    <p> \
+                        <label for=\"ZZBFRQ_op1_put_label\">证照颁发日期:</label> \
+                        <input type=\"text\" id=\"ZZBFRQ_op1_put_input\" value=\"2019年1月16日\"> \
+                    </p> \
+                    <p> \
+                        <label for=\"KZ_ZL_op1_put_label\">坐落:</label> \
+                        <input type=\"text\" id=\"KZ_ZL_op1_put_input\" value=\"XXX小区A12号楼1单元602室\"> \
+                    </p> \
+                    <p> \
+                        <label for=\"KZ_MJ_op1_put_label\">面积:</label> \
+                        <input type=\"text\" id=\"KZ_MJ_op1_put_input\" value=\"宗地面积23942.21㎡\"> \
+                    </p> \
+                    <p> \
+                        <label for=\"Image_op1_put_label\">选择图片:</label> \
+                        <input type=\"file\" id=\"Image_op1_put_input\"> \
                     </p> \
                 ")
                 break;
@@ -215,40 +232,86 @@ $(document).ready(function(){
                 break;
         } 
     });
-    
+
+    $("#Pubkey_put_input").change(function(){
+        var objFiles = document.getElementById("Pubkey_put_input");
+        var fileName = objFiles.files[0].name;
+        var isFileValide = true;    // 交互click和ajax之间的信息
+        
+        // 读取文件内容
+        var reader = new FileReader();//新建一个FileReader
+        reader.readAsText(objFiles.files[0], "UTF-8");//读取文件 
+        reader.onload = function(evt){ //读取完文件之后会回来这里
+            var fileString = evt.target.result; // 读取文件内容
+            try {
+                var jsonFile = JSON.parse(fileString);
+            } catch(err){
+                alert("请选择正确的证书文件");
+                return;
+            }
+        }
+    });
+
     $("#put_btn").click(function(){
         var storageTypeChecked = $("[name='storageType']").filter(":checked");
         var storageType = storageTypeChecked.attr("value");
-        var parentTxID = "parentTxIDHashString";
+        var parentTxID = "genesisTx";
+        if($("#ParentID_op0_put_input").val() != ""){
+            parentTxID = $("#ParentID_op0_put_input").val();
+        }
 
         var objFiles_PrvkeyPEM = document.getElementById("Prvkey_put_input");
         var reader_PrvkeyPEM = new FileReader();
-        reader_PrvkeyPEM.readAsText(objFiles_PrvkeyPEM.files[0], "UTF-8");
+        try{
+            reader_PrvkeyPEM.readAsText(objFiles_PrvkeyPEM.files[0], "UTF-8");
+        } catch(err) {
+            alert("请选择签名密钥");
+            return;
+        }
         reader_PrvkeyPEM.onload = function(evt_Prvkey){
             var fileString_PrvkeyPEM = evt_Prvkey.target.result;
             var Prvkey = getPrvKeyFromPEM(fileString_PrvkeyPEM);
 
             var objFiles_PubkeyPEM = document.getElementById("Pubkey_put_input");
             var reader_PubkeyPEM = new FileReader();
-            reader_PubkeyPEM.readAsText(objFiles_PubkeyPEM.files[0], "UTF-8");
+
+            try{
+                reader_PubkeyPEM.readAsText(objFiles_PubkeyPEM.files[0], "UTF-8");
+            } catch(err) {
+                alert("请选择身份证书");
+                return;
+            }
+
             reader_PubkeyPEM.onload = function(evt_Pubkey){
                 var fileString_PubkeyPEM = evt_Pubkey.target.result;
-
+                try {
+                    var jsonFile = JSON.parse(fileString_PubkeyPEM);
+                } catch(err){
+                    alert("请选择正确的身份证书");
+                    return;
+                }
                 var args = "";
                 var signature = "";
                 switch ($("#put_select").val()) {
                     case "transaction":
-                        args = '{"hash":"' + $("#Hash_op0_put_input").val() + '","addrrec":"' + $("#AddrRec_op0_put_input").val() + '","price":"' + $("#Price_op0_put_input").val() + '","storageType":"' + storageType + '","addrsend":"' + $("#AddrSend_op0_put_input").val() + '","parentTxID":"'+ $("#ParentID_op0_put_input").val() +'"}';
+                        args = '{"hash":"' + $("#Hash_op0_put_input").val() + '","addrrec":"' + $("#AddrRec_op0_put_input").val() + '","price":"' + $("#Price_op0_put_input").val() + '","storageType":"' + storageType + '","addrsend":"' + $("#AddrSend_op0_put_input").val() + '","parentTxID":"'+ parentTxID +'"}';
 
                         signature = ECSign(Prvkey, args);
+
                         var argsHash = hex_sha256(args);
 
-                        args = '{"hash":"' + $("#Hash_op0_put_input").val() + '","recordID":"' + argsHash + '","addrrec":"' + $("#AddrRec_op0_put_input").val() + '","price":"' + $("#Price_op0_put_input").val() + '","storageType":"' + storageType + '","addrsend":"' + $("#AddrSend_op0_put_input").val() + '","parentTxID":"' + $("#ParentID_op0_put_input").val() + '","signature":"'  + signature + '"}';
+                        args = '{"hash":"' + $("#Hash_op0_put_input").val() + '","recordID":"' + argsHash + '","addrrec":"' + $("#AddrRec_op0_put_input").val() + '","price":"' + $("#Price_op0_put_input").val() + '","storageType":"' + storageType + '","addrsend":"' + $("#AddrSend_op0_put_input").val() + '","parentTxID":"' + parentTxID + '","signature":"'  + signature + '"}';
 
+                        console.log("args:" + args);
 
                         var objFiles_Data = document.getElementById("File_op0_put_input");
                         var reader_Data = new FileReader();
-                        reader_Data.readAsText(objFiles_Data.files[0], "UTF-8");
+                        try {
+                            reader_Data.readAsText(objFiles_Data.files[0], "UTF-8");
+                        } catch(err) {
+                            alert("请选择数据文件");
+                            return;
+                        }
                         reader_Data.onload = function(evt_Data){
                             var fileString_Data = evt_Data.target.result;
                             var dataHash = $("#Hash_op0_put_input").val();
@@ -284,12 +347,17 @@ $(document).ready(function(){
                         }
                         break;
                     case "estate":
-                        var objFiles_Image = document.getElementById("Image_op0_put_input");
+                        var objFiles_Image = document.getElementById("Image_op1_put_input");
                         var reader_Image = new FileReader();
-                        reader_Image.readAsBinaryString(objFiles_Image.files[0]);
+                        try {
+                            reader_Image.readAsBinaryString(objFiles_Image.files[0]);
+                        } catch(err) {
+                            alert("请选择图片");
+                            return;
+                        }
                         reader_Image.onload = function(evt_Image){
                             var fileString_Image = evt_Image.target.result;
-                            var estateid = $("#estateid_op1_put_input").val();
+                            var ZZBH = $("#ZZBH_op1_put_input").val();
 
                             // console.log(fileString_Image);
                             // image base64 encode
@@ -297,12 +365,12 @@ $(document).ready(function(){
                             // var fileString_Image_Base64 = b.encode(fileString_Image);  
                             // console.log(fileString_Image_Base64);
 
-                            args = '{"estateid":"'+ estateid + '","ower":"' + $("#ower_op1_put_input").val() + '","position":"' + $("#position_op1_put_input").val() + '","area":"' + $("#area_op1_put_input").val() + '","storageType":"' + storageType + '","hash":"' + hex_sha256(fileString_Image) + '","parentTxID":"' + parentTxID + '"}';
+                            args = '{"ZZBH":"'+ ZZBH + '","KZ_BDCQZH":"' + $("#KZ_BDCQZH_op1_put_input").val() + '","CZZT":"' + $("#CZZT_op1_put_input").val() + '","KZ_QLRZJH":"' + $("#KZ_QLRZJH_op1_put_input").val() + '","ZZBFJG":"' + $("#ZZBFJG_op1_put_input").val() + '","ZZBFRQ":"' + $("#ZZBFRQ_op1_put_input").val() + '","KZ_ZL":"' + $("#KZ_ZL_op1_put_input").val() + '","KZ_MJ":"' + $("#KZ_MJ_op1_put_input").val() + '","storageType":"' + storageType + '","hash":"' + hex_sha256(fileString_Image) + '","parentTxID":"' + parentTxID + '"}';
 
                             signature = ECSign(Prvkey, args);
                             var argsHash = hex_sha256(args);
 
-                            args = '{"estateid":"'+ estateid + '","recordID":"' + argsHash + '","ower":"' + $("#ower_op1_put_input").val() + '","position":"' + $("#position_op1_put_input").val() + '","area":"' + $("#area_op1_put_input").val() + '","storageType":"' + storageType + '","hash":"' + hex_sha256(fileString_Image) + '","parentTxID":"' + parentTxID + '","signature":"' + signature + '"}';
+                            args = '{"ZZBH":"'+ ZZBH + '","KZ_BDCQZH":"' + $("#KZ_BDCQZH_op1_put_input").val() + '","CZZT":"' + $("#CZZT_op1_put_input").val() + '","KZ_QLRZJH":"' + $("#KZ_QLRZJH_op1_put_input").val() + '","ZZBFJG":"' + $("#ZZBFJG_op1_put_input").val() + '","ZZBFRQ":"' + $("#ZZBFRQ_op1_put_input").val() + '","KZ_ZL":"' + $("#KZ_ZL_op1_put_input").val() + '","KZ_MJ":"' + $("#KZ_MJ_op1_put_input").val() + '","storageType":"' + storageType + '","hash":"' + hex_sha256(fileString_Image) + '","parentTxID":"' + parentTxID + '","recordID":"' + argsHash + '","signature":"' + signature + '"}';
                             console.log(args);
 
                             $.ajax({
@@ -310,7 +378,7 @@ $(document).ready(function(){
                                 
                                 url: RESTURL + '/channels/atlchannel/chaincodes/atlchainCC/AddRecord',
                                 data:JSON.stringify({
-                                    'args':[estateid, args, signature, fileString_PubkeyPEM],
+                                    'args':[ZZBH, args, signature, fileString_PubkeyPEM],
                                     'imgdata':fileString_Image,
                                     'username':getCookie("username"),
                                     'orgname':getCookie("orgname")
@@ -356,8 +424,8 @@ $(document).ready(function(){
             case "estate":
                 $("#content_trace_div").html(" \
                     <p> \
-                        <label for=\"estateid_op1_trace_label\">证书编号:</label> \
-                        <input type=\"text\" id=\"estateid_op1_trace_input\"> \
+                        <label for=\"ZZBH_op1_trace_label\">证书编号:</label> \
+                        <input type=\"text\" id=\"ZZBH_op1_trace_input\"> \
                     </p> \
                     <p> \
                         根据不动产证书编号追溯数据交易历史 \
@@ -372,7 +440,6 @@ $(document).ready(function(){
     $("#trace_btn").click(function(){
         switch($("#trace_select").val()){
             case "transaction":
-                
                 $.ajax({
                     type:'post',
                     url: RESTURL + '/channels/atlchannel/chaincodes/atlchainCC/trace',
@@ -388,9 +455,12 @@ $(document).ready(function(){
                         "content-type": "application/json"
                     },
                     success:function(data){
-                        // console.log(data);
+                        console.log(data);
                         
                         $("#result_input").html(FormatOutputUsual(data));
+                        if(data == "[]"){
+                            alert("未查询到结果");
+                        }
                     },
                     error:function(err){
                         console.log(err);
@@ -398,14 +468,13 @@ $(document).ready(function(){
                 });
                 break;
             case "estate":
-                
                 $.ajax({
                     type:'post',
                     url: RESTURL + '/channels/atlchannel/chaincodes/atlchainCC/trace',
                     data:JSON.stringify({
                         'fcn': 'getHistoryByKey',
                         'peer': 'peer0.orga.atlchain.com',
-                        'args':[$("#estateid_op1_trace_input").val()],
+                        'args':[$("#ZZBH_op1_trace_input").val()],
                         'username':getCookie("username"),
                         'orgname':getCookie("orgname")
                     }),
@@ -414,9 +483,12 @@ $(document).ready(function(){
                         "content-type": "application/json"
                     },
                     success:function(data){
-                        // console.log(data);
+                        console.log(data);
                         
                         $("#result_input").html(FormatOutputUsual(data));
+                        if(data == "[]"){
+                            alert("未查询到结果");
+                        }
                     },
                     error:function(err){
                         console.log(err);
@@ -443,8 +515,8 @@ $(document).ready(function(){
                         <input type=\"text\" id=\"AddrRec_op0_get_input\"> \
                     </p> \
                     <p> \
-                        <label for=\"Price_op0_get_label\">价格:</label> \
-                        <input type=\"text\" id=\"Price_op0_get_input\"> \
+                        <label for=\"RecordID_op0_get_label\">记录号:</label> \
+                        <input type=\"text\" id=\"RecordID_op0_get_input\"> \
                     </p> \
                     <p> \
                         <label for=\"Hash_op0_get_label\">数据哈希:</label> \
@@ -455,20 +527,12 @@ $(document).ready(function(){
             case "estate":
                 $("#content_get_div").html(" \
                     <p> \
-                        <label for=\"id_op1_get_label\">证书编号:</label> \
-                        <input type=\"text\" id=\"id_op1_get_input\"> \
+                        <label for=\"ZZBH_op1_get_label\">证照编号:</label> \
+                        <input type=\"text\" id=\"ZZBH_op1_get_input\"> \
                     </p> \
                     <p> \
-                        <label for=\"ower_op1_get_label\">权利人:</label> \
-                        <input type=\"text\" id=\"ower_op1_get_input\"> \
-                    </p> \
-                    <p> \
-                        <label for=\"position_op1_get_label\">坐落:</label> \
-                        <input type=\"text\" id=\"position_op1_get_input\"> \
-                    </p> \
-                    <p> \
-                        <label for=\"area_op1_get_label\">面积:</label> \
-                        <input type=\"text\" id=\"area_op1_get_input\"> \
+                        <label for=\"CZZT_op1_get_label\">持证主体:</label> \
+                        <input type=\"text\" id=\"CZZT_op1_get_input\"> \
                     </p> \
                 ")
                 break;
@@ -499,8 +563,8 @@ $(document).ready(function(){
                     shouldAddComma = true;
                     args += args1;
                 }
-                if($("#Price_op0_get_input").val() != ""){
-                    args2 = '"price":"' + $("#Price_op0_get_input").val() + '"';     
+                if($("#RecordID_op0_get_input").val() != ""){
+                    args2 = '"recordID":"' + $("#RecordID_op0_get_input").val() + '"';     
                     if(shouldAddComma){
                         args += ',';
                     }
@@ -533,8 +597,10 @@ $(document).ready(function(){
                     },
                     success:function(data){
                         console.log(data);
-                        
                         $("#result_input").html(FormatOutputUsual(data));
+                        if(data == "[]"){
+                            alert("未查询到结果");
+                        }
                     },
                     error:function(err){
                         console.log(err);
@@ -545,37 +611,19 @@ $(document).ready(function(){
                 var args = '{';
                 var args0 = "";
                 var args1 = "";
-                var args2 = "";
-                var args3 = "";
                 var shouldAddComma = false;
-                if($("#id_op1_get_input").val() != ""){
-                    args0 = '"estateid":"' + $("#id_op1_get_input").val() + '"';
+                if($("#ZZBH_op1_get_input").val() != ""){
+                    args0 = '"ZZBH":"' + $("#ZZBH_op1_get_input").val() + '"';
                     shouldAddComma = true;
                     args += args0;
                 }
-                if($("#ower_op1_get_input").val() != ""){
-                    args1 = '"ower":"' + $("#ower_op1_get_input").val() + '"';     
+                if($("#CZZT_op1_get_input").val() != ""){
+                    args1 = '"CZZT":"' + $("#CZZT_op1_get_input").val() + '"';     
                     if(shouldAddComma){
                         args += ',';
                     }
                     shouldAddComma = true;
                     args += args1;
-                }
-                if($("#position_op1_get_input").val() != ""){
-                    args2 = '"position":"' + $("#position_op1_get_input").val() + '"';     
-                    if(shouldAddComma){
-                        args += ',';
-                    }
-                    shouldAddComma = true;
-                    args += args2;
-                }
-                if($("#area_op1_get_input").val() != ""){
-                    args3 = '"area":"' + $("#area_op1_get_input").val() + '"';
-                    if(shouldAddComma){
-                        args += ',';
-                    }
-                    shouldAddComma = true;
-                    args += args3;
                 }
                 args += '}';
 
@@ -595,8 +643,10 @@ $(document).ready(function(){
                     },
                     success:function(data){
                         console.log(data);
-                        
                         $("#result_input").html(FormatOutputUsual(data));
+                        if(data == "[]"){
+                            alert("未查询到结果");
+                        }
                     },
                     error:function(err){
                         console.log(err);
@@ -783,6 +833,9 @@ function FormatOutputUsual(data){
             if(key == "Value" || key == "Record"){
                 for(var key2 in jsonData[i][key]){
                     switch(key2) {
+                        case "signature":
+                            keyName = "数字签名";
+                            break;
                         // transaction
                         case "hash":
                             keyName = "数据哈希";
@@ -806,23 +859,29 @@ function FormatOutputUsual(data){
                             keyName = "记录号";
                             break;
                         // estate
-                        case "estateid":
-                            keyName = "证书编号";
+                        case "ZZBH":
+                            keyName = "证照编号";
                             break;
-                        case "ower":
-                            keyName = "权利人";
+                        case "KZ_BDCQZH":
+                            keyName = "不动产权证号";
                             break;
-                        case "position":
+                        case "CZZT":
+                            keyName = "持证主体";
+                            break;
+                        case "KZ_QLRZJH":
+                            keyName = "权利人证件号";
+                            break;
+                        case "ZZBFJG":
+                            keyName = "证照颁发机构";
+                            break;
+                        case "ZZBFRQ":
+                            keyName = "证照颁发日期";
+                            break;
+                        case "KZ_ZL":
                             keyName = "坐落";
                             break;
-                        case "area":
+                        case "KZ_MJ":
                             keyName = "面积";
-                            break;
-                        case "hash":
-                            keyName = "数据哈希";
-                            break;
-                        case "signature":
-                            keyName = "签名";
                             break;
                         default:
                             break;

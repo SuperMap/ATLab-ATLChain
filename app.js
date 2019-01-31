@@ -197,11 +197,12 @@ app.post('/channels/:channelName/chaincodes/:chaincodeName/get', async function(
 	logger.debug('==================== QUERY BY CHAINCODE ==================');
 	var channelName = req.params.channelName;
 	var chaincodeName = req.params.chaincodeName;
-	var fcn = req.body.fcn;
 	let args = req.body.args;
-	let peer = req.body.peer;
     let username = req.body.username;
     let orgname = req.body.orgname;
+
+	var fcn = "Get";
+	let peer = 'peer0.orga.atlchain.com';
 
 	if (!chaincodeName) {
 		res.json(getErrorMessage('\'chaincodeName\''));
@@ -255,10 +256,22 @@ app.post('/channels/:channelName/chaincodes/:chaincodeName/putTx', async functio
     var username = req.body.username;
     var orgname = req.body.orgname;
 
+	var peers = ['peer0.orga.atlchain.com'] ;
+    var fcn = "Put";
+
 	if (!args) {
 		res.json(getErrorMessage('\'args\''));
 		return;
 	}
+
+    var jsonArgs = JSON.parse(args[1]);
+
+    var signature = jsonArgs.signature;
+    var storageType = jsonArgs.storageType;
+    var hash = jsonArgs.hash;
+    var recordID = jsonArgs.recordID;
+    console.log("recordID: " + recordID);
+    var cert = args[3];
  
     console.log("++++++++++++++++++++++++");
     console.log(args);
@@ -295,7 +308,7 @@ app.post('/channels/:channelName/chaincodes/:chaincodeName/putTx', async functio
 	// invoke
     console.log(storageType);
 	let message = await invoke.invokeChaincode(peers, channel, chaincode, fcn, args, username, orgname);
-	res.send(message);
+	res.send(recordID);
 });
 
 // Put estate
@@ -326,9 +339,10 @@ app.post('/channels/:channelName/chaincodes/:chaincodeName/AddRecord', async fun
     console.log("recordID: " + recordID);
     var cert = args[3];
 
-    if(storageType == "onchain") {
-        jsonArgs.image = imgdata;
-    }
+    // Put data on chain
+    // if(storageType == "onchain") {
+    //     jsonArgs.image = imgdata;
+    // }
 
     var args_1 = JSON.stringify(jsonArgs);
     args[1] = args_1;
@@ -346,6 +360,7 @@ app.post('/channels/:channelName/chaincodes/:chaincodeName/AddRecord', async fun
     }
 
     switch(storageType) {
+        case "onchain" :
         case "hbase" :
 	        // Put data into HBase
 	        // statement about create database:
