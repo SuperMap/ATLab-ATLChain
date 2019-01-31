@@ -32,7 +32,7 @@ $ peer chaincode upgrade -o 127.0.0.1:7050 -C atlchannel -n atlchain -v 0.2 -c '
 // atlchainCC-v0.1
 $ peer chaincode invoke -o 127.0.0.1:7050 -C atlchannel -n atlchain -c '{"Args":["putRecord", "addB", "addA", "100", "20181107", "hashcode"]}'
 
-// atlchainCC-v0.3 
+// atlchainCC-v0.4.1
 $ peer chaincode invoke -o 127.0.0.1:7050 -C atlchannel -n atlchainCC -c '{"Args":["Put", "tryPutkey", "{\"tryAddrReceive\":\"trytestAddrA\", \"tryAddrSend\":\"trytestAddrB\"}", "trysignagure", "trypubKey"]}'
 ```
 
@@ -41,10 +41,12 @@ $ peer chaincode invoke -o 127.0.0.1:7050 -C atlchannel -n atlchainCC -c '{"Args
 // atlchainCC-v0.1
 $ peer chaincode query -C atlchannel -n atlchain -c '{"Args":["getRecordByBuyerAddr","addB"]}'
 
-// atlchainCC-v0.3 
+// atlchainCC-v0.4.1
 $ peer chaincode query -C atlchannel -n atlchainCC -c '{"Args":["Get", "{\"tryAddrSend\":\"trytestAddrB\"}"]}'
 
 $ peer chaincode query -C atlchannel -n atlchainCC -c '{"Args":["Get", "{\"price\":\"10000\"}"]}'
+
+$ peer chaincode query -C atlchannel -n atlchainCC -c '{"Args":["getRecordByKey", "93f34d06fcf4ce30e2745ec11d856506ef9b"]}'
 ```
 
 8. 根据买方地址查询历史交易记录
@@ -53,7 +55,7 @@ $ peer chaincode query -C atlchannel -n atlchain -c '{"Args":["getHistoryByBuyer
 // 结果示例 {"TxId":"3a198be789b60fb964141e4d4e24b47298f874b0378900ae5e33c98f401afbb9", "Value":{"Buyer":"addB","Seller":"addC","Price":100,"Time":"20181108","Hash":"hashcode2"}, "Timestamp":"2018-11-07 06:58:56.420657457 +0000 UTC", "IsDelete":"false"}
 
 // atlchainCC-v0.3 
-$ peer chaincode invoke -o 127.0.0.1:7050 -C atlchannel -n atlchainCC -c '{"Args":["getHistoryByKey", "8bd9946c3afdbdc8cf69ddab6a933c55e9eeb4492b43cccd3098236374128685"]}'
+$ peer chaincode invoke -o 127.0.0.1:7050 -C atlchannel -n atlchainCC -c '{"Args":["getHistoryByKey", "93f34d06fcf4ce30e2745ec11d856506ef9b"]}'
 ```
 
 9. 根据hash查询交易记录 
