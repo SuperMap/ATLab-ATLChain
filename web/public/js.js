@@ -34,6 +34,7 @@ $(document).ready(function(){
                 orgName:$("#orgName_input").val()
             },
             success:function(data){
+                console.log(data);
                 var username = $("#username_input").val();
                 $("#accountAddress_input").val(data.address);
                 alert($("#username_input").val() + "登记成功\n请保存好下载的证书和密钥文件\n请牢记账户地址:" + data.address);
@@ -121,7 +122,7 @@ $(document).ready(function(){
                 console.log(data);
                 if(data.success){
                     document.cookie = "token=" + data.message.token;
-                    //document.cookie = "address=" + data.address;
+                    document.cookie = "address=" + data.message.address;
                     document.cookie = "username=" + data.message.username;
                     document.cookie = "orgname=" + data.message.orgname;
                     // document.cookie = "cert=" + $("#ECert_text");
@@ -174,9 +175,10 @@ $(document).ready(function(){
                         <textarea id=\"Hash_op0_put_input\" rows=\"3\" cols=\"38\" readonly=\"readonly\" style=\"vertical-align: top;\"></textarea> \
                     </p> \
                     <p> \
-                        <label for=\"ParentID_op0_put_label\">父记录号:</label> \
+                        <label for=\"ParentID_op0_put_label\">父交易ID（无父交易请空白）:</label> \
                         <textarea id=\"ParentID_op0_put_input\" rows=\"3\" cols=\"38\" style=\"vertical-align: top;\"></textarea> \
-                    </p>");
+                    </p> \
+                ");
                 $("#File_op0_put_input").change(function(){
                     var objFiles = document.getElementById("File_op0_put_input");
                     // 读取文件内容
@@ -223,10 +225,14 @@ $(document).ready(function(){
                         <input type=\"text\" id=\"KZ_MJ_op1_put_input\" value=\"宗地面积23942.21㎡\"> \
                     </p> \
                     <p> \
+                        <label for=\"ParentID_op0_put_label\">父交易ID（无父交易请空白）:</label> \
+                        <textarea id=\"ParentID_op0_put_input\" rows=\"3\" cols=\"38\" style=\"vertical-align: top;\"></textarea> \
+                    </p> \
+                    <p> \
                         <label for=\"Image_op1_put_label\">选择图片:</label> \
                         <input type=\"file\" id=\"Image_op1_put_input\"> \
                     </p> \
-                ")
+                ");
                 break;
             default:
                 break;
@@ -255,10 +261,7 @@ $(document).ready(function(){
     $("#put_btn").click(function(){
         var storageTypeChecked = $("[name='storageType']").filter(":checked");
         var storageType = storageTypeChecked.attr("value");
-        var parentTxID = "genesisTx";
-        if($("#ParentID_op0_put_input").val() != ""){
-            parentTxID = $("#ParentID_op0_put_input").val();
-        }
+        var parentRecordID = "";
 
         var objFiles_PrvkeyPEM = document.getElementById("Prvkey_put_input");
         var reader_PrvkeyPEM = new FileReader();
@@ -294,13 +297,16 @@ $(document).ready(function(){
                 var signature = "";
                 switch ($("#put_select").val()) {
                     case "transaction":
-                        args = '{"hash":"' + $("#Hash_op0_put_input").val() + '","addrrec":"' + $("#AddrRec_op0_put_input").val() + '","price":"' + $("#Price_op0_put_input").val() + '","storageType":"' + storageType + '","addrsend":"' + $("#AddrSend_op0_put_input").val() + '","parentTxID":"'+ parentTxID +'"}';
+                        if($("#ParentID_op0_put_input").val() != ""){
+                            parentRecordID = $("#ParentID_op0_put_input").val();
+                        }
+                        args = '{"hash":"' + $("#Hash_op0_put_input").val() + '","addrrec":"' + $("#AddrRec_op0_put_input").val() + '","price":"' + $("#Price_op0_put_input").val() + '","storageType":"' + storageType + '","addrsend":"' + $("#AddrSend_op0_put_input").val() + '","parentRecordID":"'+ parentRecordID +'"}';
 
                         signature = ECSign(Prvkey, args);
 
                         var argsHash = hex_sha256(args);
 
-                        args = '{"hash":"' + $("#Hash_op0_put_input").val() + '","recordID":"' + argsHash + '","addrrec":"' + $("#AddrRec_op0_put_input").val() + '","price":"' + $("#Price_op0_put_input").val() + '","storageType":"' + storageType + '","addrsend":"' + $("#AddrSend_op0_put_input").val() + '","parentTxID":"' + parentTxID + '","signature":"'  + signature + '"}';
+                        args = '{"hash":"' + $("#Hash_op0_put_input").val() + '","recordID":"' + argsHash + '","addrrec":"' + $("#AddrRec_op0_put_input").val() + '","price":"' + $("#Price_op0_put_input").val() + '","storageType":"' + storageType + '","addrsend":"' + $("#AddrSend_op0_put_input").val() + '","parentRecordID":"' + parentRecordID + '","signature":"'  + signature + '"}';
 
                         console.log("args:" + args);
 
@@ -347,6 +353,9 @@ $(document).ready(function(){
                         }
                         break;
                     case "estate":
+                        if($("#ParentID_op1_put_input").val() != ""){
+                            parentRecordID = $("#ParentID_op1_put_input").val();
+                        }
                         var objFiles_Image = document.getElementById("Image_op1_put_input");
                         var reader_Image = new FileReader();
                         try {
@@ -365,12 +374,12 @@ $(document).ready(function(){
                             // var fileString_Image_Base64 = b.encode(fileString_Image);  
                             // console.log(fileString_Image_Base64);
 
-                            args = '{"ZZBH":"'+ ZZBH + '","KZ_BDCQZH":"' + $("#KZ_BDCQZH_op1_put_input").val() + '","CZZT":"' + $("#CZZT_op1_put_input").val() + '","KZ_QLRZJH":"' + $("#KZ_QLRZJH_op1_put_input").val() + '","ZZBFJG":"' + $("#ZZBFJG_op1_put_input").val() + '","ZZBFRQ":"' + $("#ZZBFRQ_op1_put_input").val() + '","KZ_ZL":"' + $("#KZ_ZL_op1_put_input").val() + '","KZ_MJ":"' + $("#KZ_MJ_op1_put_input").val() + '","storageType":"' + storageType + '","hash":"' + hex_sha256(fileString_Image) + '","parentTxID":"' + parentTxID + '"}';
+                            args = '{"ZZBH":"'+ ZZBH + '","KZ_BDCQZH":"' + $("#KZ_BDCQZH_op1_put_input").val() + '","CZZT":"' + $("#CZZT_op1_put_input").val() + '","KZ_QLRZJH":"' + $("#KZ_QLRZJH_op1_put_input").val() + '","ZZBFJG":"' + $("#ZZBFJG_op1_put_input").val() + '","ZZBFRQ":"' + $("#ZZBFRQ_op1_put_input").val() + '","KZ_ZL":"' + $("#KZ_ZL_op1_put_input").val() + '","KZ_MJ":"' + $("#KZ_MJ_op1_put_input").val() + '","storageType":"' + storageType + '","hash":"' + hex_sha256(fileString_Image) + '","parentRecordID":"' + parentRecordID + '"}';
 
                             signature = ECSign(Prvkey, args);
                             var argsHash = hex_sha256(args);
 
-                            args = '{"ZZBH":"'+ ZZBH + '","KZ_BDCQZH":"' + $("#KZ_BDCQZH_op1_put_input").val() + '","CZZT":"' + $("#CZZT_op1_put_input").val() + '","KZ_QLRZJH":"' + $("#KZ_QLRZJH_op1_put_input").val() + '","ZZBFJG":"' + $("#ZZBFJG_op1_put_input").val() + '","ZZBFRQ":"' + $("#ZZBFRQ_op1_put_input").val() + '","KZ_ZL":"' + $("#KZ_ZL_op1_put_input").val() + '","KZ_MJ":"' + $("#KZ_MJ_op1_put_input").val() + '","storageType":"' + storageType + '","hash":"' + hex_sha256(fileString_Image) + '","parentTxID":"' + parentTxID + '","recordID":"' + argsHash + '","signature":"' + signature + '"}';
+                            args = '{"ZZBH":"'+ ZZBH + '","KZ_BDCQZH":"' + $("#KZ_BDCQZH_op1_put_input").val() + '","CZZT":"' + $("#CZZT_op1_put_input").val() + '","KZ_QLRZJH":"' + $("#KZ_QLRZJH_op1_put_input").val() + '","ZZBFJG":"' + $("#ZZBFJG_op1_put_input").val() + '","ZZBFRQ":"' + $("#ZZBFRQ_op1_put_input").val() + '","KZ_ZL":"' + $("#KZ_ZL_op1_put_input").val() + '","KZ_MJ":"' + $("#KZ_MJ_op1_put_input").val() + '","storageType":"' + storageType + '","hash":"' + hex_sha256(fileString_Image) + '","parentRecordID":"' + parentRecordID + '","recordID":"' + argsHash + '","signature":"' + signature + '"}';
                             console.log(args);
 
                             $.ajax({
@@ -378,7 +387,7 @@ $(document).ready(function(){
                                 
                                 url: RESTURL + '/channels/atlchannel/chaincodes/atlchainCC/AddRecord',
                                 data:JSON.stringify({
-                                    'args':[ZZBH, args, signature, fileString_PubkeyPEM],
+                                    'args':[argsHash, args, signature, fileString_PubkeyPEM],
                                     'imgdata':fileString_Image,
                                     'username':getCookie("username"),
                                     'orgname':getCookie("orgname")
@@ -408,96 +417,122 @@ $(document).ready(function(){
     // put <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
     // trace >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-    $("#trace_select").change(function(){
-        switch ($("#trace_select").val()) {
-            case "transaction":
-                $("#content_trace_div").html(" \
-                    <p> \
-                        <label for=\"txid_op0_trace_label\">记录号:</label> \
-                        <textarea id=\"txid_op0_trace_input\" rows=\"3\" cols=\"38\" style=\"vertical-align: top;\"></textarea> \
-                    </p> \
-                    <p> \
-                        根据记录号追溯数据交易历史 \
-                    </p> \
-                ")
-                break;
-            case "estate":
-                $("#content_trace_div").html(" \
-                    <p> \
-                        <label for=\"ZZBH_op1_trace_label\">证书编号:</label> \
-                        <input type=\"text\" id=\"ZZBH_op1_trace_input\"> \
-                    </p> \
-                    <p> \
-                        根据不动产证书编号追溯数据交易历史 \
-                    </p> \
-                ")
-                break;
-            default:
-                break;
-        } 
-    });
+    // $("#trace_select").change(function(){
+        //     switch ($("#trace_select").val()) {
+        //         case "transaction":
+        //             $("#content_trace_div").html(" \
+        //                 <p> \
+        //                     <label for=\"txid_op0_trace_label\">记录号:</label> \
+        //                     <textarea id=\"txid_op0_trace_input\" rows=\"3\" cols=\"38\" style=\"vertical-align: top;\"></textarea> \
+        //                 </p> \
+        //                 <p> \
+        //                     根据记录号追溯数据交易历史 \
+        //                 </p> \
+        //             ")
+        //             break;
+        //         case "estate":
+        //             $("#content_trace_div").html(" \
+        //                 <p> \
+        //                     <label for=\"ZZBH_op1_trace_label\">证书编号:</label> \
+        //                     <input type=\"text\" id=\"ZZBH_op1_trace_input\"> \
+        //                 </p> \
+        //                 <p> \
+        //                     根据不动产证书编号追溯数据交易历史 \
+        //                 </p> \
+        //             ")
+        //             break;
+        //         default:
+        //             break;
+        //     } 
+    // });
 
     $("#trace_btn").click(function(){
-        switch($("#trace_select").val()){
-            case "transaction":
-                $.ajax({
-                    type:'post',
-                    url: RESTURL + '/channels/atlchannel/chaincodes/atlchainCC/trace',
-                    data:JSON.stringify({
-                        'fcn': 'getHistoryByKey',
-                        'peer': 'peer0.orga.atlchain.com',
-                        'args':[$("#txid_op0_trace_input").val()],
-                        'username':getCookie("username"),
-                        'orgname':getCookie("orgname")
-                    }),
-                    headers: {
-                        "authorization": "Bearer " + getCookie("token") ,
-                        "content-type": "application/json"
-                    },
-                    success:function(data){
-                        console.log(data);
-                        
-                        $("#result_input").html(FormatOutputUsual(data));
-                        if(data == "[]"){
-                            alert("未查询到结果");
-                        }
-                    },
-                    error:function(err){
-                        console.log(err);
-                    }
-                });
-                break;
-            case "estate":
-                $.ajax({
-                    type:'post',
-                    url: RESTURL + '/channels/atlchannel/chaincodes/atlchainCC/trace',
-                    data:JSON.stringify({
-                        'fcn': 'getHistoryByKey',
-                        'peer': 'peer0.orga.atlchain.com',
-                        'args':[$("#ZZBH_op1_trace_input").val()],
-                        'username':getCookie("username"),
-                        'orgname':getCookie("orgname")
-                    }),
-                    headers: {
-                        "authorization": "Bearer " + getCookie("token") ,
-                        "content-type": "application/json"
-                    },
-                    success:function(data){
-                        console.log(data);
-                        
-                        $("#result_input").html(FormatOutputUsual(data));
-                        if(data == "[]"){
-                            alert("未查询到结果");
-                        }
-                    },
-                    error:function(err){
-                        console.log(err);
-                    }
-                });
-                break;
-            default:
-                break;
-        }
+        $.ajax({
+            type:'post',
+            url: RESTURL + '/channels/atlchannel/chaincodes/atlchainCC/TraceRecord',
+            data:JSON.stringify({
+                // 'fcn': 'getHistoryByKey',
+                // 'peer': 'peer0.orga.atlchain.com',
+                'args':[$("#recordID_trace_input").val()],
+                'username':getCookie("username"),
+                'orgname':getCookie("orgname")
+            }),
+            headers: {
+                "authorization": "Bearer " + getCookie("token") ,
+                "content-type": "application/json"
+            },
+            success:function(data){
+                console.log(data);
+                
+                $("#result_input").html(FormatOutputUsual(data));
+                if(data == "[]"){
+                    alert("未查询到结果");
+                }
+            },
+            error:function(err){
+                console.log(err);
+            }
+        });
+        // switch($("#trace_select").val()){
+        //     case "transaction":
+        //         $.ajax({
+        //             type:'post',
+        //             url: RESTURL + '/channels/atlchannel/chaincodes/atlchainCC/TraceRecord',
+        //             data:JSON.stringify({
+        //                 // 'fcn': 'getHistoryByKey',
+        //                 // 'peer': 'peer0.orga.atlchain.com',
+        //                 'args':[$("#txid_op0_trace_input").val()],
+        //                 'username':getCookie("username"),
+        //                 'orgname':getCookie("orgname")
+        //             }),
+        //             headers: {
+        //                 "authorization": "Bearer " + getCookie("token") ,
+        //                 "content-type": "application/json"
+        //             },
+        //             success:function(data){
+        //                 console.log(data);
+        //                 
+        //                 $("#result_input").html(FormatOutputUsual(data));
+        //                 if(data == "[]"){
+        //                     alert("未查询到结果");
+        //                 }
+        //             },
+        //             error:function(err){
+        //                 console.log(err);
+        //             }
+        //         });
+        //         break;
+        //     case "estate":
+        //         $.ajax({
+        //             type:'post',
+        //             url: RESTURL + '/channels/atlchannel/chaincodes/atlchainCC/TraceRecord',
+        //             data:JSON.stringify({
+        //                 // 'fcn': 'getHistoryByKey',
+        //                 // 'peer': 'peer0.orga.atlchain.com',
+        //                 'args':[$("#ZZBH_op1_trace_input").val()],
+        //                 'username':getCookie("username"),
+        //                 'orgname':getCookie("orgname")
+        //             }),
+        //             headers: {
+        //                 "authorization": "Bearer " + getCookie("token") ,
+        //                 "content-type": "application/json"
+        //             },
+        //             success:function(data){
+        //                 console.log(data);
+        //                 
+        //                 $("#result_input").html(FormatOutputUsual(data));
+        //                 if(data == "[]"){
+        //                     alert("未查询到结果");
+        //                 }
+        //             },
+        //             error:function(err){
+        //                 console.log(err);
+        //             }
+        //         });
+        //         break;
+        //     default:
+        //         break;
+        // }
     });
     // trace <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
@@ -515,7 +550,7 @@ $(document).ready(function(){
                         <input type=\"text\" id=\"AddrRec_op0_get_input\"> \
                     </p> \
                     <p> \
-                        <label for=\"RecordID_op0_get_label\">记录号:</label> \
+                        <label for=\"RecordID_op0_get_label\">交易ID:</label> \
                         <input type=\"text\" id=\"RecordID_op0_get_input\"> \
                     </p> \
                     <p> \
@@ -533,6 +568,10 @@ $(document).ready(function(){
                     <p> \
                         <label for=\"CZZT_op1_get_label\">持证主体:</label> \
                         <input type=\"text\" id=\"CZZT_op1_get_input\"> \
+                    </p> \
+                    <p> \
+                        <label for=\"RecordID_op1_get_label\">交易ID:</label> \
+                        <input type=\"text\" id=\"RecordID_op1_get_input\"> \
                     </p> \
                 ")
                 break;
@@ -583,7 +622,7 @@ $(document).ready(function(){
 
                 $.ajax({
                     type:'post',
-                    url: RESTURL + '/channels/atlchannel/chaincodes/atlchainCC/get',
+                    url: RESTURL + '/channels/atlchannel/chaincodes/atlchainCC/GetRecord',
                     data:JSON.stringify({
                         'fcn': 'Get',
                         'peer': 'peer0.orga.atlchain.com',
@@ -611,6 +650,7 @@ $(document).ready(function(){
                 var args = '{';
                 var args0 = "";
                 var args1 = "";
+                var args2 = "";
                 var shouldAddComma = false;
                 if($("#ZZBH_op1_get_input").val() != ""){
                     args0 = '"ZZBH":"' + $("#ZZBH_op1_get_input").val() + '"';
@@ -625,11 +665,20 @@ $(document).ready(function(){
                     shouldAddComma = true;
                     args += args1;
                 }
+                if($("#RecordID_op1_get_input").val() != ""){
+                    args1 = '"recordID":"' + $("#RecordID_op1_get_input").val() + '"';     
+                    if(shouldAddComma){
+                        args += ',';
+                    }
+                    shouldAddComma = true;
+                    args += args1;
+                }
+
                 args += '}';
 
                 $.ajax({
                     type:'post',
-                    url: RESTURL + '/channels/atlchannel/chaincodes/atlchainCC/get',
+                    url: RESTURL + '/channels/atlchannel/chaincodes/atlchainCC/GetRecord',
                     data:JSON.stringify({
                         'fcn': 'Get',
                         'peer': 'peer0.orga.atlchain.com',
@@ -662,7 +711,7 @@ $(document).ready(function(){
         $.ajax({
             type:'get',
             
-            url: RESTURL + '/getDataFromHBase?hash=' + $("#key_hbase_input").val(),
+            url: RESTURL + '/GetDataFromHBase?hash=' + $("#key_hbase_input").val(),
             data:JSON.stringify({}),
             headers: {
                 "authorization": "Bearer " + getCookie("token"),
@@ -682,7 +731,7 @@ $(document).ready(function(){
         $.ajax({
             type:'get',
             
-            url: RESTURL + '/getFileFromHDFS?filename=' + $("#fileName_hdfs_input").val(),
+            url: RESTURL + '/GetFileFromHDFS?filename=' + $("#fileName_hdfs_input").val(),
             data:JSON.stringify({}),
             headers: {
                 "authorization": "Bearer " + getCookie("token"),
@@ -802,7 +851,6 @@ function FormatOutputHDFS(data){
 
 function FormatOutputText(data){
     return "<p>" + data + "</p>"
-
 }
 
 function FormatOutputUsual(data){
@@ -817,9 +865,12 @@ function FormatOutputUsual(data){
             if(key == "Key"){
                 continue;
             }
+            if(key == "TxId"){
+                continue;
+            }
             switch(key) {
                 case "TxId":
-                    keyName = "交易ID";
+                    keyName = "FabricTxID";
                     break;
                 case "Timestamp":
                     keyName = "时间戳";
@@ -831,6 +882,12 @@ function FormatOutputUsual(data){
                     break;
             }
             if(key == "Value" || key == "Record"){
+                str += "<p><label><b>交易ID:</b></label>" + jsonData[i][key]["recordID"] + "</p>";
+                if(!jsonData[i][key].hasOwnProperty("parentRecordID")){
+                    str += "<p><label><b>父交易ID:</b></label>" + jsonData[i][key]["parentTxID"] + "</p>";
+                } else {
+                    str += "<p><label><b>父交易ID:</b></label>" + jsonData[i][key]["parentRecordID"] + "</p>";
+                }
                 for(var key2 in jsonData[i][key]){
                     switch(key2) {
                         case "signature":
@@ -840,8 +897,9 @@ function FormatOutputUsual(data){
                         case "hash":
                             keyName = "数据哈希";
                             break;
+                        case "parentRecordID":
                         case "parentTxID":
-                            keyName = "父记录号";
+                            keyName = "父交易ID";
                             break;
                         case "price":
                             keyName = "价格";
@@ -856,7 +914,7 @@ function FormatOutputUsual(data){
                             keyName = "存储类型";
                             break;
                         case "recordID":
-                            keyName = "记录号";
+                            keyName = "交易ID";
                             break;
                         // estate
                         case "ZZBH":
@@ -885,6 +943,9 @@ function FormatOutputUsual(data){
                             break;
                         default:
                             break;
+                    }
+                    if(keyName == "交易ID" || keyName == "父交易ID"){
+                        continue;
                     }
 
                     str += "<p><label><b>" + keyName + ":</b></label>" + jsonData[i][key][key2] + "</p>";

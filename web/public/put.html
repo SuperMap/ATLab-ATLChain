@@ -64,7 +64,7 @@
                     <input type="text" id="KZ_MJ_op1_put_input" value="宗地面积23942.21㎡">
                 </p>
                 <p>
-                    <label for="ParentID_op1_put_label">父记录号:</label>
+                    <label for="ParentID_op1_put_label">父交易ID（无父交易请空白）:</label>
                     <textarea id="ParentID_op1_put_input" rows="3" cols="38" style="vertical-align: top;"></textarea>
                 </p>
                 <p>
@@ -75,9 +75,9 @@
             
             <p style="margin-right:100px">
                 <label for="Stroage_op0_put_label">存储方式:</label>
+                <input type="radio" id="hdfs_op0_put_label" name="storageType" value="hdfs" style="width:20px; height:15px" checked="checked">HDFS
                 <input type="radio" id="onchain_op0_put_label" name="storageType" value="onchain" style="width:20px; height:15px">onchain
                 <input type="radio" id="hbase_op0_put_label" name="storageType" value="hbase" style="width:20px; height:15px">HBase
-                <input type="radio" id="hdfs_op0_put_label" name="storageType" value="hdfs" style="width:20px; height:15px" checked="checked">HDFS
             </p>
             <p>
                 <label for="Prvkey_put_label">签名密钥（本地签名，不上传）:</label>
@@ -98,8 +98,8 @@
 
     <div id="result_div">
         <p style="text-align: center">
-            <label for="txID_put_label">记录号:</label>
-            <textarea id="txID_put_input"  rows="3" cols="50" readonly="readonly" style="vertical-align: top;">记录号</textarea>
+            <label for="txID_put_label">交易ID:</label>
+            <textarea id="txID_put_input"  rows="3" cols="50" readonly="readonly" style="vertical-align: top;">交易ID</textarea>
         </p>
     </div>
 </body>

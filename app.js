@@ -133,6 +133,12 @@ app.post('/login', async function(req, res) {
     var username = certJsonObj.name;
 	var orgname = certJsonObj.mspid;
 
+    var jsonObj = JSON.parse(cert);
+    var filename = jsonObj.enrollment.signingIdentity + "-pub";
+    var address = account.getAddress('./fabric-client-kv-orga/' + filename);
+
+    console.log("address:" + address);
+
     // Generate JWT
     var token = jwt.sign({
 		exp: Math.floor(Date.now() / 1000) + parseInt(hfc.getConfigSetting('jwt_expiretime')),
@@ -144,6 +150,7 @@ app.post('/login', async function(req, res) {
         token: token,
         username: username,
         orgname: orgname,
+        address: address,
         message: "login sucessfully"
     }
     res.json({success: true, message: response});
@@ -183,6 +190,7 @@ app.post('/users', async function(req, res) {
 		logger.debug('Successfully registered the username %s for organization %s',username,orgName);
         response.filename = filename;
 		response.address = account.getAddress('./fabric-client-kv-orga/' + pubkeyFile);
+        console.log("username:" + username);
 		logger.debug("address: " + response.address);
 		res.json(response);
 	} else {
@@ -193,7 +201,7 @@ app.post('/users', async function(req, res) {
 
 ////////////////////////////////////////// APIs about operate chaincode //////////////////////////////////////////
 // Query on chaincode on target peers
-app.post('/channels/:channelName/chaincodes/:chaincodeName/get', async function(req, res) {
+app.post('/channels/:channelName/chaincodes/:chaincodeName/GetRecord', async function(req, res) {
 	logger.debug('==================== QUERY BY CHAINCODE ==================');
 	var channelName = req.params.channelName;
 	var chaincodeName = req.params.chaincodeName;
@@ -226,13 +234,13 @@ app.post('/channels/:channelName/chaincodes/:chaincodeName/get', async function(
 });
 
 // Trace
-app.post('/channels/:channelName/chaincodes/:chaincodeName/trace', async function(req, res) {
+app.post('/channels/:channelName/chaincodes/:chaincodeName/TraceRecord', async function(req, res) {
 	logger.info('==================== TRACING HISTORY ==================');
 	var channelName = req.params.channelName;
 	var chaincodeName = req.params.chaincodeName;
     let username = req.body.username;
     let orgname = req.body.orgname;
-	let peer = req.body.peer;
+	let peer = 'peer0.orga.atlchain.com';
     let args = req.body.args; 
     let fcn = "getHistoryByKey";
 
@@ -322,6 +330,10 @@ app.post('/channels/:channelName/chaincodes/:chaincodeName/AddRecord', async fun
     var username = req.body.username;
     var orgname = req.body.orgname;
 
+    console.log("+++++++++++++++++++++++");
+    console.log(args)
+    console.log("+++++++++++++++++++++++");
+
 	var peers = ['peer0.orga.atlchain.com'] ;
     var fcn = "Put";
 
@@ -387,7 +399,7 @@ app.post('/channels/:channelName/chaincodes/:chaincodeName/AddRecord', async fun
 });
 
 // TODO: Get data from remote HDFS, now it is only avaliable for localhost hdfs
-app.get('/getFileFromHDFS', async function(req, res) {
+app.get('/GetFileFromHDFS', async function(req, res) {
 	logger.info('==================== GET HDFS DATA ==================');
     let filename = req.query.filename;
 	if (!filename) {
@@ -402,7 +414,7 @@ app.get('/getFileFromHDFS', async function(req, res) {
 });
 
 // Get data from HBase by hash
-app.get('/getDataFromHBase', async function(req, res) {
+app.get('/GetDataFromHBase', async function(req, res) {
 	logger.debug('==================== GET HBASE DATA ==================');
 	let hash = req.query.hash;
 	if (!hash) {
