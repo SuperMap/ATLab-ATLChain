@@ -35,8 +35,8 @@ var host = process.env.HOST || hfc.getConfigSetting('host');
 var hbaseClient = new hbase('148.70.109.243', '8080');
 var hbaseTable = 'atlc';
 var hbaseCF = 'data:data';
-var hdfsClient = new hdfs('chengyang', 'localhost', '50070');
-var hdfsDir = '/atl/';
+var hdfsClient = new hdfs('root', 'localhost', '50070');
+var hdfsDir = '/user/root';
 
 ///////////////////////////////////////////////////////////////////////////////
 //////////////////////////////// SET CONFIGURATONS ////////////////////////////

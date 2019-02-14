@@ -33,20 +33,20 @@
 // console.log("======================== End test crypto.js =======================")
 
 
-// console.log("======================== Begin test hdfs.js =======================")
-// var HDFS = require('./hdfs.js');
-// 
-// function callback(){
-//     console.log("Do something here");    
-// }
-// 
-// var hdfs = new HDFS('chengyang', 'localhost', '50070');
-// // hdfs.put("./orgA.yaml", "/user/chengyang/orgA.yaml", callback);
-// 
+console.log("======================== Begin test hdfs.js =======================")
+var HDFS = require('./hdfs.js');
+
+function callback(){
+    console.log("Do something here");    
+}
+
+var hdfs = new HDFS('root', '127.0.0.1', '50070');
+hdfs.put("./orgA.yaml", "/user/root/orgA.yaml", callback);
+
 // filename = "ttttt";
-// hdfs.get("/user/chengyang/orgA.yaml", filename, function(){console.log(filename.length)});
-// 
-// console.log("======================== End test hdfs.js =======================")
+// hdfs.get("/test/orgA.yaml", filename, function(){console.log(filename.length)});
+
+console.log("======================== End test hdfs.js =======================")
  
  
 // console.log("======================== Begin test hbase.js =======================")
@@ -68,8 +68,8 @@
 // console.log("======================== End test hbase.js =======================")
 
 
-console.log("======================== Start test write file =======================")
-var fs = require('fs');
-fs.writeFileSync('/tmp/fstest', "fstest");
-console.log("======================== End test write file =======================")
+// console.log("======================== Start test write file =======================")
+// var fs = require('fs');
+// fs.writeFileSync('/tmp/fstest', "fstest");
+// console.log("======================== End test write file =======================")
 

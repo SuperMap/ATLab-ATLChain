@@ -30,3 +30,21 @@ services:
     environment:
       ZOO_MY_ID: 3
       ZOO_SERVERS: server.1=zoo1:2888:3888 server.2=zoo2:2888:3888 server.3=0.0.0.0:2888:3888
+
+  hadoop:
+    image: sequenceiq/hadoop-docker:2.7.1 
+    restart: always
+    hostname: localhost
+    ports:
+      - 50070:50070
+      - 50075:50075
+      - 2122:2122
+      - 8030-8033:8030-8033
+      - 8040:8040
+      - 8042:8042
+      - 8088:8088
+      - 19888:19888
+      - 49707:49707
+      - 50010:50010
+      - 50020:50020
+      - 50090:50090
