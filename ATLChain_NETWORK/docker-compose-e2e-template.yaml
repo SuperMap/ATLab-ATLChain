@@ -6,6 +6,8 @@
 version: '2'
 
 volumes:
+  ca0.example.com:
+  ca1.example.com:
   orderer.example.com:
   peer0.org1.example.com:
   peer1.org1.example.com:
@@ -15,7 +17,7 @@ volumes:
 networks:
   byfn:
 services:
-  ca0:
+  ca0.example.com:
     image: hyperledger/fabric-ca:$IMAGE_TAG
     environment:
       - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
@@ -28,11 +30,11 @@ services:
     command: sh -c 'fabric-ca-server start --ca.certfile /etc/hyperledger/fabric-ca-server-config/ca.org1.example.com-cert.pem --ca.keyfile /etc/hyperledger/fabric-ca-server-config/CA1_PRIVATE_KEY -b admin:adminpw -d'
     volumes:
       - ./crypto-config/peerOrganizations/org1.example.com/ca/:/etc/hyperledger/fabric-ca-server-config
-    container_name: ca_peerOrg1
+    container_name: ca0.example.com
     networks:
       - byfn
 
-  ca1:
+  ca1.example.com:
     image: hyperledger/fabric-ca:$IMAGE_TAG
     environment:
       - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
@@ -45,7 +47,7 @@ services:
     command: sh -c 'fabric-ca-server start --ca.certfile /etc/hyperledger/fabric-ca-server-config/ca.org2.example.com-cert.pem --ca.keyfile /etc/hyperledger/fabric-ca-server-config/CA2_PRIVATE_KEY -b admin:adminpw -d'
     volumes:
       - ./crypto-config/peerOrganizations/org2.example.com/ca/:/etc/hyperledger/fabric-ca-server-config
-    container_name: ca_peerOrg2
+    container_name: ca1.example.com
     networks:
       - byfn
 

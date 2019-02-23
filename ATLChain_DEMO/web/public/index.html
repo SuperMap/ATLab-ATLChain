@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="jquery-2.1.4.min.js"></script>
+    <script src="jsrsasign-all-min.js"></script>
+    <script src="js.js"></script>
+    <script src="crypto.js"></script>
+    <link rel="stylesheet" href="css.css">
+    <meta charset="utf-8">
+    <title>ATLChain</title>
+</head>
+
+<body>
+    <div id="enroll_div">
+        <h2 style="text-align: center">登录</h2>
+        <form>
+            <fieldset>
+                <p>
+                    <label for="ECert_label" style="width:130px">身份证书:</label>
+                    <input type="file" id="ECert_input" style="width: 220px">
+                    <textarea id="ECert_text" hidden="hide"></textarea>
+                </p>
+                <!--
+                <p>
+                    <label for="pkey_input" style="width:130px">选择你的密钥:</br>(密钥不上传)</label>
+                    <input type="file" id="pkey_input" style="width: 220px">
+                    <textarea id="pkey_text" hidden="hide"></textarea>
+                </p> 
+                -->
+                <p>
+                    <button type="button" id="login_btn">登录</button>
+                </p>
+                <p>
+                    <span>还没有账号？</span><a href="register.html">注册</a>
+                </p>
+            </fieldset>
+        </form>     
+    </div>
+</body>
+</html> 
