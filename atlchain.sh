@@ -29,9 +29,9 @@ function printHelp() {
     echo "    -t <timeout> - CLI timeout duration in seconds (defaults to 10)"
     echo "    -d <delay> - delay duration in seconds (defaults to 3)"
     echo "    -f <docker-compose-file> - specify which docker-compose file use (defaults to docker-compose-cli.yaml)"
-    echo "    -s <dbtype> - the database backend to use: goleveldb (default) or couchdb"
+    echo "    -s <dbtype> - the database backend to use: goleveldb or couchdb (default)"
     echo "    -l <language> - the chaincode language: golang (default) or node"
-    echo "    -o <consensus-type> - the consensus-type of the ordering service: solo (default) or kafka"
+    echo "    -o <consensus-type> - the consensus-type of the ordering service: solo or kafka (default)"
     echo "    -i <imagetag> - the tag to be used to launch the network (defaults to \"latest\")"
     echo "    -v - verbose mode"
     echo "  byfn.sh -h (print this message)"
@@ -435,7 +435,8 @@ LANGUAGE=golang
 # default image tag
 IMAGETAG="latest"
 # default consensus type
-CONSENSUS_TYPE="solo"
+CONSENSUS_TYPE="kafka"
+IF_COUCHDB="couchdb"
 # Parse commandline args
 if [ "$1" = "-m" ]; then # supports old usage, muscle memory is powerful!
     shift
@@ -496,6 +497,7 @@ done
 
 
 # Announce what was requested
+
 
 if [ "${IF_COUCHDB}" == "couchdb" ]; then
     echo

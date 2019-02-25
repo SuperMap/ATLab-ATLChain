@@ -1,32 +1,58 @@
-# Copyright IBM Corp. All Rights Reserved.
-#
-# SPDX-License-Identifier: Apache-2.0
-#
-
 # ---------------------------------------------------------------------------
 # "OrdererOrgs" - Definition of organizations managing orderer nodes
 # ---------------------------------------------------------------------------
 OrdererOrgs:
   # ---------------------------------------------------------------------------
-  # Orderer
+  # OrdererA
   # ---------------------------------------------------------------------------
-  - Name: Orderer
-    Domain: example.com
+  - Name: OrdererA
+    Domain: orga.atlchain.com
+
     # ---------------------------------------------------------------------------
     # "Specs" - See PeerOrgs below for complete description
     # ---------------------------------------------------------------------------
     Specs:
-      - Hostname: orderer
+      - Hostname: orderer0
+
+  # ---------------------------------------------------------------------------
+  # OrdererB
+  # ---------------------------------------------------------------------------
+  - Name: OrdererB
+    Domain: orgb.atlchain.com
+
+    # ---------------------------------------------------------------------------
+    # "Specs" - See PeerOrgs below for complete description
+    # ---------------------------------------------------------------------------
+    Specs:
+      - Hostname: orderer0
+
+
 # ---------------------------------------------------------------------------
 # "PeerOrgs" - Definition of organizations managing peer nodes
 # ---------------------------------------------------------------------------
 PeerOrgs:
   # ---------------------------------------------------------------------------
-  # Org1
+  # OrgA
   # ---------------------------------------------------------------------------
-  - Name: Org1
-    Domain: org1.example.com
-    EnableNodeOUs: true
+  - Name: OrgA
+    Domain: orga.atlchain.com
+    EnableNodeOUs: true 
+
+    # ---------------------------------------------------------------------------
+    # "CA"
+    # ---------------------------------------------------------------------------
+    # Uncomment this section to enable the explicit definition of the CA for this
+    # organization.  This entry is a Spec.  See "Specs" section below for details.
+    # ---------------------------------------------------------------------------
+    # CA:
+    #    Hostname: ca # implicitly ca.org1.example.com
+    #    Country: US
+    #    Province: California
+    #    Locality: San Francisco
+    #    OrganizationalUnit: Hyperledger Fabric
+    #    StreetAddress: address for org # default nil
+    #    PostalCode: postalCode for org # default nil
+
     # ---------------------------------------------------------------------------
     # "Specs"
     # ---------------------------------------------------------------------------
@@ -42,12 +68,26 @@ PeerOrgs:
     #
     #                 which obtains its values from the Spec.Hostname and
     #                 Org.Domain, respectively.
+    #   - SANS:       (Optional) Specifies one or more Subject Alternative Names
+    #                 to be set in the resulting x509. Accepts template
+    #                 variables {{.Hostname}}, {{.Domain}}, {{.CommonName}}. IP
+    #                 addresses provided here will be properly recognized. Other
+    #                 values will be taken as DNS names.
+    #                 NOTE: Two implicit entries are created for you:
+    #                     - {{ .CommonName }}
+    #                     - {{ .Hostname }}
     # ---------------------------------------------------------------------------
     # Specs:
     #   - Hostname: foo # implicitly "foo.org1.example.com"
     #     CommonName: foo27.org5.example.com # overrides Hostname-based FQDN set above
+    #     SANS:
+    #       - "bar.{{.Domain}}"
+    #       - "altfoo.{{.Domain}}"
+    #       - "{{.Hostname}}.org6.net"
+    #       - 172.16.10.31
     #   - Hostname: bar
     #   - Hostname: baz
+
     # ---------------------------------------------------------------------------
     # "Template"
     # ---------------------------------------------------------------------------
@@ -64,20 +104,24 @@ PeerOrgs:
       Count: 2
       # Start: 5
       # Hostname: {{.Prefix}}{{.Index}} # default
+      # SANS:
+      #   - "{{.Hostname}}.alt.{{.Domain}}"
+
     # ---------------------------------------------------------------------------
     # "Users"
     # ---------------------------------------------------------------------------
     # Count: The number of user accounts _in addition_ to Admin
     # ---------------------------------------------------------------------------
     Users:
-      Count: 1
+      Count: 2
+
   # ---------------------------------------------------------------------------
-  # Org2: See "Org1" for full specification
+  # OrgB: See "OrgA" for full specification
   # ---------------------------------------------------------------------------
-  - Name: Org2
-    Domain: org2.example.com
+  - Name: OrgB
+    Domain: orgb.atlchain.com
     EnableNodeOUs: true
     Template:
       Count: 2
     Users:
-      Count: 1
+      Count: 2
