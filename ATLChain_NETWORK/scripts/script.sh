@@ -68,6 +68,13 @@ joinChannel () {
 	done
 }
 
+##
+# docker exec -it ca0.example.com sed -i "s/org1/Org1/g" /etc/hyperledger/fabric-ca-server/fabric-ca-server-config.yaml 
+# docker exec -it ca0.example.com sed -i "s/org2/Org2/g" /etc/hyperledger/fabric-ca-server/fabric-ca-server-config.yaml  
+# 
+# docker exec -it ca1.example.com sed -i "s/org1/Org1/g" /etc/hyperledger/fabric-ca-server/fabric-ca-server-config.yaml 
+# docker exec -it ca1.example.com sed -i "s/org2/Org2/g" /etc/hyperledger/fabric-ca-server/fabric-ca-server-config.yaml  
+
 ## Create channel
 echo "Creating channel..."
 createChannel
@@ -95,15 +102,15 @@ sleep $DELAY
 
 # Invoking chaincode on peer0.org1
 echo "Invoking chaincode on peer0.org1..."
-chaincodeInvoke 0 1
+# chaincodeInvoke 0 1
 
 # Query chaincode on peer0.org1
 echo "Querying chaincode on peer0.org1..."
-chaincodeQuery 0 1 100
+# chaincodeQuery 0 1 100
 
 # Invoke chaincode on peer0.org1 and peer0.org2
 echo "Sending invoke transaction on peer0.org1 peer0.org2..."
-chaincodeInvoke 0 1 0 2
+# chaincodeInvoke 0 1 0 2
 
 ## Install chaincode on peer1.org2
 echo "Installing chaincode on peer1.org2..."
@@ -111,7 +118,7 @@ installChaincode 1 2
 
 # Query on chaincode on peer1.org2, check if the result is 90
 echo "Querying chaincode on peer1.org2..."
-chaincodeQuery 1 2 90
+# chaincodeQuery 1 2 90
 
 cd demo/server
 if [ ! -d node_modules ]

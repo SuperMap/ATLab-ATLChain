@@ -5,7 +5,7 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
-# prepending $PWD/../bin to PATH to ensure we are picking up the correct binaries
+# prepending $PWD/ATLChain_NETWORK/bin to PATH to ensure we are picking up the correct binaries
 # this may be commented out to resolve installed version of tools if desired
 export PATH=${PWD}/ATLChain_NETWORK/bin:${PWD}:$PATH
 export FABRIC_CFG_PATH=${PWD}/ATLChain_NETWORK
@@ -141,7 +141,7 @@ function networkUp() {
     fi
     if [ "${IF_COUCHDB}" == "couchdb" ]; then
         if [ "$CONSENSUS_TYPE" == "kafka" ]; then
-            IMAGE_TAG=$IMAGETAG docker-compose -f $COMPOSE_FILE -f $COMPOSE_FILE_KAFKA -f $COMPOSE_FILE_COUCH -f $COMPOSE_FILE_E2E up -d 2>&1
+            IMAGE_TAG=$IMAGETAG docker-compose -f $COMPOSE_FILE -f $COMPOSE_FILE_KAFKA -f $COMPOSE_FILE_COUCH -f $COMPOSE_FILE_E2E -f $COMPOSE_FILE_HADOOP up -d 2>&1
         else
             IMAGE_TAG=$IMAGETAG docker-compose -f $COMPOSE_FILE -f $COMPOSE_FILE_COUCH up -d 2>&1
         fi
@@ -260,8 +260,11 @@ function networkDown() {
         # remove orderer block and other channel configuration transactions and certs
         rm -rf channel-artifacts/*.block channel-artifacts/*.tx crypto-config ./org3-artifacts/crypto-config/ channel-artifacts/org3.json
         # remove the docker-compose yaml file that was customized to the example
-        rm -f docker-compose-e2e.yaml
+        rm -f docker-compose-e2e.yaml ../ATLChain_DEMO/server/app/network-config.yaml
     fi
+
+    # remove useless files
+    rm -rf ./ATLChain_DEMO/web/public/msp/* ./ATLChain_DEMO/web/public/tmp/* ./ATLChain_DEMO/server/fabric-client-kv-orga/*
 }
 
 # Using docker-compose-e2e-template.yaml, replace constants with private key file names
@@ -291,6 +294,16 @@ function replacePrivateKey() {
     PRIV_KEY=$(ls *_sk)
     cd "$CURRENT_DIR"
     sed $OPTS "s/CA2_PRIVATE_KEY/${PRIV_KEY}/g" docker-compose-e2e.yaml
+
+    cp ../ATLChain_DEMO/server/app/network-config-template.yaml ../ATLChain_DEMO/server/app/network-config.yaml
+    cd crypto-config/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp/keystore/
+    PRIV_KEY=$(ls *_sk)
+    cd "$CURRENT_DIR"
+    sed $OPTS "s/ADMIN_ORG1_PRIVATE_KEY/${PRIV_KEY}/g" ../ATLChain_DEMO/server/app/network-config.yaml
+    cd crypto-config/peerOrganizations/org2.example.com/users/Admin@org2.example.com/msp/keystore/
+    PRIV_KEY=$(ls *_sk)
+    cd "$CURRENT_DIR"
+    sed $OPTS "s/ADMIN_ORG2_PRIVATE_KEY/${PRIV_KEY}/g" ../ATLChain_DEMO/server/app/network-config.yaml
     # If MacOSX, remove the temporary backup of the docker-compose file
     if [ "$ARCH" == "Darwin" ]; then
         rm docker-compose-e2e.yamlt
@@ -369,28 +382,28 @@ function generateChannelArtifacts() {
 
     echo
     echo "#################################################################"
-    echo "#######    Generating anchor peer update for Org1MSP   ##########"
+    echo "#######    Generating anchor peer update for Org1   ##########"
     echo "#################################################################"
     set -x
-    configtxgen -profile TwoOrgsChannel -outputAnchorPeersUpdate ./channel-artifacts/Org1MSPanchors.tx -channelID $CHANNEL_NAME -asOrg Org1MSP
+    configtxgen -profile TwoOrgsChannel -outputAnchorPeersUpdate ./channel-artifacts/Org1anchors.tx -channelID $CHANNEL_NAME -asOrg Org1
     res=$?
     set +x
     if [ $res -ne 0 ]; then
-        echo "Failed to generate anchor peer update for Org1MSP..."
+        echo "Failed to generate anchor peer update for Org1..."
         exit 1
     fi
 
     echo
     echo "#################################################################"
-    echo "#######    Generating anchor peer update for Org2MSP   ##########"
+    echo "#######    Generating anchor peer update for Org2   ##########"
     echo "#################################################################"
     set -x
     configtxgen -profile TwoOrgsChannel -outputAnchorPeersUpdate \
-        ./channel-artifacts/Org2MSPanchors.tx -channelID $CHANNEL_NAME -asOrg Org2MSP
+        ./channel-artifacts/Org2anchors.tx -channelID $CHANNEL_NAME -asOrg Org2
     res=$?
     set +x
     if [ $res -ne 0 ]; then
-        echo "Failed to generate anchor peer update for Org2MSP..."
+        echo "Failed to generate anchor peer update for Org2..."
         exit 1
     fi
     echo
@@ -415,6 +428,7 @@ COMPOSE_FILE_ORG3=./docker-compose-org3.yaml
 # kafka and zookeeper compose file
 COMPOSE_FILE_KAFKA=./docker-compose-kafka.yaml
 COMPOSE_FILE_E2E=./docker-compose-e2e.yaml
+COMPOSE_FILE_HADOOP=./docker-compose-hadoop.yaml
 #
 # use golang as the default language for chaincode
 LANGUAGE=golang

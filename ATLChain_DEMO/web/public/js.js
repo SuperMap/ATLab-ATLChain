@@ -3,7 +3,7 @@
 // var RESTURL = "http://148.70.109.243:4000";
 // var FileURL = "http://148.70.109.243:8888";
 var RESTURL = "http://127.0.0.1:4000";
-var FileURL = "http://127.0.0.1:4000";
+var FileURL = "http://127.0.0.1:8888";
 
 $(document).ready(function(){
 
@@ -324,10 +324,10 @@ $(document).ready(function(){
                             $.ajax({
                                 type:'post',
                                 
-                                url: RESTURL + '/channels/atlchannel/chaincodes/atlchainCC/putTx',
+                                url: RESTURL + '/channels/mychannel/chaincodes/mycc/putTx',
                                 data:JSON.stringify({
                                     'fcn': 'Put',
-                                    'peers':['peer0.orga.atlchain.com'],
+                                    'peers':['peer0.org1.example.com'],
                                     'args':[argsHash, args, signature, fileString_PubkeyPEM],
                                     'cert':fileString_PubkeyPEM,
                                     'signature':signature,
@@ -385,7 +385,7 @@ $(document).ready(function(){
                             $.ajax({
                                 type:'post',
                                 
-                                url: RESTURL + '/channels/atlchannel/chaincodes/atlchainCC/AddRecord',
+                                url: RESTURL + '/channels/mychannel/chaincodes/mycc/AddRecord',
                                 data:JSON.stringify({
                                     'args':[argsHash, args, signature, fileString_PubkeyPEM],
                                     'imgdata':fileString_Image,
@@ -449,10 +449,10 @@ $(document).ready(function(){
     $("#trace_btn").click(function(){
         $.ajax({
             type:'post',
-            url: RESTURL + '/channels/atlchannel/chaincodes/atlchainCC/TraceRecord',
+            url: RESTURL + '/channels/mychannel/chaincodes/mycc/TraceRecord',
             data:JSON.stringify({
                 // 'fcn': 'getHistoryByKey',
-                // 'peer': 'peer0.orga.atlchain.com',
+                // 'peer': 'peer0.org1.example.com',
                 'args':[$("#recordID_trace_input").val()],
                 'username':getCookie("username"),
                 'orgname':getCookie("orgname")
@@ -477,10 +477,10 @@ $(document).ready(function(){
         //     case "transaction":
         //         $.ajax({
         //             type:'post',
-        //             url: RESTURL + '/channels/atlchannel/chaincodes/atlchainCC/TraceRecord',
+        //             url: RESTURL + '/channels/mychannel/chaincodes/mycc/TraceRecord',
         //             data:JSON.stringify({
         //                 // 'fcn': 'getHistoryByKey',
-        //                 // 'peer': 'peer0.orga.atlchain.com',
+        //                 // 'peer': 'peer0.org1.example.com',
         //                 'args':[$("#txid_op0_trace_input").val()],
         //                 'username':getCookie("username"),
         //                 'orgname':getCookie("orgname")
@@ -505,10 +505,10 @@ $(document).ready(function(){
         //     case "estate":
         //         $.ajax({
         //             type:'post',
-        //             url: RESTURL + '/channels/atlchannel/chaincodes/atlchainCC/TraceRecord',
+        //             url: RESTURL + '/channels/mychannel/chaincodes/mycc/TraceRecord',
         //             data:JSON.stringify({
         //                 // 'fcn': 'getHistoryByKey',
-        //                 // 'peer': 'peer0.orga.atlchain.com',
+        //                 // 'peer': 'peer0.org1.example.com',
         //                 'args':[$("#ZZBH_op1_trace_input").val()],
         //                 'username':getCookie("username"),
         //                 'orgname':getCookie("orgname")
@@ -622,10 +622,10 @@ $(document).ready(function(){
 
                 $.ajax({
                     type:'post',
-                    url: RESTURL + '/channels/atlchannel/chaincodes/atlchainCC/GetRecord',
+                    url: RESTURL + '/channels/mychannel/chaincodes/mycc/GetRecord',
                     data:JSON.stringify({
                         'fcn': 'Get',
-                        'peer': 'peer0.orga.atlchain.com',
+                        'peer': 'peer0.org1.example.com',
                         'args':[args],
                         'username':getCookie("username"),
                         'orgname':getCookie("orgname")
@@ -678,10 +678,10 @@ $(document).ready(function(){
 
                 $.ajax({
                     type:'post',
-                    url: RESTURL + '/channels/atlchannel/chaincodes/atlchainCC/GetRecord',
+                    url: RESTURL + '/channels/mychannel/chaincodes/mycc/GetRecord',
                     data:JSON.stringify({
                         'fcn': 'Get',
-                        'peer': 'peer0.orga.atlchain.com',
+                        'peer': 'peer0.org1.example.com',
                         'args':[args],
                         'username':getCookie("username"),
                         'orgname':getCookie("orgname")

@@ -35,7 +35,7 @@ var host = process.env.HOST || hfc.getConfigSetting('host');
 var hbaseClient = new hbase('hbase.example.com', '8080');
 var hbaseTable = 'atlc';
 var hbaseCF = 'data:data';
-var hdfsClient = new hdfs('root', 'hdfs.example.com', '50070');
+var hdfsClient = new hdfs('root', 'hadoop.example.com', '50070');
 var hdfsDir = '/user/root';
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -184,8 +184,8 @@ app.post('/users', async function(req, res) {
         
 		logger.debug("private key file: " + filename);
         
-        fs.writeFileSync('./web/public/msp/' + username, fdata);
-        fs.writeFileSync('./web/public/msp/' + filename, fs.readFileSync('./fabric-client-kv-orga/' + filename));
+        fs.writeFileSync('../web/public/msp/' + username, fdata);
+        fs.writeFileSync('../web/public/msp/' + filename, fs.readFileSync('./fabric-client-kv-orga/' + filename));
 
 		logger.debug('Successfully registered the username %s for organization %s',username,orgName);
         response.filename = filename;
@@ -210,7 +210,7 @@ app.post('/channels/:channelName/chaincodes/:chaincodeName/GetRecord', async fun
     let orgname = req.body.orgname;
 
 	var fcn = "Get";
-	let peer = 'peer0.orga.atlchain.com';
+	let peer = 'peer0.org1.example.com';
 
 	if (!chaincodeName) {
 		res.json(getErrorMessage('\'chaincodeName\''));
@@ -240,7 +240,7 @@ app.post('/channels/:channelName/chaincodes/:chaincodeName/TraceRecord', async f
 	var chaincodeName = req.params.chaincodeName;
     let username = req.body.username;
     let orgname = req.body.orgname;
-	let peer = 'peer0.orga.atlchain.com';
+	let peer = 'peer0.org1.example.com';
     let args = req.body.args; 
     let fcn = "getHistoryByKey";
 
@@ -252,8 +252,8 @@ app.post('/channels/:channelName/chaincodes/:chaincodeName/TraceRecord', async f
 app.post('/channels/:channelName/chaincodes/:chaincodeName/putTx', async function(req, res) {
 	logger.debug('==================== INVOKE ON CHAINCODE ==================');
 	var peers = req.body.peers;
-    var channel = req.params.channelName;     // atlchannel
-    var chaincode = req.params.chaincodeName; // atlchainCC
+    var channel = req.params.channelName;     
+    var chaincode = req.params.chaincodeName; 
     var fcn = req.body.fcn; // Put
 	var args = req.body.args;
     var cert = req.body.cert;
@@ -264,7 +264,7 @@ app.post('/channels/:channelName/chaincodes/:chaincodeName/putTx', async functio
     var username = req.body.username;
     var orgname = req.body.orgname;
 
-	var peers = ['peer0.orga.atlchain.com'] ;
+	var peers = ['peer0.org1.example.com'] ;
     var fcn = "Put";
 
 	if (!args) {
@@ -334,7 +334,7 @@ app.post('/channels/:channelName/chaincodes/:chaincodeName/AddRecord', async fun
     console.log(args)
     console.log("+++++++++++++++++++++++");
 
-	var peers = ['peer0.orga.atlchain.com'] ;
+	var peers = ['peer0.org1.example.com'] ;
     var fcn = "Put";
 
 	if (!args) {

@@ -22,7 +22,7 @@ Organizations:
         Name: OrdererOrg
 
         # ID to load the MSP definition as
-        ID: OrdererMSP
+        ID: Orderer
 
         # MSPDir is the filesystem path which contains the MSP configuration
         MSPDir: crypto-config/ordererOrganizations/example.com/msp
@@ -33,21 +33,21 @@ Organizations:
         Policies:
             Readers:
                 Type: Signature
-                Rule: "OR('OrdererMSP.member')"
+                Rule: "OR('Orderer.member')"
             Writers:
                 Type: Signature
-                Rule: "OR('OrdererMSP.member')"
+                Rule: "OR('Orderer.member')"
             Admins:
                 Type: Signature
-                Rule: "OR('OrdererMSP.admin')"
+                Rule: "OR('Orderer.admin')"
 
     - &Org1
         # DefaultOrg defines the organization which is used in the sampleconfig
         # of the fabric.git development environment
-        Name: Org1MSP
+        Name: Org1
 
         # ID to load the MSP definition as
-        ID: Org1MSP
+        ID: Org1
 
         MSPDir: crypto-config/peerOrganizations/org1.example.com/msp
 
@@ -57,13 +57,13 @@ Organizations:
         Policies:
             Readers:
                 Type: Signature
-                Rule: "OR('Org1MSP.admin', 'Org1MSP.peer', 'Org1MSP.client')"
+                Rule: "OR('Org1.admin', 'Org1.peer', 'Org1.client')"
             Writers:
                 Type: Signature
-                Rule: "OR('Org1MSP.admin', 'Org1MSP.client')"
+                Rule: "OR('Org1.admin', 'Org1.client')"
             Admins:
                 Type: Signature
-                Rule: "OR('Org1MSP.admin')"
+                Rule: "OR('Org1.admin')"
 
         # leave this flag set to true.
         AnchorPeers:
@@ -76,10 +76,10 @@ Organizations:
     - &Org2
         # DefaultOrg defines the organization which is used in the sampleconfig
         # of the fabric.git development environment
-        Name: Org2MSP
+        Name: Org2
 
         # ID to load the MSP definition as
-        ID: Org2MSP
+        ID: Org2
 
         MSPDir: crypto-config/peerOrganizations/org2.example.com/msp
 
@@ -89,13 +89,13 @@ Organizations:
         Policies:
             Readers:
                 Type: Signature
-                Rule: "OR('Org2MSP.admin', 'Org2MSP.peer', 'Org2MSP.client')"
+                Rule: "OR('Org2.admin', 'Org2.peer', 'Org2.client')"
             Writers:
                 Type: Signature
-                Rule: "OR('Org2MSP.admin', 'Org2MSP.client')"
+                Rule: "OR('Org2.admin', 'Org2.client')"
             Admins:
                 Type: Signature
-                Rule: "OR('Org2MSP.admin')"
+                Rule: "OR('Org2.admin')"
 
         AnchorPeers:
             # AnchorPeers defines the location of peers which can be used
