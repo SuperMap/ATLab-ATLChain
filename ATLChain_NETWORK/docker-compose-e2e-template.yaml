@@ -51,11 +51,11 @@ services:
         networks:
             - byfn
 
-    orderer.atlchain.com:
+    orderer0.orga.atlchain.com:
         extends:
             file:   base/docker-compose-base.yaml
             service: orderer0.orga.atlchain.com
-        container_name: orderer.atlchain.com
+        container_name: orderer0.orga.atlchain.com
         networks:
             - byfn
 

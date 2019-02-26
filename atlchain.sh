@@ -305,7 +305,7 @@ function replacePrivateKey() {
     PRIV_KEY=$(ls *_sk)
     cd "$CURRENT_DIR"
     sed $OPTS "s/ADMIN_ORG1_PRIVATE_KEY/${PRIV_KEY}/g" ../ATLChain_DEMO/server/app/network-config.yaml
-    cd crypto-config/peerOrganizations/org2.atlchain.com/users/Admin@org2.atlchain.com/msp/keystore/
+    cd crypto-config/peerOrganizations/orgb.atlchain.com/users/Admin@orgb.atlchain.com/msp/keystore/
     PRIV_KEY=$(ls *_sk)
     cd "$CURRENT_DIR"
     sed $OPTS "s/ADMIN_ORG2_PRIVATE_KEY/${PRIV_KEY}/g" ../ATLChain_DEMO/server/app/network-config.yaml
@@ -514,6 +514,12 @@ fi
 askProceed
 
 cd ATLChain_NETWORK
+
+# untar bin package
+if [ ! -d "bin" ] 
+then
+    tar xvf bin.tar.xz
+fi
 
 #Create the network using docker compose
 if [ "${MODE}" == "up" ]; then
