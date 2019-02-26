@@ -13,3 +13,7 @@ Hadoop, Hbase, Kafka, Fabric, Go, Node.js, Npm
 
 
 TODO: We will do it better.
+
+TroubleShoting:
+
+Error: got unexpected status: SERVICE_UNAVAILABLE -- backing Kafka cluster has not completed booting; try again later

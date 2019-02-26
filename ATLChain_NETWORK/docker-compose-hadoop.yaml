@@ -13,7 +13,7 @@ services:
         image: sequenceiq/hadoop-docker:2.7.1 
         restart: always
         hostname: localhost
-        container_name: hadoop.example.com
+        container_name: hadoop.atlchain.com
         ports:
             - 50070:50070
             - 50075:50075
@@ -34,7 +34,7 @@ services:
         image: harisekhon/hbase:latest
         restart: always
         hostname: hbase
-        container_name: hbase.example.com
+        container_name: hbase.atlchain.com
         ports:
             - 8080:8080
             - 8085:8085

@@ -27,7 +27,7 @@ description: "ATLChain"
 version: "1.0"
 
 #
-# The client section will be added on a per org basis see org1.yaml and org2.yaml
+# The client section will be added on a per org basis see orgA.yaml and orgB.yaml
 #
 #client:
 
@@ -38,17 +38,17 @@ version: "1.0"
 #
 channels:
   # name of the channel
-  mychannel:
+  atlchannel:
     # Required. list of orderers designated by the application to use for transactions on this
-    # channel. This list can be a result of access control ("org1" can only access "ordererA"), or
+    # channel. This list can be a result of access control ("orga" can only access "ordererA"), or
     # operational decisions to share loads from applications among the orderers.  The values must
     # be "names" of orgs defined under "organizations/peers"
     orderers:
-      - orderer.example.com
+      - orderer0.orga.atlchain.com
 
     # Required. list of peers from participating orgs
     peers:
-      peer0.org1.example.com:
+      peer0.orga.atlchain.com:
         # [Optional]. will this peer be sent transaction proposals for endorsement? The peer must
         # have the chaincode installed. The app can also use this property to decide which peers
         # to send the chaincode install request. Default: true
@@ -68,19 +68,19 @@ channels:
         # Default: true
         eventSource: true
 
-      peer1.org1.example.com:
+      peer1.orga.atlchain.com:
         endorsingPeer: false
         chaincodeQuery: true
         ledgerQuery: true
         eventSource: false
 
-      peer0.org2.example.com:
+      peer0.orgb.atlchain.com:
         endorsingPeer: true
         chaincodeQuery: true
         ledgerQuery: true
         eventSource: true
 
-      peer1.org2.example.com:
+      peer1.orgb.atlchain.com:
         endorsingPeer: false
         chaincodeQuery: true
         ledgerQuery: true
@@ -91,18 +91,18 @@ channels:
     # this list with the query results of getInstalledChaincodes() and getInstantiatedChaincodes()
     chaincodes:
       # the format follows the "cannonical name" of chaincodes by fabric code
-      - mycc:v0
+      - atlchainCC:v1
 
 #
 # list of participating organizations in this network
 #
 organizations:
-  Org1:
-    mspid: Org1
+  OrgA:
+    mspid: OrgA
 
     peers:
-      - peer0.org1.example.com
-      - peer1.org1.example.com
+      - peer0.orga.atlchain.com
+      - peer1.orga.atlchain.com
 
     # [Optional]. Certificate Authorities issue certificates for identification purposes in a Fabric based
     # network. Typically certificates provisioning is done in a separate process outside of the
@@ -110,7 +110,7 @@ organizations:
     # dynamic certificate management (enroll, revoke, re-enroll). The following section is only for
     # Fabric-CA servers.
     certificateAuthorities:
-      - ca0.example.com
+      - ca0.atlchain.com
 
     # [Optional]. If the application is going to make requests that are reserved to organization
     # administrators, including creating/updating channels, installing/instantiating chaincodes, it
@@ -120,26 +120,26 @@ organizations:
     # this way. The SDK should allow applications to set the org admin identity via APIs, and only use
     # this route as an alternative when it exists.
     adminPrivateKey:
-      path: ../../crypto/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp/keystore/ADMIN_ORG1_PRIVATE_KEY
+      path: ../../crypto/peerOrganizations/orga.atlchain.com/users/Admin@orga.atlchain.com/msp/keystore/ADMIN_ORGA_PRIVATE_KEY
     signedCert:
-      path: ../../crypto/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp/signcerts/Admin@org1.example.com-cert.pem
+      path: ../../crypto/peerOrganizations/orga.atlchain.com/users/Admin@orga.atlchain.com/msp/signcerts/Admin@orga.atlchain.com-cert.pem
 
   # the profile will contain public information about organizations other than the one it belongs to.
   # These are necessary information to make transaction lifecycles work, including MSP IDs and
   # peers with a public URL to send transaction proposals. The file will not contain private
   # information reserved for members of the organization, such as admin key and certificate,
   # fabric-ca registrar enroll ID and secret, etc.
-  Org2:
-    mspid: Org2
+  OrgB:
+    mspid: OrgB
     peers:
-      - peer0.org2.example.com
-      - peer1.org2.example.com
+      - peer0.orgb.atlchain.com
+      - peer1.orgb.atlchain.com
     certificateAuthorities:
-      - ca1.example.com
+      - ca1.atlchain.com
     adminPrivateKey:
-      path: ../../crypto/peerOrganizations/org2.example.com/users/Admin@org2.example.com/msp/keystore/ADMIN_ORG2_PRIVATE_KEY
+      path: ../../crypto/peerOrganizations/orgb.atlchain.com/users/Admin@orgb.atlchain.com/msp/keystore/ADMIN_ORGB_PRIVATE_KEY
     signedCert:
-      path: ../../crypto/peerOrganizations/org2.example.com/users/Admin@org2.example.com/msp/signcerts/Admin@org2.example.com-cert.pem
+      path: ../../crypto/peerOrganizations/orgb.atlchain.com/users/Admin@orgb.atlchain.com/msp/signcerts/Admin@orgb.atlchain.com-cert.pem
 
 #
 # List of orderers to send transaction and channel create/update requests to. For the time
@@ -147,13 +147,13 @@ organizations:
 # SDK is implementation specific. Consult each SDK's documentation for its handling of orderers.
 #
 orderers:
-  orderer.example.com:
-    url: grpc://orderer.example.com:7050
+  orderer0.orga.atlchain.com:
+    url: grpc://orderer0.orga.atlchain.com:7050
 
     # these are standard properties defined by the gRPC library
     # they will be passed in as-is to gRPC client constructor
     grpcOptions:
-      ssl-target-name-override: orderer.example.com
+      ssl-target-name-override: orderer0.orga.atlchain.com
 
     tlsCACerts:
       path: 
@@ -163,34 +163,33 @@ orderers:
 # and event listener registration.
 #
 peers:
-  peer0.org1.example.com:
+  peer0.orga.atlchain.com:
     # this URL is used to send endorsement and query requests
-    url: grpc://peer0.org1.example.com:7051
-
+    url: grpc://peer0.orga.atlchain.com:7051
     grpcOptions:
-      ssl-target-name-override: peer0.org1.example.com
+      ssl-target-name-override: peer0.orga.atlchain.com
     tlsCACerts:
       path: 
 
-  peer1.org1.example.com:
-    url: grpc://peer1.org1.example.com:7056
+  peer1.orga.atlchain.com:
+    url: grpc://peer1.orga.atlchain.com:7051
     grpcOptions:
-      ssl-target-name-override: peer1.org1.example.com
+      ssl-target-name-override: peer1.orga.atlchain.com
     tlsCACerts:
       path: 
 
-  peer0.org2.example.com:
-    url: grpc://peer0.org2.example.com:8051
+  peer0.orgb.atlchain.com:
+    url: grpc://peer0.orgb.atlchain.com:7051
     grpcOptions:
-      ssl-target-name-override: peer0.org2.example.com
+      ssl-target-name-override: peer0.orgb.atlchain.com
     tlsCACerts:
       path: 
 
-  peer1.org2.example.com:
-    url: grpc://peer1.org2.example.com:8056
-    eventUrl: grpc://peer1.org2.example.com:8058
+  peer1.orgb.atlchain.com:
+    url: grpc://peer1.orgb.atlchain.com:7051
+    eventUrl: grpc://peer1.orgb.atlchain.com:7053
     grpcOptions:
-      ssl-target-name-override: peer1.org2.example.com
+      ssl-target-name-override: peer1.orgb.atlchain.com
     tlsCACerts:
       path: 
 
@@ -200,8 +199,8 @@ peers:
 # Certificate Authority instead of Fabric-CA, in which case this section would not be specified.
 #
 certificateAuthorities:
-  ca0.example.com:
-    url: http://ca0.example.com:7054
+  ca0.atlchain.com:
+    url: http://ca0.atlchain.com:7054
     # the properties specified under this object are passed to the 'http' client verbatim when
     # making the request to the Fabric-CA server
     httpOptions:
@@ -215,10 +214,10 @@ certificateAuthorities:
       - enrollId: admin
         enrollSecret: adminpw
     # [Optional] The optional name of the CA.
-    caName: ca-org1
+    caName: ca-orga
 
-  ca1.example.com:
-    url: https://localhost:8054
+  ca1.atlchain.com:
+    url: https://ca1.atlchain.com:7054
     httpOptions:
       verify: false
     tlsCACerts:
@@ -227,4 +226,4 @@ certificateAuthorities:
       - enrollId: admin
         enrollSecret: adminpw
     # [Optional] The optional name of the CA.
-    caName: ca-org2
+    caName: ca-orgb

@@ -75,7 +75,7 @@ function askProceed() {
 # Obtain CONTAINER_IDS and remove them
 # TODO Might want to make this optional - could clear other containers
 function clearContainers() {
-    CONTAINER_IDS=$(docker ps -a | awk '($2 ~ /dev-peer.*.mycc.*/) {print $1}')
+    CONTAINER_IDS=$(docker ps -a | awk '($2 ~ /dev-peer.*.atlchaincc.*/) {print $1}')
     if [ -z "$CONTAINER_IDS" -o "$CONTAINER_IDS" == " " ]; then
         echo "---- No containers available for deletion ----"
     else
@@ -87,7 +87,7 @@ function clearContainers() {
 # specifically the following images are often left behind:
 # TODO list generated image naming patterns
 function removeUnwantedImages() {
-    DOCKER_IMAGE_IDS=$(docker images | awk '($1 ~ /dev-peer.*.mycc.*/) {print $3}')
+    DOCKER_IMAGE_IDS=$(docker images | awk '($1 ~ /dev-peer.*.atlchaincc.*/) {print $3}')
     if [ -z "$DOCKER_IMAGE_IDS" -o "$DOCKER_IMAGE_IDS" == " " ]; then
         echo "---- No images available for deletion ----"
     else
@@ -143,7 +143,7 @@ function networkUp() {
     fi
     if [ "${IF_COUCHDB}" == "couchdb" ]; then
         if [ "$CONSENSUS_TYPE" == "kafka" ]; then
-            IMAGE_TAG=$IMAGETAG docker-compose -f $COMPOSE_FILE -f $COMPOSE_FILE_KAFKA -f $COMPOSE_FILE_COUCH up -d 2>&1
+            IMAGE_TAG=$IMAGETAG docker-compose -f $COMPOSE_FILE -f $COMPOSE_FILE_KAFKA -f $COMPOSE_FILE_COUCH -f $COMPOSE_FILE_E2E up -d 2>&1
             # IMAGE_TAG=$IMAGETAG docker-compose -f $COMPOSE_FILE -f $COMPOSE_FILE_KAFKA -f $COMPOSE_FILE_COUCH -f $COMPOSE_FILE_E2E -f $COMPOSE_FILE_HADOOP up -d 2>&1
         else
             IMAGE_TAG=$IMAGETAG docker-compose -f $COMPOSE_FILE -f $COMPOSE_FILE_COUCH up -d 2>&1
@@ -250,7 +250,7 @@ function networkDown() {
     # stop org3 containers also in addition to org1 and org2, in case we were running sample to add org3
     # stop kafka and zookeeper containers in case we're running with kafka consensus-type
     
-    docker-compose -f $COMPOSE_FILE -f $COMPOSE_FILE_COUCH down --volumes --remove-orphans
+    docker-compose -f $COMPOSE_FILE -f $COMPOSE_FILE_COUCH -f $COMPOSE_FILE_KAFKA -f $COMPOSE_FILE_E2E down --volumes --remove-orphans
     # docker-compose -f $COMPOSE_FILE -f $COMPOSE_FILE_COUCH -f $COMPOSE_FILE_KAFKA -f $COMPOSE_FILE_E2E -f $COMPOSE_FILE_ORG3 -f $COMPOSE_FILE_HADOOP down --volumes --remove-orphans
 
     # Don't remove the generated artifacts -- note, the ledgers are always removed
@@ -304,11 +304,11 @@ function replacePrivateKey() {
     cd crypto-config/peerOrganizations/orga.atlchain.com/users/Admin@orga.atlchain.com/msp/keystore/
     PRIV_KEY=$(ls *_sk)
     cd "$CURRENT_DIR"
-    sed $OPTS "s/ADMIN_ORG1_PRIVATE_KEY/${PRIV_KEY}/g" ../ATLChain_DEMO/server/app/network-config.yaml
+    sed $OPTS "s/ADMIN_ORGA_PRIVATE_KEY/${PRIV_KEY}/g" ../ATLChain_DEMO/server/app/network-config.yaml
     cd crypto-config/peerOrganizations/orgb.atlchain.com/users/Admin@orgb.atlchain.com/msp/keystore/
     PRIV_KEY=$(ls *_sk)
     cd "$CURRENT_DIR"
-    sed $OPTS "s/ADMIN_ORG2_PRIVATE_KEY/${PRIV_KEY}/g" ../ATLChain_DEMO/server/app/network-config.yaml
+    sed $OPTS "s/ADMIN_ORGB_PRIVATE_KEY/${PRIV_KEY}/g" ../ATLChain_DEMO/server/app/network-config.yaml
     # If MacOSX, remove the temporary backup of the docker-compose file
     if [ "$ARCH" == "Darwin" ]; then
         rm docker-compose-e2e.yamlt

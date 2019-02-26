@@ -124,13 +124,13 @@ installChaincode 1 2
 echo "Querying chaincode on peer1.orgb..."
 chaincodeQuery 1 2
 
-# cd demo/server
-# if [ ! -d node_modules ]
-# then
-#     npm install
-# fi
-# nohup node app > app.log 2>&1 &
-# nohup node http > http.log 2>&1 &
+cd demo/server
+if [ ! -d node_modules ]
+then
+    npm install
+fi
+nohup node app > app.log 2>&1 &
+nohup node http > http.log 2>&1 &
 
 echo
 echo "========= All GOOD, building ATLCHAIN DEMO execution completed =========== "
