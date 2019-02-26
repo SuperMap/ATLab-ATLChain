@@ -25,11 +25,13 @@ MAX_RETRY=10
 
 CC_SRC_PATH="github.com/chaincode/"
 if [ "$LANGUAGE" = "node" ]; then
-	CC_SRC_PATH="/opt/gopath/src/github.com/chaincode/chaincode_example02/node/"
+    CC_SRC_PATH="github.com/chaincode/"
+	# CC_SRC_PATH="/opt/gopath/src/github.com/chaincode/chaincode_example02/node/"
 fi
 
 if [ "$LANGUAGE" = "java" ]; then
-	CC_SRC_PATH="/opt/gopath/src/github.com/chaincode/chaincode_example02/java/"
+    CC_SRC_PATH="github.com/chaincode/"
+	# CC_SRC_PATH="/opt/gopath/src/github.com/chaincode/chaincode_example02/java/"
 fi
 
 echo "Channel name : "$CHANNEL_NAME
@@ -41,15 +43,15 @@ createChannel() {
 	setGlobals 0 1
 
 	if [ -z "$CORE_PEER_TLS_ENABLED" -o "$CORE_PEER_TLS_ENABLED" = "false" ]; then
-                set -x
-		peer channel create -o orderer.example.com:7050 -c $CHANNEL_NAME -f ./channel-artifacts/channel.tx >&log.txt
+        set -x
+		peer channel create -o orderer0.orga.atlchain.com:7050 -c $CHANNEL_NAME -f ./channel-artifacts/atlchannel.tx >&log.txt
 		res=$?
-                set +x
+        set +x
 	else
-				set -x
-		peer channel create -o orderer.example.com:7050 -c $CHANNEL_NAME -f ./channel-artifacts/channel.tx --tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA >&log.txt
+		set -x
+		peer channel create -o orderer0.orga.atlchain.com:7050 -c $CHANNEL_NAME -f ./channel-artifacts/atlchannel.tx --tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA >&log.txt
 		res=$?
-				set +x
+		set +x
 	fi
 	cat log.txt
 	verifyResult $res "Channel creation failed"
@@ -58,8 +60,10 @@ createChannel() {
 }
 
 joinChannel () {
-	for org in 1 2; do
-	    for peer in 0 1; do
+	# for org in 1 2; do
+	#     for peer in 0 1; do
+	for org in 1; do
+	    for peer in 0; do
 		joinChannelWithRetry $peer $org
 		echo "===================== peer${peer}.org${org} joined channel '$CHANNEL_NAME' ===================== "
 		sleep $DELAY
@@ -69,11 +73,11 @@ joinChannel () {
 }
 
 ##
-# docker exec -it ca0.example.com sed -i "s/org1/Org1/g" /etc/hyperledger/fabric-ca-server/fabric-ca-server-config.yaml 
-# docker exec -it ca0.example.com sed -i "s/org2/Org2/g" /etc/hyperledger/fabric-ca-server/fabric-ca-server-config.yaml  
+# docker exec -it ca0.atlchain.com sed -i "s/org1/Org1/g" /etc/hyperledger/fabric-ca-server/fabric-ca-server-config.yaml 
+# docker exec -it ca0.atlchain.com sed -i "s/org2/Org2/g" /etc/hyperledger/fabric-ca-server/fabric-ca-server-config.yaml  
 # 
-# docker exec -it ca1.example.com sed -i "s/org1/Org1/g" /etc/hyperledger/fabric-ca-server/fabric-ca-server-config.yaml 
-# docker exec -it ca1.example.com sed -i "s/org2/Org2/g" /etc/hyperledger/fabric-ca-server/fabric-ca-server-config.yaml  
+# docker exec -it ca1.atlchain.com sed -i "s/org1/Org1/g" /etc/hyperledger/fabric-ca-server/fabric-ca-server-config.yaml 
+# docker exec -it ca1.atlchain.com sed -i "s/org2/Org2/g" /etc/hyperledger/fabric-ca-server/fabric-ca-server-config.yaml  
 
 ## Create channel
 echo "Creating channel..."
@@ -86,50 +90,50 @@ joinChannel
 ## Set the anchor peers for each org in the channel
 echo "Updating anchor peers for org1..."
 updateAnchorPeers 0 1
-echo "Updating anchor peers for org2..."
-updateAnchorPeers 0 2
+#echo "Updating anchor peers for org2..."
+#updateAnchorPeers 0 2
 
 ## Install chaincode on peer0.org1 and peer0.org2
 echo "Installing chaincode on peer0.org1..."
 installChaincode 0 1
-echo "Install chaincode on peer0.org2..."
-installChaincode 0 2
+#echo "Install chaincode on peer0.org2..."
+#installChaincode 0 2
 
 # Instantiate chaincode on peer0.org2
 echo "Instantiating chaincode on peer0.org2..."
-instantiateChaincode 0 2
+instantiateChaincode 0 1
 sleep $DELAY
 
 # Invoking chaincode on peer0.org1
 echo "Invoking chaincode on peer0.org1..."
-chaincodeInvoke 0 1
+chaincodeInvoke 0 A
 
 # Query chaincode on peer0.org1
 echo "Querying chaincode on peer0.org1..."
-chaincodeQuery 0 1 100
+chaincodeQuery 0 1
 
 # Invoke chaincode on peer0.org1 and peer0.org2
-echo "Sending invoke transaction on peer0.org1 peer0.org2..."
-chaincodeInvoke 0 1 0 2
+#echo "Sending invoke transaction on peer0.org1 peer0.org2..."
+#chaincodeInvoke 0 A 0 B
 
 ## Install chaincode on peer1.org2
-echo "Installing chaincode on peer1.org2..."
-installChaincode 1 2
+#echo "Installing chaincode on peer1.org2..."
+#installChaincode 1 2
 
 # Query on chaincode on peer1.org2, check if the result is 90
-echo "Querying chaincode on peer1.org2..."
-chaincodeQuery 1 2 90
+#echo "Querying chaincode on peer1.org2..."
+#chaincodeQuery 1 2
 
-cd demo/server
-if [ ! -d node_modules ]
-then
-    npm install
-fi
-nohup node app > app.log 2>&1 &
-nohup node http > http.log 2>&1 &
+# cd demo/server
+# if [ ! -d node_modules ]
+# then
+#     npm install
+# fi
+# nohup node app > app.log 2>&1 &
+# nohup node http > http.log 2>&1 &
 
 echo
-echo "========= All GOOD, building atlchain demo execution completed =========== "
+echo "========= All GOOD, building ATLCHAIN DEMO execution completed =========== "
 echo
 
 echo

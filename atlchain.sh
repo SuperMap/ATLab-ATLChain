@@ -13,6 +13,8 @@ export VERBOSE=false
 
 # default compose project name
 export COMPOSE_PROJECT_NAME=atl
+
+# default docker image version
 export IMAGE_TAG=latest
 
 # Print the usage message
@@ -25,7 +27,7 @@ function printHelp() {
     echo "      - 'restart' - restart the network"
     echo "      - 'generate' - generate required certificates and genesis block"
     echo "      - 'upgrade'  - upgrade the network from version 1.3.x to 1.4.0"
-    echo "    -c <channel name> - channel name to use (defaults to \"mychannel\")"
+    echo "    -c <channel name> - channel name to use (defaults to \"atlchannel\")"
     echo "    -t <timeout> - CLI timeout duration in seconds (defaults to 10)"
     echo "    -d <delay> - delay duration in seconds (defaults to 3)"
     echo "    -f <docker-compose-file> - specify which docker-compose file use (defaults to docker-compose-cli.yaml)"
@@ -39,12 +41,12 @@ function printHelp() {
     echo "Typically, one would first generate the required certificates and "
     echo "genesis block, then bring up the network. e.g.:"
     echo
-    echo "	byfn.sh generate -c mychannel"
-    echo "	byfn.sh up -c mychannel -s couchdb"
-    echo "        byfn.sh up -c mychannel -s couchdb -i 1.4.0"
+    echo "	byfn.sh generate -c atlchannel"
+    echo "	byfn.sh up -c atlchannel -s couchdb"
+    echo "        byfn.sh up -c atlchannel -s couchdb -i 1.4.0"
     echo "	byfn.sh up -l node"
-    echo "	byfn.sh down -c mychannel"
-    echo "        byfn.sh upgrade -c mychannel"
+    echo "	byfn.sh down -c atlchannel"
+    echo "        byfn.sh upgrade -c atlchannel"
     echo
     echo "Taking all defaults:"
     echo "	byfn.sh generate"
@@ -141,7 +143,8 @@ function networkUp() {
     fi
     if [ "${IF_COUCHDB}" == "couchdb" ]; then
         if [ "$CONSENSUS_TYPE" == "kafka" ]; then
-            IMAGE_TAG=$IMAGETAG docker-compose -f $COMPOSE_FILE -f $COMPOSE_FILE_KAFKA -f $COMPOSE_FILE_COUCH -f $COMPOSE_FILE_E2E -f $COMPOSE_FILE_HADOOP up -d 2>&1
+            IMAGE_TAG=$IMAGETAG docker-compose -f $COMPOSE_FILE -f $COMPOSE_FILE_KAFKA -f $COMPOSE_FILE_COUCH -f $COMPOSE_FILE_E2E up -d 2>&1
+            # IMAGE_TAG=$IMAGETAG docker-compose -f $COMPOSE_FILE -f $COMPOSE_FILE_KAFKA -f $COMPOSE_FILE_COUCH -f $COMPOSE_FILE_E2E -f $COMPOSE_FILE_HADOOP up -d 2>&1
         else
             IMAGE_TAG=$IMAGETAG docker-compose -f $COMPOSE_FILE -f $COMPOSE_FILE_COUCH up -d 2>&1
         fi
@@ -176,7 +179,7 @@ function networkUp() {
 # and relaunch the orderer and peers with latest tag
 function upgradeNetwork() {
     if [[ "$IMAGETAG" == *"1.4"* ]] || [[ $IMAGETAG == "latest" ]]; then
-        docker inspect -f '{{.Config.Volumes}}' orderer.example.com | grep -q '/var/hyperledger/production/orderer'
+        docker inspect -f '{{.Config.Volumes}}' orderer.atlchain.com | grep -q '/var/hyperledger/production/orderer'
         if [ $? -ne 0 ]; then
             echo "ERROR !!!! This network does not appear to start with fabric-samples >= v1.3.x?"
             exit 1
@@ -207,11 +210,11 @@ function upgradeNetwork() {
         docker-compose $COMPOSE_FILES up -d --no-deps cli
 
         echo "Upgrading orderer"
-        docker-compose $COMPOSE_FILES stop orderer.example.com
-        docker cp -a orderer.example.com:/var/hyperledger/production/orderer $LEDGERS_BACKUP/orderer.example.com
-        docker-compose $COMPOSE_FILES up -d --no-deps orderer.example.com
+        docker-compose $COMPOSE_FILES stop orderer.atlchain.com
+        docker cp -a orderer.atlchain.com:/var/hyperledger/production/orderer $LEDGERS_BACKUP/orderer.atlchain.com
+        docker-compose $COMPOSE_FILES up -d --no-deps orderer.atlchain.com
 
-        for PEER in peer0.org1.example.com peer1.org1.example.com peer0.org2.example.com peer1.org2.example.com; do
+        for PEER in peer0.org1.atlchain.com peer1.org1.atlchain.com peer0.org2.atlchain.com peer1.org2.atlchain.com; do
             echo "Upgrading peer $PEER"
 
             # Stop the peer and backup its ledger
@@ -246,7 +249,9 @@ function upgradeNetwork() {
 function networkDown() {
     # stop org3 containers also in addition to org1 and org2, in case we were running sample to add org3
     # stop kafka and zookeeper containers in case we're running with kafka consensus-type
-    docker-compose -f $COMPOSE_FILE -f $COMPOSE_FILE_COUCH -f $COMPOSE_FILE_KAFKA -f $COMPOSE_FILE_E2E -f $COMPOSE_FILE_ORG3 down --volumes --remove-orphans
+    
+    docker-compose -f $COMPOSE_FILE -f $COMPOSE_FILE_COUCH down --volumes --remove-orphans
+    # docker-compose -f $COMPOSE_FILE -f $COMPOSE_FILE_COUCH -f $COMPOSE_FILE_KAFKA -f $COMPOSE_FILE_E2E -f $COMPOSE_FILE_ORG3 -f $COMPOSE_FILE_HADOOP down --volumes --remove-orphans
 
     # Don't remove the generated artifacts -- note, the ledgers are always removed
     if [ "$MODE" != "restart" ]; then
@@ -286,21 +291,21 @@ function replacePrivateKey() {
     # The next steps will replace the template's contents with the
     # actual values of the private key file names for the two CAs.
     CURRENT_DIR=$PWD
-    cd crypto-config/peerOrganizations/org1.example.com/ca/
+    cd crypto-config/peerOrganizations/orga.atlchain.com/ca/
     PRIV_KEY=$(ls *_sk)
     cd "$CURRENT_DIR"
     sed $OPTS "s/CA1_PRIVATE_KEY/${PRIV_KEY}/g" docker-compose-e2e.yaml
-    cd crypto-config/peerOrganizations/org2.example.com/ca/
+    cd crypto-config/peerOrganizations/orgb.atlchain.com/ca/
     PRIV_KEY=$(ls *_sk)
     cd "$CURRENT_DIR"
     sed $OPTS "s/CA2_PRIVATE_KEY/${PRIV_KEY}/g" docker-compose-e2e.yaml
 
     cp ../ATLChain_DEMO/server/app/network-config-template.yaml ../ATLChain_DEMO/server/app/network-config.yaml
-    cd crypto-config/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp/keystore/
+    cd crypto-config/peerOrganizations/orga.atlchain.com/users/Admin@orga.atlchain.com/msp/keystore/
     PRIV_KEY=$(ls *_sk)
     cd "$CURRENT_DIR"
     sed $OPTS "s/ADMIN_ORG1_PRIVATE_KEY/${PRIV_KEY}/g" ../ATLChain_DEMO/server/app/network-config.yaml
-    cd crypto-config/peerOrganizations/org2.example.com/users/Admin@org2.example.com/msp/keystore/
+    cd crypto-config/peerOrganizations/org2.atlchain.com/users/Admin@org2.atlchain.com/msp/keystore/
     PRIV_KEY=$(ls *_sk)
     cd "$CURRENT_DIR"
     sed $OPTS "s/ADMIN_ORG2_PRIVATE_KEY/${PRIV_KEY}/g" ../ATLChain_DEMO/server/app/network-config.yaml
@@ -353,9 +358,9 @@ function generateChannelArtifacts() {
     echo "CONSENSUS_TYPE="$CONSENSUS_TYPE
     set -x
     if [ "$CONSENSUS_TYPE" == "solo" ]; then
-        configtxgen -profile TwoOrgsOrdererGenesis -channelID byfn-sys-channel -outputBlock ./channel-artifacts/genesis.block
+        configtxgen -profile OrdererChannel -channelID ordererchannel -outputBlock ./channel-artifacts/genesis.block
     elif [ "$CONSENSUS_TYPE" == "kafka" ]; then
-        configtxgen -profile SampleDevModeKafka -channelID byfn-sys-channel -outputBlock ./channel-artifacts/genesis.block
+        configtxgen -profile OrdererChannel -channelID ordererchannel -outputBlock ./channel-artifacts/genesis.block
     else
         set +x
         echo "unrecognized CONSESUS_TYPE='$CONSENSUS_TYPE'. exiting"
@@ -369,10 +374,10 @@ function generateChannelArtifacts() {
     fi
     echo
     echo "#################################################################"
-    echo "### Generating channel configuration transaction 'channel.tx' ###"
+    echo "### Generating channel configuration transaction 'atlchannel.tx' ###"
     echo "#################################################################"
     set -x
-    configtxgen -profile TwoOrgsChannel -outputCreateChannelTx ./channel-artifacts/channel.tx -channelID $CHANNEL_NAME
+    configtxgen -profile TxChannel -outputCreateChannelTx ./channel-artifacts/atlchannel.tx -channelID $CHANNEL_NAME
     res=$?
     set +x
     if [ $res -ne 0 ]; then
@@ -382,28 +387,28 @@ function generateChannelArtifacts() {
 
     echo
     echo "#################################################################"
-    echo "#######    Generating anchor peer update for Org1   ##########"
+    echo "#######    Generating anchor peer update for OrgA   ##########"
     echo "#################################################################"
     set -x
-    configtxgen -profile TwoOrgsChannel -outputAnchorPeersUpdate ./channel-artifacts/Org1anchors.tx -channelID $CHANNEL_NAME -asOrg Org1
+    configtxgen -profile TxChannel -outputAnchorPeersUpdate ./channel-artifacts/OrgAanchors.tx -channelID $CHANNEL_NAME -asOrg OrgA
     res=$?
     set +x
     if [ $res -ne 0 ]; then
-        echo "Failed to generate anchor peer update for Org1..."
+        echo "Failed to generate anchor peer update for OrgA..."
         exit 1
     fi
 
     echo
     echo "#################################################################"
-    echo "#######    Generating anchor peer update for Org2   ##########"
+    echo "#######    Generating anchor peer update for OrgB   ##########"
     echo "#################################################################"
     set -x
-    configtxgen -profile TwoOrgsChannel -outputAnchorPeersUpdate \
-        ./channel-artifacts/Org2anchors.tx -channelID $CHANNEL_NAME -asOrg Org2
+    configtxgen -profile TxChannel -outputAnchorPeersUpdate \
+        ./channel-artifacts/OrgBanchors.tx -channelID $CHANNEL_NAME -asOrg OrgB
     res=$?
     set +x
     if [ $res -ne 0 ]; then
-        echo "Failed to generate anchor peer update for Org2..."
+        echo "Failed to generate anchor peer update for OrgB..."
         exit 1
     fi
     echo
@@ -417,8 +422,8 @@ OS_ARCH=$(echo "$(uname -s | tr '[:upper:]' '[:lower:]' | sed 's/mingw64_nt.*/wi
 CLI_TIMEOUT=10
 # default for delay between commands
 CLI_DELAY=3
-# channel name defaults to "mychannel"
-CHANNEL_NAME="mychannel"
+# channel name defaults to "atlchannel"
+CHANNEL_NAME="atlchannel"
 # use this as the default docker-compose yaml definition
 COMPOSE_FILE=./docker-compose-cli.yaml
 #
@@ -435,7 +440,7 @@ LANGUAGE=golang
 # default image tag
 IMAGETAG="latest"
 # default consensus type
-CONSENSUS_TYPE="kafka"
+CONSENSUS_TYPE="solo"
 IF_COUCHDB="couchdb"
 # Parse commandline args
 if [ "$1" = "-m" ]; then # supports old usage, muscle memory is powerful!
