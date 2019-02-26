@@ -521,6 +521,11 @@ then
     tar xvf bin.tar.xz
 fi
 
+if [ ! -d "channel-artifacts" ] 
+then
+    mkdir channel-artifacts
+fi
+
 #Create the network using docker compose
 if [ "${MODE}" == "up" ]; then
     networkUp
