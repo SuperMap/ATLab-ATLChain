@@ -60,24 +60,18 @@ createChannel() {
 }
 
 joinChannel () {
-	# for org in 1 2; do
-	#     for peer in 0 1; do
-	for org in 1; do
-	    for peer in 0; do
-		joinChannelWithRetry $peer $org
-		echo "===================== peer${peer}.org${org} joined channel '$CHANNEL_NAME' ===================== "
-		sleep $DELAY
-		echo
+	for org in 1 2; do
+	    for peer in 0 1; do
+		    joinChannelWithRetry $peer $org
+		    echo "===================== peer${peer}.org${org} joined channel '$CHANNEL_NAME' ===================== "
+		    sleep $DELAY
+		    echo
 	    done
 	done
 }
 
 ##
 # docker exec -it ca0.atlchain.com sed -i "s/org1/Org1/g" /etc/hyperledger/fabric-ca-server/fabric-ca-server-config.yaml 
-# docker exec -it ca0.atlchain.com sed -i "s/org2/Org2/g" /etc/hyperledger/fabric-ca-server/fabric-ca-server-config.yaml  
-# 
-# docker exec -it ca1.atlchain.com sed -i "s/org1/Org1/g" /etc/hyperledger/fabric-ca-server/fabric-ca-server-config.yaml 
-# docker exec -it ca1.atlchain.com sed -i "s/org2/Org2/g" /etc/hyperledger/fabric-ca-server/fabric-ca-server-config.yaml  
 
 ## Create channel
 echo "Creating channel..."
@@ -88,41 +82,41 @@ echo "Having all peers join the channel..."
 joinChannel
 
 ## Set the anchor peers for each org in the channel
-echo "Updating anchor peers for org1..."
+echo "Updating anchor peers for orga..."
 updateAnchorPeers 0 1
-#echo "Updating anchor peers for org2..."
-#updateAnchorPeers 0 2
+echo "Updating anchor peers for orgb..."
+updateAnchorPeers 0 2
 
-## Install chaincode on peer0.org1 and peer0.org2
-echo "Installing chaincode on peer0.org1..."
+## Install chaincode on peer0.orga and peer0.orgb
+echo "Installing chaincode on peer0.orga..."
 installChaincode 0 1
-#echo "Install chaincode on peer0.org2..."
-#installChaincode 0 2
+echo "Install chaincode on peer0.orgb..."
+installChaincode 0 2
 
-# Instantiate chaincode on peer0.org2
-echo "Instantiating chaincode on peer0.org2..."
-instantiateChaincode 0 1
+# Instantiate chaincode on peer0.orgb
+echo "Instantiating chaincode on peer0.orgb..."
+instantiateChaincode 0 2
 sleep $DELAY
 
-# Invoking chaincode on peer0.org1
-echo "Invoking chaincode on peer0.org1..."
+# Invoking chaincode on peer0.orga
+echo "Invoking chaincode on peer0.orga..."
 chaincodeInvoke 0 A
 
-# Query chaincode on peer0.org1
-echo "Querying chaincode on peer0.org1..."
+# Query chaincode on peer0.orga
+echo "Querying chaincode on peer0.orga..."
 chaincodeQuery 0 1
 
-# Invoke chaincode on peer0.org1 and peer0.org2
-#echo "Sending invoke transaction on peer0.org1 peer0.org2..."
-#chaincodeInvoke 0 A 0 B
+# Invoke chaincode on peer0.orga and peer0.orgb
+echo "Sending invoke transaction on peer0.orga peer0.orgb..."
+chaincodeInvoke 0 A 0 B
 
-## Install chaincode on peer1.org2
-#echo "Installing chaincode on peer1.org2..."
-#installChaincode 1 2
+## Install chaincode on peer1.orgb
+echo "Installing chaincode on peer1.orgb..."
+installChaincode 1 2
 
-# Query on chaincode on peer1.org2, check if the result is 90
-#echo "Querying chaincode on peer1.org2..."
-#chaincodeQuery 1 2
+# Query on chaincode on peer1.orgb, check if the result is 90
+echo "Querying chaincode on peer1.orgb..."
+chaincodeQuery 1 2
 
 # cd demo/server
 # if [ ! -d node_modules ]

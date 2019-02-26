@@ -7,111 +7,111 @@ version: '2'
 
 services:
 
-  orderer0.orga.atlchain.com:
-    container_name: orderer0.orga.atlchain.com
-    image: hyperledger/fabric-orderer:$IMAGE_TAG
-    environment:
-      - GODEBUG=netdns=go
-      - FABRIC_LOGGING_SPEC=INFO
-      - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
-      - ORDERER_GENERAL_GENESISMETHOD=file
-      - ORDERER_GENERAL_GENESISFILE=/var/hyperledger/orderer/orderer.genesis.block
-      - ORDERER_GENERAL_LOCALMSPID=OrdererA
-      - ORDERER_GENERAL_LOCALMSPDIR=/var/hyperledger/orderer/msp
-      # enabled TLS
-      - ORDERER_GENERAL_TLS_ENABLED=false
-      - ORDERER_GENERAL_TLS_PRIVATEKEY=/var/hyperledger/orderer/tls/server.key
-      - ORDERER_GENERAL_TLS_CERTIFICATE=/var/hyperledger/orderer/tls/server.crt
-      - ORDERER_GENERAL_TLS_ROOTCAS=[/var/hyperledger/orderer/tls/ca.crt]
-      - ORDERER_KAFKA_TOPIC_REPLICATIONFACTOR=1
-      - ORDERER_KAFKA_VERBOSE=true
-    working_dir: /opt/gopath/src/github.com/hyperledger/fabric
-    command: orderer
-    volumes:
-    - ../channel-artifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
-    - ../crypto-config/ordererOrganizations/orga.atlchain.com/orderers/orderer0.orga.atlchain.com/msp:/var/hyperledger/orderer/msp
-    - ../crypto-config/ordererOrganizations/orga.atlchain.com/orderers/orderer0.orga.atlchain.com/tls/:/var/hyperledger/orderer/tls
-    - orderer0.orga.atlchain.com:/var/hyperledger/production/orderer
-    ports:
-      - 7050:7050
+    orderer0.orga.atlchain.com:
+        container_name: orderer0.orga.atlchain.com
+        image: hyperledger/fabric-orderer:$IMAGE_TAG
+        environment:
+            - GODEBUG=netdns=go
+            - FABRIC_LOGGING_SPEC=INFO
+            - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
+            - ORDERER_GENERAL_GENESISMETHOD=file
+            - ORDERER_GENERAL_GENESISFILE=/var/hyperledger/orderer/orderer.genesis.block
+            - ORDERER_GENERAL_LOCALMSPID=OrdererA
+            - ORDERER_GENERAL_LOCALMSPDIR=/var/hyperledger/orderer/msp
+            # enabled TLS
+            - ORDERER_GENERAL_TLS_ENABLED=false
+            - ORDERER_GENERAL_TLS_PRIVATEKEY=/var/hyperledger/orderer/tls/server.key
+            - ORDERER_GENERAL_TLS_CERTIFICATE=/var/hyperledger/orderer/tls/server.crt
+            - ORDERER_GENERAL_TLS_ROOTCAS=[/var/hyperledger/orderer/tls/ca.crt]
+            - ORDERER_KAFKA_TOPIC_REPLICATIONFACTOR=1
+            - ORDERER_KAFKA_VERBOSE=true
+        working_dir: /opt/gopath/src/github.com/hyperledger/fabric
+        command: orderer
+        volumes:
+            - ../channel-artifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
+            - ../crypto-config/ordererOrganizations/orga.atlchain.com/orderers/orderer0.orga.atlchain.com/msp:/var/hyperledger/orderer/msp
+            - ../crypto-config/ordererOrganizations/orga.atlchain.com/orderers/orderer0.orga.atlchain.com/tls/:/var/hyperledger/orderer/tls
+            - orderer0.orga.atlchain.com:/var/hyperledger/production/orderer
+        ports:
+            - 7050:7050
 
-  peer0.orga.atlchain.com:
-    container_name: peer0.orga.atlchain.com
-    extends:
-      file: peer-base.yaml
-      service: peer-base
-    environment:
-      - CORE_PEER_ID=peer0.orga.atlchain.com
-      - CORE_PEER_ADDRESS=peer0.orga.atlchain.com:7051
-      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.orga.atlchain.com:7051
-      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.orga.atlchain.com:7051
-      - CORE_PEER_LOCALMSPID=OrgA
-    volumes:
-        - /var/run/:/host/var/run/
-        - ../crypto-config/peerOrganizations/orga.atlchain.com/peers/peer0.orga.atlchain.com/msp:/etc/hyperledger/fabric/msp
-        - ../crypto-config/peerOrganizations/orga.atlchain.com/peers/peer0.orga.atlchain.com/tls:/etc/hyperledger/fabric/tls
-        - peer0.orga.atlchain.com:/var/hyperledger/production
-    ports:
-      - 7051:7051
-      - 7053:7053
-
-        #  peer1.org1.atlchain.com:
-        #    container_name: peer1.org1.atlchain.com
-        #    extends:
-        #      file: peer-base.yaml
-        #      service: peer-base
-        #    environment:
-        #      - CORE_PEER_ID=peer1.org1.atlchain.com
-        #      - CORE_PEER_ADDRESS=peer1.org1.atlchain.com:7051
-        #      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1.org1.atlchain.com:7051
-        #      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.org1.atlchain.com:7051
-        #      - CORE_PEER_LOCALMSPID=Org1
-        #    volumes:
-        #        - /var/run/:/host/var/run/
-        #        - ../crypto-config/peerOrganizations/org1.atlchain.com/peers/peer1.org1.atlchain.com/msp:/etc/hyperledger/fabric/msp
-        #        - ../crypto-config/peerOrganizations/org1.atlchain.com/peers/peer1.org1.atlchain.com/tls:/etc/hyperledger/fabric/tls
-        #        - peer1.org1.atlchain.com:/var/hyperledger/production
-        #
-        #    ports:
-        #      - 8051:7051
-        #      - 8053:7053
-        #
-        #  peer0.org2.atlchain.com:
-        #    container_name: peer0.org2.atlchain.com
-        #    extends:
-        #      file: peer-base.yaml
-        #      service: peer-base
-        #    environment:
-        #      - CORE_PEER_ID=peer0.org2.atlchain.com
-        #      - CORE_PEER_ADDRESS=peer0.org2.atlchain.com:7051
-        #      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.org2.atlchain.com:7051
-        #      - CORE_PEER_GOSSIP_BOOTSTRAP=peer1.org2.atlchain.com:7051
-        #      - CORE_PEER_LOCALMSPID=Org2
-        #    volumes:
-        #        - /var/run/:/host/var/run/
-        #        - ../crypto-config/peerOrganizations/org2.atlchain.com/peers/peer0.org2.atlchain.com/msp:/etc/hyperledger/fabric/msp
-        #        - ../crypto-config/peerOrganizations/org2.atlchain.com/peers/peer0.org2.atlchain.com/tls:/etc/hyperledger/fabric/tls
-        #        - peer0.org2.atlchain.com:/var/hyperledger/production
-        #    ports:
-        #      - 9051:7051
-        #      - 9053:7053
-        #
-        #  peer1.org2.atlchain.com:
-        #    container_name: peer1.org2.atlchain.com
-        #    extends:
-        #      file: peer-base.yaml
-        #      service: peer-base
-        #    environment:
-        #      - CORE_PEER_ID=peer1.org2.atlchain.com
-        #      - CORE_PEER_ADDRESS=peer1.org2.atlchain.com:7051
-        #      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1.org2.atlchain.com:7051
-        #      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.org2.atlchain.com:7051
-        #      - CORE_PEER_LOCALMSPID=Org2
-        #    volumes:
-        #        - /var/run/:/host/var/run/
-        #        - ../crypto-config/peerOrganizations/org2.atlchain.com/peers/peer1.org2.atlchain.com/msp:/etc/hyperledger/fabric/msp
-        #        - ../crypto-config/peerOrganizations/org2.atlchain.com/peers/peer1.org2.atlchain.com/tls:/etc/hyperledger/fabric/tls
-        #        - peer1.org2.atlchain.com:/var/hyperledger/production
-        #    ports:
-        #      - 10051:7051
-        #      - 10053:7053
+    peer0.orga.atlchain.com:
+        container_name: peer0.orga.atlchain.com
+        extends:
+            file: peer-base.yaml
+            service: peer-base
+        environment:
+            - CORE_PEER_ID=peer0.orga.atlchain.com
+            - CORE_PEER_ADDRESS=peer0.orga.atlchain.com:7051
+            - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.orga.atlchain.com:7051
+            - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.orga.atlchain.com:7051
+            - CORE_PEER_LOCALMSPID=OrgA
+        volumes:
+            - /var/run/:/host/var/run/
+            - ../crypto-config/peerOrganizations/orga.atlchain.com/peers/peer0.orga.atlchain.com/msp:/etc/hyperledger/fabric/msp
+            - ../crypto-config/peerOrganizations/orga.atlchain.com/peers/peer0.orga.atlchain.com/tls:/etc/hyperledger/fabric/tls
+            - peer0.orga.atlchain.com:/var/hyperledger/production
+        ports:
+            - 7051:7051
+            - 7053:7053
+    
+    peer1.orga.atlchain.com:
+        container_name: peer1.orga.atlchain.com
+        extends:
+            file: peer-base.yaml
+            service: peer-base
+        environment:
+            - CORE_PEER_ID=peer1.orga.atlchain.com
+            - CORE_PEER_ADDRESS=peer1.orga.atlchain.com:7051
+            - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1.orga.atlchain.com:7051
+            - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.orga.atlchain.com:7051
+            - CORE_PEER_LOCALMSPID=OrgA
+        volumes:
+            - /var/run/:/host/var/run/
+            - ../crypto-config/peerOrganizations/orga.atlchain.com/peers/peer1.orga.atlchain.com/msp:/etc/hyperledger/fabric/msp
+            - ../crypto-config/peerOrganizations/orga.atlchain.com/peers/peer1.orga.atlchain.com/tls:/etc/hyperledger/fabric/tls
+            - peer1.orga.atlchain.com:/var/hyperledger/production
+    
+        ports:
+            - 8051:7051
+            - 8053:7053
+    
+    peer0.orgb.atlchain.com:
+        container_name: peer0.orgb.atlchain.com
+        extends:
+            file: peer-base.yaml
+            service: peer-base
+        environment:
+            - CORE_PEER_ID=peer0.orgb.atlchain.com
+            - CORE_PEER_ADDRESS=peer0.orgb.atlchain.com:7051
+            - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.orgb.atlchain.com:7051
+            - CORE_PEER_GOSSIP_BOOTSTRAP=peer1.orgb.atlchain.com:7051
+            - CORE_PEER_LOCALMSPID=OrgB
+        volumes:
+            - /var/run/:/host/var/run/
+            - ../crypto-config/peerOrganizations/orgb.atlchain.com/peers/peer0.orgb.atlchain.com/msp:/etc/hyperledger/fabric/msp
+            - ../crypto-config/peerOrganizations/orgb.atlchain.com/peers/peer0.orgb.atlchain.com/tls:/etc/hyperledger/fabric/tls
+            - peer0.orgb.atlchain.com:/var/hyperledger/production
+        ports:
+            - 9051:7051
+            - 9053:7053
+    
+    peer1.orgb.atlchain.com:
+        container_name: peer1.orgb.atlchain.com
+        extends:
+            file: peer-base.yaml
+            service: peer-base
+        environment:
+            - CORE_PEER_ID=peer1.orgb.atlchain.com
+            - CORE_PEER_ADDRESS=peer1.orgb.atlchain.com:7051
+            - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1.orgb.atlchain.com:7051
+            - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.orgb.atlchain.com:7051
+            - CORE_PEER_LOCALMSPID=OrgB
+        volumes:
+            - /var/run/:/host/var/run/
+            - ../crypto-config/peerOrganizations/orgb.atlchain.com/peers/peer1.orgb.atlchain.com/msp:/etc/hyperledger/fabric/msp
+            - ../crypto-config/peerOrganizations/orgb.atlchain.com/peers/peer1.orgb.atlchain.com/tls:/etc/hyperledger/fabric/tls
+            - peer1.orgb.atlchain.com:/var/hyperledger/production
+        ports:
+            - 10051:7051
+            - 10053:7053

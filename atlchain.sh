@@ -143,7 +143,7 @@ function networkUp() {
     fi
     if [ "${IF_COUCHDB}" == "couchdb" ]; then
         if [ "$CONSENSUS_TYPE" == "kafka" ]; then
-            IMAGE_TAG=$IMAGETAG docker-compose -f $COMPOSE_FILE -f $COMPOSE_FILE_KAFKA -f $COMPOSE_FILE_COUCH -f $COMPOSE_FILE_E2E up -d 2>&1
+            IMAGE_TAG=$IMAGETAG docker-compose -f $COMPOSE_FILE -f $COMPOSE_FILE_KAFKA -f $COMPOSE_FILE_COUCH up -d 2>&1
             # IMAGE_TAG=$IMAGETAG docker-compose -f $COMPOSE_FILE -f $COMPOSE_FILE_KAFKA -f $COMPOSE_FILE_COUCH -f $COMPOSE_FILE_E2E -f $COMPOSE_FILE_HADOOP up -d 2>&1
         else
             IMAGE_TAG=$IMAGETAG docker-compose -f $COMPOSE_FILE -f $COMPOSE_FILE_COUCH up -d 2>&1
@@ -440,7 +440,7 @@ LANGUAGE=golang
 # default image tag
 IMAGETAG="latest"
 # default consensus type
-CONSENSUS_TYPE="solo"
+CONSENSUS_TYPE="kafka"
 IF_COUCHDB="couchdb"
 # Parse commandline args
 if [ "$1" = "-m" ]; then # supports old usage, muscle memory is powerful!
