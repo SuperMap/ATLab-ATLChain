@@ -1,9 +1,9 @@
 // enroll
 
-var RESTURL = "http://103.254.67.181:10002";
-var FileURL = "http://103.254.67.181:10001";
-// var RESTURL = "http://127.0.0.1:4000";
-// var FileURL = "http://127.0.0.1:10001";
+// var RESTURL = "http://103.254.67.181:10002";
+// var FileURL = "http://103.254.67.181:10001";
+var RESTURL = "http://127.0.0.1:10002";
+var FileURL = "http://127.0.0.1:10001";
 
 $(document).ready(function(){
 
@@ -446,14 +446,15 @@ $(document).ready(function(){
         //     } 
     // });
 
-    $("#trace_btn").click(function(){
+
+    function getTraction(txid, pData){
         $.ajax({
             type:'post',
             url: RESTURL + '/channels/atlchannel/chaincodes/atlchainCC/TraceRecord',
             data:JSON.stringify({
                 // 'fcn': 'getHistoryByKey',
                 // 'peer': 'peer0.orga.atlchain.com',
-                'args':[$("#recordID_trace_input").val()],
+                'args':[txid],
                 'username':getCookie("username"),
                 'orgname':getCookie("orgname")
             }),
@@ -464,75 +465,34 @@ $(document).ready(function(){
             success:function(data){
                 console.log(data);
                 
-                $("#result_input").html(FormatOutputUsual(data));
                 if(data == "[]"){
                     alert("未查询到结果");
+                }
+                if (pData == "") {
+                    cdata = pData + data.substring(1, data.length - 1);
+                } else {
+                    cdata = pData + "," + data.substring(1, data.length - 1);
+                }
+                // console.log(cdata);
+                var jsonData = JSON.parse(data);
+                var pID = jsonData[0]["Value"]["parentRecordID"];
+                if(pID != "" && pID.length == 64){
+                    getTraction(pID, cdata);
+
+                } else {
+                    $("#result_input").html(FormatOutputUsual("[" + cdata + "]"));
                 }
             },
             error:function(err){
                 console.log(err);
             }
         });
-        // switch($("#trace_select").val()){
-        //     case "transaction":
-        //         $.ajax({
-        //             type:'post',
-        //             url: RESTURL + '/channels/atlchannel/chaincodes/atlchainCC/TraceRecord',
-        //             data:JSON.stringify({
-        //                 // 'fcn': 'getHistoryByKey',
-        //                 // 'peer': 'peer0.orga.atlchain.com',
-        //                 'args':[$("#txid_op0_trace_input").val()],
-        //                 'username':getCookie("username"),
-        //                 'orgname':getCookie("orgname")
-        //             }),
-        //             headers: {
-        //                 "authorization": "Bearer " + getCookie("token") ,
-        //                 "content-type": "application/json"
-        //             },
-        //             success:function(data){
-        //                 console.log(data);
-        //                 
-        //                 $("#result_input").html(FormatOutputUsual(data));
-        //                 if(data == "[]"){
-        //                     alert("未查询到结果");
-        //                 }
-        //             },
-        //             error:function(err){
-        //                 console.log(err);
-        //             }
-        //         });
-        //         break;
-        //     case "estate":
-        //         $.ajax({
-        //             type:'post',
-        //             url: RESTURL + '/channels/atlchannel/chaincodes/atlchainCC/TraceRecord',
-        //             data:JSON.stringify({
-        //                 // 'fcn': 'getHistoryByKey',
-        //                 // 'peer': 'peer0.orga.atlchain.com',
-        //                 'args':[$("#ZZBH_op1_trace_input").val()],
-        //                 'username':getCookie("username"),
-        //                 'orgname':getCookie("orgname")
-        //             }),
-        //             headers: {
-        //                 "authorization": "Bearer " + getCookie("token") ,
-        //                 "content-type": "application/json"
-        //             },
-        //             success:function(data){
-        //                 console.log(data);
-        //                 
-        //                 $("#result_input").html(FormatOutputUsual(data));
-        //                 if(data == "[]"){
-        //                     alert("未查询到结果");
-        //                 }
-        //             },
-        //             error:function(err){
-        //                 console.log(err);
-        //             }
-        //         });
-        //         break;
-        //     default:
-        //         break;
-        // }
+
+    }
+
+    $("#trace_btn").click(function(){
+        pTxID = $("#recordID_trace_input").val()
+        getTraction(pTxID, "");
     });
     // trace <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
