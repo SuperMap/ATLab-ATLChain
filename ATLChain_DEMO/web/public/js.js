@@ -1,9 +1,9 @@
 // enroll
 
-// var RESTURL = "http://148.70.109.243:4000";
-// var FileURL = "http://148.70.109.243:8888";
-var RESTURL = "http://127.0.0.1:10002";
-var FileURL = "http://127.0.0.1:10001";
+var RESTURL = "http://103.254.67.181:10002";
+var FileURL = "http://103.254.67.181:10001";
+// var RESTURL = "http://127.0.0.1:4000";
+// var FileURL = "http://127.0.0.1:10001";
 
 $(document).ready(function(){
 
