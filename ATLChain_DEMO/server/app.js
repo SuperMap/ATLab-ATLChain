@@ -33,7 +33,7 @@ var crypto = require('./app/crypto.js');
 var port = process.env.PORT || hfc.getConfigSetting('port');
 var host = process.env.HOST || hfc.getConfigSetting('host');
 var hbaseClient = new hbase('hbase.atlchain.com', '8080');
-var hbaseTable = 'atlc';
+var hbaseTable = 'atlchain';
 var hbaseCF = 'data:data';
 var hdfsClient = new hdfs('root', 'hadoop.atlchain.com', '50070');
 var hdfsDir = '/user/root';
@@ -298,16 +298,27 @@ app.post('/channels/:channelName/chaincodes/:chaincodeName/putTx', async functio
 	        // statement about create database:
 	        // 1. create 'atlchain', 'data'
 	        // 2. put 'atlchain', 'hash1', 'data:data', "json string value"
-	        hbaseClient.put(hbaseTable, hash, hbaseCF, data, function(){
-                logger.info("Put into hbase finish");
+	        hbaseClient.put(hbaseTable, hash, hbaseCF, data, function(err){
+                if(err != null){
+                    console.log("err: " + err);
+                    hbaseClient.createTable("atlchain","data", function(){});
+	                hbaseClient.put(hbaseTable, hash, hbaseCF, data, function(err){
+                        if (err != null){
+                            logger.info(err);
+                        } else {
+                            logger.info("Put into hbase finish");
+                        }
+                    })
+                }
             })
             break;
         case "hdfs" :
-            await fs.writeFileSync('/tmp/' + hash, data);
+            await fs.writeFileSync('../web/public/tmp/' + hash, data);
 
-            hdfsClient.put("/tmp/" + hash, hdfsDir + hash, function(){
-                logger.info("Put into HDFS finish");
-            });
+            // hdfsClient.put("/tmp/" + hash, hdfsDir + hash, function(){
+            //     logger.info("Put into HDFS finish");
+            // });
+
             break;
         default:
             break;
@@ -383,11 +394,11 @@ app.post('/channels/:channelName/chaincodes/:chaincodeName/AddRecord', async fun
             })
             break;
         case "hdfs" :
-            await fs.writeFileSync('/tmp/' + hash, imgdata, 'binary');
+            await fs.writeFileSync('../web/public/tmp/' + hash, imgdata, 'binary');
 
-            hdfsClient.put("/tmp/" + hash, hdfsDir + hash, function(){
-                logger.info("Put into HDFS finish");
-            });
+            // hdfsClient.put("/tmp/" + hash, hdfsDir + hash, function(){
+            //     logger.info("Put into HDFS finish");
+            // });
             break;
         default:
             break;
@@ -407,10 +418,11 @@ app.get('/GetFileFromHDFS', async function(req, res) {
 		return;
 	}
 
-    hdfsClient.get(hdfsDir + filename, "./web/public/tmp/" + filename, function(){
-        res.json(filename);
-        logger.info("Got file from HDFS");
-    });
+    res.json(filename);
+    // hdfsClient.get(hdfsDir + filename, "../web/public/tmp/" + filename, function(){
+    //     res.json(filename);
+    //     logger.info("Got file from HDFS");
+    // });
 });
 
 // Get data from HBase by hash
@@ -423,8 +435,12 @@ app.get('/GetDataFromHBase', async function(req, res) {
 	}
 
     hbaseClient.get(hbaseTable, hash, hbaseCF, (err, value) => {
-        logger.info("Got file from HBase");
-        res.json(value);
+        if (err != null) {
+            logger.info(err);
+        } else {
+            logger.info("Got file from HBase");
+            res.json(value);
+        }
     })
 });
 

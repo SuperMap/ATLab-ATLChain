@@ -143,8 +143,7 @@ function networkUp() {
     fi
     if [ "${IF_COUCHDB}" == "couchdb" ]; then
         if [ "$CONSENSUS_TYPE" == "kafka" ]; then
-            IMAGE_TAG=$IMAGETAG docker-compose -f $COMPOSE_FILE -f $COMPOSE_FILE_KAFKA -f $COMPOSE_FILE_COUCH -f $COMPOSE_FILE_E2E up -d 2>&1
-            # IMAGE_TAG=$IMAGETAG docker-compose -f $COMPOSE_FILE -f $COMPOSE_FILE_KAFKA -f $COMPOSE_FILE_COUCH -f $COMPOSE_FILE_E2E -f $COMPOSE_FILE_HADOOP up -d 2>&1
+            IMAGE_TAG=$IMAGETAG docker-compose -f $COMPOSE_FILE -f $COMPOSE_FILE_KAFKA -f $COMPOSE_FILE_COUCH -f $COMPOSE_FILE_E2E -f $COMPOSE_FILE_HADOOP up -d 2>&1
         else
             IMAGE_TAG=$IMAGETAG docker-compose -f $COMPOSE_FILE -f $COMPOSE_FILE_COUCH up -d 2>&1
         fi
@@ -249,9 +248,10 @@ function upgradeNetwork() {
 function networkDown() {
     # stop org3 containers also in addition to org1 and org2, in case we were running sample to add org3
     # stop kafka and zookeeper containers in case we're running with kafka consensus-type
+
+    docker exec -it cli rm -rf /opt/gopath/src/github.com/hyperledger/fabric/peer/demo/server/fabric-client-kv-orga/
     
-    docker-compose -f $COMPOSE_FILE -f $COMPOSE_FILE_COUCH -f $COMPOSE_FILE_KAFKA -f $COMPOSE_FILE_E2E down --volumes --remove-orphans
-    # docker-compose -f $COMPOSE_FILE -f $COMPOSE_FILE_COUCH -f $COMPOSE_FILE_KAFKA -f $COMPOSE_FILE_E2E -f $COMPOSE_FILE_ORG3 -f $COMPOSE_FILE_HADOOP down --volumes --remove-orphans
+    docker-compose -f $COMPOSE_FILE -f $COMPOSE_FILE_COUCH -f $COMPOSE_FILE_KAFKA -f $COMPOSE_FILE_E2E -f $COMPOSE_FILE_ORG3 -f $COMPOSE_FILE_HADOOP down --volumes --remove-orphans
 
     # Don't remove the generated artifacts -- note, the ledgers are always removed
     if [ "$MODE" != "restart" ]; then
