@@ -250,8 +250,17 @@ function networkDown() {
     # stop kafka and zookeeper containers in case we're running with kafka consensus-type
 
     # remove useless files
+
+    echo "##########################################################"
+    echo "#################  remove useless files ##################"
+    echo "##########################################################"
+    echo "docker exec -it cli rm -rf /opt/gopath/src/github.com/hyperledger/fabric/peer/demo/web/public/msp/"
     docker exec -it cli rm -rf /opt/gopath/src/github.com/hyperledger/fabric/peer/demo/web/public/msp/
+
+    echo "docker exec -it cli rm -rf /opt/gopath/src/github.com/hyperledger/fabric/peer/demo/web/public/tmp/"
     docker exec -it cli rm -rf /opt/gopath/src/github.com/hyperledger/fabric/peer/demo/web/public/tmp/
+
+    echo "docker exec -it cli rm -rf /opt/gopath/src/github.com/hyperledger/fabric/peer/demo/server/fabric-client-kv-orga/"
     docker exec -it cli rm -rf /opt/gopath/src/github.com/hyperledger/fabric/peer/demo/server/fabric-client-kv-orga/
     
     docker-compose -f $COMPOSE_FILE -f $COMPOSE_FILE_COUCH -f $COMPOSE_FILE_KAFKA -f $COMPOSE_FILE_E2E -f $COMPOSE_FILE_ORG3 -f $COMPOSE_FILE_HADOOP down --volumes --remove-orphans

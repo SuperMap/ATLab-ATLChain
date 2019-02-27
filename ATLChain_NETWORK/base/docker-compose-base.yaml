@@ -32,8 +32,8 @@ services:
             - ../crypto-config/ordererOrganizations/orga.atlchain.com/orderers/orderer0.orga.atlchain.com/msp:/var/hyperledger/orderer/msp
             - ../crypto-config/ordererOrganizations/orga.atlchain.com/orderers/orderer0.orga.atlchain.com/tls/:/var/hyperledger/orderer/tls
             - orderer0.orga.atlchain.com:/var/hyperledger/production/orderer
-        ports:
-            - 7050:7050
+              #         ports:
+              #             - 7050:7050
 
     peer0.orga.atlchain.com:
         container_name: peer0.orga.atlchain.com
@@ -51,9 +51,9 @@ services:
             - ../crypto-config/peerOrganizations/orga.atlchain.com/peers/peer0.orga.atlchain.com/msp:/etc/hyperledger/fabric/msp
             - ../crypto-config/peerOrganizations/orga.atlchain.com/peers/peer0.orga.atlchain.com/tls:/etc/hyperledger/fabric/tls
             - peer0.orga.atlchain.com:/var/hyperledger/production
-        ports:
-            - 7051:7051
-            - 7053:7053
+              #             ports:
+              #                 - 7051:7051
+              #                 - 7053:7053
     
     peer1.orga.atlchain.com:
         container_name: peer1.orga.atlchain.com
@@ -72,9 +72,9 @@ services:
             - ../crypto-config/peerOrganizations/orga.atlchain.com/peers/peer1.orga.atlchain.com/tls:/etc/hyperledger/fabric/tls
             - peer1.orga.atlchain.com:/var/hyperledger/production
     
-        ports:
-            - 8051:7051
-            - 8053:7053
+              #         ports:
+              #             - 8051:7051
+              #             - 8053:7053
     
     peer0.orgb.atlchain.com:
         container_name: peer0.orgb.atlchain.com
@@ -92,9 +92,9 @@ services:
             - ../crypto-config/peerOrganizations/orgb.atlchain.com/peers/peer0.orgb.atlchain.com/msp:/etc/hyperledger/fabric/msp
             - ../crypto-config/peerOrganizations/orgb.atlchain.com/peers/peer0.orgb.atlchain.com/tls:/etc/hyperledger/fabric/tls
             - peer0.orgb.atlchain.com:/var/hyperledger/production
-        ports:
-            - 9051:7051
-            - 9053:7053
+              #         ports:
+              #             - 9051:7051
+              #             - 9053:7053
     
     peer1.orgb.atlchain.com:
         container_name: peer1.orgb.atlchain.com
@@ -112,6 +112,6 @@ services:
             - ../crypto-config/peerOrganizations/orgb.atlchain.com/peers/peer1.orgb.atlchain.com/msp:/etc/hyperledger/fabric/msp
             - ../crypto-config/peerOrganizations/orgb.atlchain.com/peers/peer1.orgb.atlchain.com/tls:/etc/hyperledger/fabric/tls
             - peer1.orgb.atlchain.com:/var/hyperledger/production
-        ports:
-            - 10051:7051
-            - 10053:7053
+              #         ports:
+              #             - 10051:7051
+              #             - 10053:7053

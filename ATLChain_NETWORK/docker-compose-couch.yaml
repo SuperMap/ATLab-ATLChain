@@ -19,8 +19,8 @@ services:
             - COUCHDB_PASSWORD=
         # Comment/Uncomment the port mapping if you want to hide/expose the CouchDB service,
         # for example map it to utilize Fauxton User Interface in dev environments.
-        ports:
-            - "5984:5984"
+        # ports:
+        #     - "5984:5984"
         networks:
             - byfn
 
@@ -46,8 +46,8 @@ services:
             - COUCHDB_PASSWORD=
         # Comment/Uncomment the port mapping if you want to hide/expose the CouchDB service,
         # for example map it to utilize Fauxton User Interface in dev environments.
-        ports:
-            - "6984:5984"
+        # ports:
+        #     - "6984:5984"
         networks:
             - byfn
         
@@ -73,8 +73,8 @@ services:
             - COUCHDB_PASSWORD=
         # Comment/Uncomment the port mapping if you want to hide/expose the CouchDB service,
         # for example map it to utilize Fauxton User Interface in dev environments.
-        ports:
-            - "7984:5984"
+        # ports:
+        #     - "7984:5984"
         networks:
             - byfn
     
@@ -100,8 +100,8 @@ services:
             - COUCHDB_PASSWORD=
         # Comment/Uncomment the port mapping if you want to hide/expose the CouchDB service,
         # for example map it to utilize Fauxton User Interface in dev environments.
-        ports:
-            - "8984:5984"
+        # ports:
+        #     - "8984:5984"
         networks:
             - byfn
     
