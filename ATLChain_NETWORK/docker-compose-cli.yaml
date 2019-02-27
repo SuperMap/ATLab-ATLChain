@@ -92,8 +92,8 @@ services:
             - peer0.orgb.atlchain.com
             - peer1.orgb.atlchain.com
         ports:
-            - 8888:8888
-            - 4000:4000
+            - 10001:4444
+            - 10002:4000
 
         networks:
             - byfn
