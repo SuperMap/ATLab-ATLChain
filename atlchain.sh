@@ -521,6 +521,21 @@ then
     tar xvf bin.tar.xz
 fi
 
+if [ ! -d "../ATLChain_DEMO/web/public/tmp" ] 
+then
+    mkdir ../ATLChain_DEMO/web/public/tmp
+fi
+
+if [ ! -d "../ATLChain_DEMO/web/public/msp" ] 
+then
+    mkdir ../ATLChain_DEMO/web/public/msp
+fi
+
+if [ ! -d "../ATLChain_DEMO/server/fabric-client-kv-orga" ] 
+then
+    mkdir ../ATLChain_DEMO/server/fabric-client-kv-orga
+fi
+
 if [ ! -d "channel-artifacts" ] 
 then
     mkdir channel-artifacts
