@@ -38,6 +38,20 @@ var hbaseCF = 'data:data';
 var hdfsClient = new hdfs('root', 'hadoop.atlchain.com', '50070');
 var hdfsDir = '/user/root';
 
+hbaseClient.get(hbaseTable, 'rowkey', hbaseCF, getCallback);
+function getCallback(err, val){
+    if(err != null){
+        console.log("err: " + err);
+        hbaseClient.createTable(hbaseTable,"data", getCallback);
+        hbaseClient.put(hbaseTable, 'rowkey', hbaseCF, 'test data', putCallback);
+    }
+    console.log(val);
+}
+
+function putCallback(){
+    console.log("finish");
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 //////////////////////////////// SET CONFIGURATONS ////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
@@ -301,7 +315,6 @@ app.post('/channels/:channelName/chaincodes/:chaincodeName/putTx', async functio
 	        hbaseClient.put(hbaseTable, hash, hbaseCF, data, function(err){
                 if(err != null){
                     console.log("err: " + err);
-                    hbaseClient.createTable("atlchain","data", function(){});
 	                hbaseClient.put(hbaseTable, hash, hbaseCF, data, function(err){
                         if (err != null){
                             logger.info(err);

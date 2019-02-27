@@ -249,6 +249,9 @@ function networkDown() {
     # stop org3 containers also in addition to org1 and org2, in case we were running sample to add org3
     # stop kafka and zookeeper containers in case we're running with kafka consensus-type
 
+    # remove useless files
+    docker exec -it cli rm -rf /opt/gopath/src/github.com/hyperledger/fabric/peer/demo/web/public/msp/
+    docker exec -it cli rm -rf /opt/gopath/src/github.com/hyperledger/fabric/peer/demo/web/public/tmp/
     docker exec -it cli rm -rf /opt/gopath/src/github.com/hyperledger/fabric/peer/demo/server/fabric-client-kv-orga/
     
     docker-compose -f $COMPOSE_FILE -f $COMPOSE_FILE_COUCH -f $COMPOSE_FILE_KAFKA -f $COMPOSE_FILE_E2E -f $COMPOSE_FILE_ORG3 -f $COMPOSE_FILE_HADOOP down --volumes --remove-orphans
@@ -268,8 +271,6 @@ function networkDown() {
         rm -f docker-compose-e2e.yaml ../ATLChain_DEMO/server/app/network-config.yaml
     fi
 
-    # remove useless files
-    rm -rf ./ATLChain_DEMO/web/public/msp/* ./ATLChain_DEMO/web/public/tmp/* ./ATLChain_DEMO/server/fabric-client-kv-orga/*
 }
 
 # Using docker-compose-e2e-template.yaml, replace constants with private key file names
