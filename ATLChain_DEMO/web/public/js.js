@@ -4,7 +4,6 @@ var RESTURL = "http://127.0.0.1:10002";
 var FileURL = "http://127.0.0.1:10001";
 
 $(document).ready(function(){
-
     // 设置预设值
     $("#username_input").val(getCookie("username"));
     $("#orgname_input").val(getCookie("orgname"));
@@ -445,7 +444,7 @@ $(document).ready(function(){
     // });
 
 
-    function getTraction(txid, pData){
+    function getTractionOneKey(txid, pData){
         $.ajax({
             type:'post',
             url: RESTURL + '/channels/atlchannel/chaincodes/atlchainCC/TraceRecord',
@@ -485,12 +484,52 @@ $(document).ready(function(){
                 console.log(err);
             }
         });
-
     }
+
+    function getTractionStepByStep(txid, pData){
+        $.ajax({
+            type:'post',
+            url: RESTURL + '/channels/atlchannel/chaincodes/atlchainCC/TraceRecord',
+            data:JSON.stringify({
+                // 'fcn': 'getHistoryByKey',
+                // 'peer': 'peer0.orga.atlchain.com',
+                'args':[txid],
+                'username':getCookie("username"),
+                'orgname':getCookie("orgname")
+            }),
+            headers: {
+                "authorization": "Bearer " + getCookie("token") ,
+                "content-type": "application/json"
+            },
+            success:function(data){
+                console.log(data);
+                
+                if(data == "[]"){
+                    alert("未查询到结果");
+                }
+
+                var jsonData = JSON.parse(data);
+                var pID = jsonData[0]["Value"]["parentRecordID"];
+                if(pID != "" && pID.length == 64){
+                    $("#result_input").html(FormatOutputUsualWithUrl(data));
+                } else {
+                    $("#result_input").html(FormatOutputUsual(data));
+                }
+            },
+            error:function(err){
+                console.log(err);
+            }
+        });
+    }
+
+    $('body').on('click' , '#traceParentTxID' , function(){
+        console.log("tracing parent tx id...");
+        getTractionStepByStep($("#traceParentTxIDContent").html().trim(), "");
+    });
 
     $("#trace_btn").click(function(){
         pTxID = $("#recordID_trace_input").val()
-        getTraction(pTxID, "");
+        getTractionStepByStep(pTxID, "");
     });
     // trace <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
@@ -845,6 +884,114 @@ function FormatOutputUsual(data){
                     str += "<p><label><b>父交易ID:</b></label>" + jsonData[i][key]["parentTxID"] + "</p>";
                 } else {
                     str += "<p><label><b>父交易ID:</b></label>" + jsonData[i][key]["parentRecordID"] + "</p>";
+                }
+                for(var key2 in jsonData[i][key]){
+                    switch(key2) {
+                        case "signature":
+                            keyName = "数字签名";
+                            break;
+                        // transaction
+                        case "hash":
+                            keyName = "数据哈希";
+                            break;
+                        case "parentRecordID":
+                        case "parentTxID":
+                            keyName = "父交易ID";
+                            break;
+                        case "price":
+                            keyName = "价格";
+                            break;
+                        case "addrrec":
+                            keyName = "接收方地址";
+                            break;
+                        case "addrsend":
+                            keyName = "发送方地址";
+                            break;
+                        case "storageType":
+                            keyName = "存储类型";
+                            break;
+                        case "recordID":
+                            keyName = "交易ID";
+                            break;
+                        // estate
+                        case "ZZBH":
+                            keyName = "证照编号";
+                            break;
+                        case "KZ_BDCQZH":
+                            keyName = "不动产权证号";
+                            break;
+                        case "CZZT":
+                            keyName = "持证主体";
+                            break;
+                        case "KZ_QLRZJH":
+                            keyName = "权利人证件号";
+                            break;
+                        case "ZZBFJG":
+                            keyName = "证照颁发机构";
+                            break;
+                        case "ZZBFRQ":
+                            keyName = "证照颁发日期";
+                            break;
+                        case "KZ_ZL":
+                            keyName = "坐落";
+                            break;
+                        case "KZ_MJ":
+                            keyName = "面积";
+                            break;
+                        default:
+                            break;
+                    }
+                    if(keyName == "交易ID" || keyName == "父交易ID"){
+                        continue;
+                    }
+
+                    str += "<p><label><b>" + keyName + ":</b></label>" + jsonData[i][key][key2] + "</p>";
+                    keyName = "null";
+                }
+            } else {
+                str += "<p><label><b>" + keyName + ":</b></label>" + jsonData[i][key] + "</p>";
+                keyName = "null";
+            }
+        }
+    str += "<hr><p></p>"
+    }
+    return str;
+}
+
+function FormatOutputUsualWithUrl(data){
+    var jsonData = JSON.parse(data);
+    // console.log(jsonData);
+
+    var str = "";
+    var keyName = "";
+    for(var i = 0; i < jsonData.length; i++){
+        str += "<p><label><b>序号： </b></label>" + (i+1) + "</p>";
+        for(var key in jsonData[i]){
+            if(key == "Key"){
+                continue;
+            }
+            if(key == "TxId"){
+                continue;
+            }
+            switch(key) {
+                case "TxId":
+                    keyName = "FabricTxID";
+                    break;
+                case "Timestamp":
+                    keyName = "时间戳";
+                    break;
+                case "IsDelete":
+                    keyName = "是否删除";
+                    break;
+                default:
+                    break;
+            }
+            if(key == "Value" || key == "Record"){
+                str += "<p><label><b>交易ID:</b></label>" + jsonData[i][key]["recordID"] + "</p>";
+                if(!jsonData[i][key].hasOwnProperty("parentRecordID")){
+                    str += "<p><label><b>父交易ID:</b></label>" + jsonData[i][key]["parentTxID"] + "</p>";
+                } else {
+                    str += "<p id=\"traceParentTxID\"><label><b>父交易ID:</b></label><label id=\"traceParentTxIDContent\" style=\"color:blue\">" + jsonData[i][key]["parentRecordID"] + "</label></p>";
                 }
                 for(var key2 in jsonData[i][key]){
                     switch(key2) {
