@@ -14,16 +14,16 @@ This is an experimental system  for "BLOCKCHAIN + GIS"
 └── atlchain.sh         # ATLChain depoly script
 ```
 
-** 1. Prerequisites ** 
+**1. Prerequisites**
 
-    Ubuntu >= 18.04 
-    Docker >= 18.x 
+    Ubuntu >= 18.04
+    Docker >= 18.x
     Docker-compose >= 1.17.x
 
     NOTE:
     memory >= 8GB
 
-** 2. Getting Started **
+**2. Getting Started**
 
     ```
     # install tools
@@ -41,14 +41,14 @@ This is an experimental system  for "BLOCKCHAIN + GIS"
     ```
 
 
-** 3. TroubleShooting **
+**3. TroubleShooting**
 
 1. ```Error: got unexpected status: SERVICE_UNAVAILABLE -- backing Kafka cluster has not completed booting; try again later``` because kafka is not booting completely.
     try to start the service again:
     ```
     ./atlchain.sh down
-    
+
     ./atlchain.sh up
     ```
-    
+
 TODO: We will do it better.
