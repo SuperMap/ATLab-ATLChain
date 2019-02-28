@@ -41,7 +41,7 @@ This is an experimental system  for "BLOCKCHAIN + GIS"
     ```
 
 
-TroubleShooting:
+** 3. TroubleShooting **
 
 1. ```Error: got unexpected status: SERVICE_UNAVAILABLE -- backing Kafka cluster has not completed booting; try again later``` because kafka is not booting completely.
     try to start the service again:
