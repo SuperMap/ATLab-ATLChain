@@ -2,11 +2,11 @@
 
 This is an experimental system  for "BLOCKCHAIN + GIS"
 
-** 0. Project struct **
+**0. Project struct**
 
 ```
 .
-├──ATLChain_CC         # ChainCode for ATLChain
+├── ATLChain_CC         # ChainCode for ATLChain
 ├── ATLChain_DEMO       # ATLChain DEMO system
 │   ├── server              # ATLChain server made by Fabric NodeJK SDK
 │   └── web                 # ATLChain DEMO website
