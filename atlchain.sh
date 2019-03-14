@@ -15,8 +15,9 @@ export IMAGE_TAG=latest
 # Print the usage message
 function printHelp() {
     echo "Usage: "
-    echo "  byfn.sh <mode> [-c <channel name>] [-t <timeout>] [-d <delay>] [-f <docker-compose-file>] [-s <dbtype>] [-l <language>] [-o <consensus-type>] [-i <imagetag>] [-v]"
+    echo "  byfn.sh <mode> <orgs> [-c <channel name>] [-t <timeout>] [-d <delay>] [-f <docker-compose-file>] [-s <dbtype>] [-l <language>] [-o <consensus-type>] [-i <imagetag>] [-v]"
     echo "    <mode> - one of 'up', 'down', 'restart', 'generate' or 'upgrade'"
+    echo "    <orgs> - organizations you want to create e.g. OrgA OrgSuperMap. NEVER use special characters e.g. # @"
     echo "      - 'up' - bring up the network with docker-compose up"
     echo "      - 'down' - clear the network with docker-compose down"
     echo "      - 'restart' - restart the network"
@@ -36,16 +37,16 @@ function printHelp() {
     echo "Typically, one would first generate the required certificates and "
     echo "genesis block, then bring up the network. e.g.:"
     echo
-    echo "	byfn.sh generate -c atlchannel"
-    echo "	byfn.sh up -c atlchannel -s couchdb"
-    echo "        byfn.sh up -c atlchannel -s couchdb -i 1.4.0"
-    echo "	byfn.sh up -l node"
+    echo "	byfn.sh generate OrgA  -c atlchannel"
+    echo "	byfn.sh up OrgA -c atlchannel -s couchdb"
+    echo "  byfn.sh up OrgA -c atlchannel -s couchdb -i 1.4.0"
+    echo "	byfn.sh up OrgA -l node"
     echo "	byfn.sh down -c atlchannel"
-    echo "        byfn.sh upgrade -c atlchannel"
+    echo "  byfn.sh upgrade OrgA -c atlchannel"
     echo
     echo "Taking all defaults:"
-    echo "	byfn.sh generate"
-    echo "	byfn.sh up"
+    echo "	byfn.sh generate OrgA"
+    echo "	byfn.sh up OrgA"
     echo "	byfn.sh down"
 }
 
@@ -243,9 +244,6 @@ function upgradeNetwork() {
 function networkDown() {
     # stop org3 containers also in addition to org1 and org2, in case we were running sample to add org3
     # stop kafka and zookeeper containers in case we're running with kafka consensus-type
-
-    # remove useless files
-
     echo "##########################################################"
     echo "#################  remove useless files ##################"
     echo "##########################################################"
@@ -314,6 +312,7 @@ function replacePrivateKey() {
     PRIV_KEY=$(ls *_sk)
     cd "$CURRENT_DIR"
     sed $OPTS "s/ADMIN_ORGB_PRIVATE_KEY/${PRIV_KEY}/g" ../ATLChain_DEMO/server/app/network-config.yaml
+
     # If MacOSX, remove the temporary backup of the docker-compose file
     if [ "$ARCH" == "Darwin" ]; then
         rm docker-compose-e2e.yamlt
@@ -341,18 +340,20 @@ function generateCryptoConfig() {
 
     # Set orderer nodes
     echo "OrdererOrgs:" > ${CRYPTO_CONFIG_FILE}
-    echo  >> ${CRYPTO_CONFIG_FILE}
+    echo "" >> ${CRYPTO_CONFIG_FILE}
     cat ./templates/crypto-config-orderer.template >> ${CRYPTO_CONFIG_FILE}
     # Set orderer hostname
     sed ${OPTS} "s/ORDERER_NUM/0/g" ${CRYPTO_CONFIG_FILE}
 
     # Set peer nodes
-    echo  >> ${CRYPTO_CONFIG_FILE}
+    echo "" >> ${CRYPTO_CONFIG_FILE}
     echo "PeerOrgs:" >> ${CRYPTO_CONFIG_FILE}
     count=0
-    while (( ${count} <= "$#" ))
+    echo "args nums: $#"
+    args_count=$#
+    while (( ${count} < args_count))
     do
-        echo  >> ${CRYPTO_CONFIG_FILE}
+        echo "" >> ${CRYPTO_CONFIG_FILE}
         cat ./templates/crypto-config-peer.template >> ${CRYPTO_CONFIG_FILE}
 
         # Set org name
@@ -369,6 +370,9 @@ function generateCryptoConfig() {
         # Set user count
         sed ${OPTS} "s/USER_COUNT/2/g" ${CRYPTO_CONFIG_FILE}
 
+        index=${#ARRAY_ORGS[*]}
+        ARRAY_ORGS[index]=${1}
+
         shift
         let "count++"
     done
@@ -376,9 +380,8 @@ function generateCryptoConfig() {
 
 # Generates Org certs using cryptogen tool
 function generateCerts() {
-
-    generateCryptoConfig OrgA OrgB
-
+    generateCryptoConfig $*
+    echo "array::: ${ARRAY_ORGS[*]}"
     which cryptogen
     if [ "$?" -ne 0 ]; then
         echo "cryptogen tool not found. exiting"
@@ -497,9 +500,10 @@ COMPOSE_FILE_KAFKA=./docker-compose-kafka.yaml
 COMPOSE_FILE_E2E=./docker-compose-e2e.yaml
 COMPOSE_FILE_HADOOP=./docker-compose-hadoop.yaml
 #
-#
 CRYPTO_CONFIG_FILE=crypto-config.yaml
 DOMAIN_NAME="atlchain.com"
+#
+ARRAY_ORGS=()
 #
 # use golang as the default language for chaincode
 LANGUAGE=golang
@@ -583,7 +587,6 @@ askProceed
 
 # touch file if not exist
 cd ATLChain_DEMO/server
-
 if [ ! -f "app.log" ]
 then
     touch app.log
@@ -593,11 +596,9 @@ if [ ! -f "http.log" ]
 then
     touch http.log
 fi
-
 cd ../..
 
 cd ATLChain_NETWORK
-
 # untar bin package
 if [ ! -d "bin" ] 
 then
@@ -631,9 +632,9 @@ if [ "${MODE}" == "up" ]; then
 elif [ "${MODE}" == "down" ]; then ## Clear the network
     networkDown
 elif [ "${MODE}" == "generate" ]; then ## Generate Artifacts
-    generateCerts
-    replacePrivateKey
-    generateChannelArtifacts
+    generateCerts $*
+    # replacePrivateKey
+    # generateChannelArtifacts
 elif [ "${MODE}" == "restart" ]; then ## Restart the network
     networkDown
     networkUp
@@ -643,5 +644,4 @@ else
     printHelp
     exit 1
 fi
-
 cd ..
