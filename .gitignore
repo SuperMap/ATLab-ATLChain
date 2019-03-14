@@ -1,0 +1,18 @@
+#SPDX-License-Identifier: Apache-2.0
+
+# Vim file artifacts
+.*.sw*
+*~
+# log files
+*.log
+# config files generated
+*.tx
+*.block
+*genesisblock
+*production/
+*crypto-config/
+*bin/
+# tox
+.tox/
+# vscode settings
+.vscode
