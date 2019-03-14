@@ -1,9 +1,4 @@
 #!/bin/bash
-#
-# Copyright IBM Corp All Rights Reserved
-#
-# SPDX-License-Identifier: Apache-2.0
-#
 
 # prepending $PWD/ATLChain_NETWORK/bin to PATH to ensure we are picking up the correct binaries
 # this may be commented out to resolve installed version of tools if desired
@@ -277,7 +272,7 @@ function networkDown() {
         # remove orderer block and other channel configuration transactions and certs
         rm -rf channel-artifacts/*.block channel-artifacts/*.tx crypto-config ./org3-artifacts/crypto-config/ channel-artifacts/org3.json
         # remove the docker-compose yaml file that was customized to the example
-        rm -f docker-compose-e2e.yaml ../ATLChain_DEMO/server/app/network-config.yaml
+        rm -f docker-compose-e2e.yaml ../ATLChain_DEMO/server/app/network-config.yaml ../ATLChain_DEMO/server/app.log ../ATLChain_DEMO/server/http.log
     fi
 
 }
@@ -523,6 +518,21 @@ fi
 # ask for confirmation to proceed
 askProceed
 
+# touch file if not exist
+cd ATLChain_DEMO/server
+
+if [ ! -f "app.log" ]
+then
+    touch app.log
+fi
+
+if [ ! -f "http.log" ]
+then
+    touch http.log
+fi
+
+cd ../..
+
 cd ATLChain_NETWORK
 
 # untar bin package
@@ -531,6 +541,7 @@ then
     tar xvf bin.tar.xz
 fi
 
+# make directories if not exist
 if [ ! -d "../ATLChain_DEMO/web/public/tmp" ] 
 then
     mkdir ../ATLChain_DEMO/web/public/tmp
