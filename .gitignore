@@ -12,6 +12,12 @@
 *production/
 *crypto-config/
 *bin/
+*IssuerPublicKey
+*IssuerRevocationPublicKey
+*fabric-ca-server.db
+*/ca-config/msp/
+*package-lock.json
+*node_modules/
 # tox
 .tox/
 # vscode settings

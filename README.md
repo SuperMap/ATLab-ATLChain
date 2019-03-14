@@ -50,5 +50,10 @@ This is an experimental system  for "BLOCKCHAIN + GIS"
 
     ./atlchain.sh up
     ```
+2. No response when query hbase data.
+   Maybe therer is somethings wrong with hbase container, try to restart hbase container by :
+   ```
+   docker restart hbase.atlchain.com
+   ```
 
 TODO: We will do it better.
