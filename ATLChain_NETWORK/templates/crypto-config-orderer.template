@@ -1,0 +1,4 @@
+  - Name: OrdererORG_NAME
+    Domain: ORG_DOMAIN
+    Specs:
+      - Hostname: ordererORDERER_NUM

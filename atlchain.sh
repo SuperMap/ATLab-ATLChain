@@ -320,8 +320,65 @@ function replacePrivateKey() {
     fi
 }
 
+# generate crypto-config.yaml 
+function generateCryptoConfig() {
+    echo
+    echo "##########################################################"
+    echo "############# Generate crypto config file ################"
+    echo "##########################################################"
+
+    ARCH=$(uname -s | grep Darwin)
+    if [ "$ARCH" == "Darwin" ]; then
+        OPTS="-it"
+    else
+        OPTS="-i"
+    fi
+
+    if [ ! -f "${CRYPTO_CONFIG_FILE}" ]
+    then
+        touch ${CRYPTO_CONFIG_FILE}
+    fi
+
+    # Set orderer nodes
+    echo "OrdererOrgs:" > ${CRYPTO_CONFIG_FILE}
+    echo  >> ${CRYPTO_CONFIG_FILE}
+    cat ./templates/crypto-config-orderer.template >> ${CRYPTO_CONFIG_FILE}
+    # Set orderer hostname
+    sed ${OPTS} "s/ORDERER_NUM/0/g" ${CRYPTO_CONFIG_FILE}
+
+    # Set peer nodes
+    echo  >> ${CRYPTO_CONFIG_FILE}
+    echo "PeerOrgs:" >> ${CRYPTO_CONFIG_FILE}
+    count=0
+    while (( ${count} <= "$#" ))
+    do
+        echo  >> ${CRYPTO_CONFIG_FILE}
+        cat ./templates/crypto-config-peer.template >> ${CRYPTO_CONFIG_FILE}
+
+        # Set org name
+        sed ${OPTS} "s/ORG_NAME/${1}/g" ${CRYPTO_CONFIG_FILE}
+        
+        # Set domain name
+        DOMAIN=$(echo "${1}.${DOMAIN_NAME}" | tr '[:upper:]' '[:lower:]')
+        sed ${OPTS} "s/ORG_DOMAIN/${DOMAIN}/g" ${CRYPTO_CONFIG_FILE}
+
+
+        # Set peer count
+        sed ${OPTS} "s/PEER_COUNT/2/g" ${CRYPTO_CONFIG_FILE}
+
+        # Set user count
+        sed ${OPTS} "s/USER_COUNT/2/g" ${CRYPTO_CONFIG_FILE}
+
+        shift
+        let "count++"
+    done
+}
+
 # Generates Org certs using cryptogen tool
 function generateCerts() {
+
+    generateCryptoConfig OrgA OrgB
+
     which cryptogen
     if [ "$?" -ne 0 ]; then
         echo "cryptogen tool not found. exiting"
@@ -440,6 +497,10 @@ COMPOSE_FILE_KAFKA=./docker-compose-kafka.yaml
 COMPOSE_FILE_E2E=./docker-compose-e2e.yaml
 COMPOSE_FILE_HADOOP=./docker-compose-hadoop.yaml
 #
+#
+CRYPTO_CONFIG_FILE=crypto-config.yaml
+DOMAIN_NAME="atlchain.com"
+#
 # use golang as the default language for chaincode
 LANGUAGE=golang
 # default image tag
@@ -464,6 +525,8 @@ elif [ "$MODE" == "generate" ]; then
     EXPMODE="Generating certs and genesis block"
 elif [ "$MODE" == "upgrade" ]; then
     EXPMODE="Upgrading the network"
+elif [ "$MODE" == "crypto" ]; then
+    EXPMODE="trying"
 else
     printHelp
     exit 1
