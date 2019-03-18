@@ -1,0 +1,7 @@
+    peer0.orga.atlchain.com:
+        container_name: peer0.orga.atlchain.com
+        extends:
+            file:  base/docker-compose-base.yaml
+            service: peer0.orga.atlchain.com
+        networks:
+            - byfn

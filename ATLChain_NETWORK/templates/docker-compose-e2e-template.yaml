@@ -3,7 +3,7 @@ version: '2'
 volumes:
     ca0.atlchain.com:
     ca1.atlchain.com:
-    orderero.orga.atlchain.com:
+    orderer0.orga.atlchain.com:
     peer0.orga.atlchain.com:
     peer1.orga.atlchain.com:
     peer0.orgb.atlchain.com:

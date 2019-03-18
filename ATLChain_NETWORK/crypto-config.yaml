@@ -5,6 +5,11 @@ OrdererOrgs:
     Specs:
       - Hostname: orderer0
 
+  - Name: OrdererOrgB
+    Domain: orgb.atlchain.com
+    Specs:
+      - Hostname: orderer0
+
 PeerOrgs:
 
   - Name: OrgA
@@ -17,30 +22,6 @@ PeerOrgs:
 
   - Name: OrgB
     Domain: orgb.atlchain.com
-    EnableNodeOUs: true
-    Template:
-      Count: 2
-    Users:
-      Count: 2
-
-  - Name: OrgC
-    Domain: orgc.atlchain.com
-    EnableNodeOUs: true
-    Template:
-      Count: 2
-    Users:
-      Count: 2
-
-  - Name: OrgD1
-    Domain: orgd1.atlchain.com
-    EnableNodeOUs: true
-    Template:
-      Count: 2
-    Users:
-      Count: 2
-
-  - Name: Org#32
-    Domain: org#32.atlchain.com
     EnableNodeOUs: true
     Template:
       Count: 2
