@@ -1,7 +1,4 @@
-# Copyright IBM Corp. All Rights Reserved.
-#
-# SPDX-License-Identifier: Apache-2.0
-#
+# Config file for configtxgen tool, define organizations and channel struction
 
 ---
 ################################################################################
@@ -49,81 +46,24 @@ Organizations:
                 Type: Signature
                 Rule: "OR('OrdererA.admin')"
 
-        # AnchorPeers defines the location of peers which can be used for
-        # cross-org gossip communication. Note, this value is only encoded in
-        # the genesis block in the Application section context.
-        # AnchorPeers:
-        #     - Host: 127.0.0.1
-        #       Port: 7051
-
-    - &OrdererB
-        Name: OrdererB
-    
-        ID: OrdererB
-    
-        MSPDir: ./crypto-config/ordererOrganizations/orgb.atlchain.com/msp
-    
-        Policies: &OrdererBPolicies
-            Readers:
-                Type: Signature
-                Rule: "OR('OrdererB.member', 'OrdererB.admin', 'OrdererB.peer', 'OrdererB.client')" 
-
-            Writers:
-                Type: Signature
-                Rule: "OR('OrdererB.member', 'OrdererB.admin', 'OrdererB.peer', 'OrdererB.client')" 
-
-            Admins:
-                Type: Signature
-                Rule: "OR('OrdererB.admin')"
-              
     - &OrgA
         Name: OrgA
-    
         ID: OrgA
-    
         MSPDir: ./crypto-config/peerOrganizations/orga.atlchain.com/msp
-    
         Policies: &OrgAPolicies
             Readers:
                 Type: Signature
                 Rule: "OR('OrgA.admin', 'OrgA.peer', 'OrgA.client', 'OrgA.member')"
-
             Writers:
                 Type: Signature
                 Rule: "OR('OrgA.admin', 'OrgA.peer', 'OrgA.client', 'OrgA.member')"
-
             Admins:
                 Type: Signature
                 Rule: "OR('OrgA.admin')"
-    
         AnchorPeers:
             - Host: peer0.orga.atlchain.com
               Port: 7051
     
-    - &OrgB
-        Name: OrgB
-
-        ID: OrgB
-
-        MSPDir: ./crypto-config/peerOrganizations/orgb.atlchain.com/msp
-
-        Policies: &OrgBPolicies
-            Readers:
-                Type: Signature
-                Rule: "OR('OrgB.admin', 'OrgB.peer', 'OrgB.client', 'OrgB.member')"
-            Writers:
-                Type: Signature
-                Rule: "OR('OrgB.admin', 'OrgB.peer', 'OrgB.client', 'OrgB.member')"
-            Admins:
-                Type: Signature
-                Rule: "OR('OrgB.admin')"
-
-        AnchorPeers:
-            - Host: peer0.orgb.atlchain.com
-              Port: 7051
-
-
-       
 ################################################################################
 #
 #   CAPABILITIES
@@ -408,7 +348,6 @@ Channel: &ChannelDefaults
             Type: ImplicitMeta
             Rule: "MAJORITY Admins"
 
-
     # Capabilities describes the channel level capabilities, see the
     # dedicated Capabilities section elsewhere in this file for a full
     # description
@@ -428,139 +367,6 @@ Channel: &ChannelDefaults
 #
 ################################################################################
 Profiles:
-
-    # # SampleSingleMSPSolo defines a configuration which uses the Solo orderer,
-    # # and contains a single MSP definition (the MSP sampleconfig).
-    # # The Consortium SampleConsortium has only a single member, SampleOrg.
-    # SampleSingleMSPSolo:
-    #     <<: *ChannelDefaults
-    #     Orderer:
-    #         <<: *OrdererDefaults
-    #         Organizations:
-    #             - *SampleOrg
-    #     Consortiums:
-    #         SampleConsortium:
-    #             Organizations:
-    #                 - *SampleOrg
-
-    # # SampleSingleMSPKafka defines a configuration that differs from the
-    # # SampleSingleMSPSolo one only in that it uses the Kafka-based orderer.
-    # SampleSingleMSPKafka:
-    #     <<: *ChannelDefaults
-    #     Orderer:
-    #         <<: *OrdererDefaults
-    #         OrdererType: kafka
-    #         Organizations:
-    #             - *SampleOrg
-    #     Consortiums:
-    #         SampleConsortium:
-    #             Organizations:
-    #                 - *SampleOrg
-
-    # # SampleInsecureSolo defines a configuration which uses the Solo orderer,
-    # # contains no MSP definitions, and allows all transactions and channel
-    # # creation requests for the consortium SampleConsortium.
-    # SampleInsecureSolo:
-    #     <<: *ChannelDefaults
-    #     Orderer:
-    #         <<: *OrdererDefaults
-    #     Consortiums:
-    #         SampleConsortium:
-    #             Organizations:
-
-    # # SampleInsecureKafka defines a configuration that differs from the
-    # # SampleInsecureSolo one only in that it uses the Kafka-based orderer.
-    # SampleInsecureKafka:
-    #     <<: *ChannelDefaults
-    #     Orderer:
-    #         OrdererType: kafka
-    #         <<: *OrdererDefaults
-    #     Consortiums:
-    #         SampleConsortium:
-    #             Organizations:
-
-    # # SampleDevModeSolo defines a configuration which uses the Solo orderer,
-    # # contains the sample MSP as both orderer and consortium member, and
-    # # requires only basic membership for admin privileges. It also defines
-    # # an Application on the ordering system channel, which should usually
-    # # be avoided.
-    # SampleDevModeSolo:
-    #     <<: *ChannelDefaults
-    #     Orderer:
-    #         <<: *OrdererDefaults
-    #         Organizations:
-    #             - <<: *SampleOrg
-    #               Policies:
-    #                   <<: *SampleOrgPolicies
-    #                   Admins:
-    #                       Type: Signature
-    #                       Rule: "OR('SampleOrg.member')"
-    #     Application:
-    #         <<: *ApplicationDefaults
-    #         Organizations:
-    #             - <<: *SampleOrg
-    #               Policies:
-    #                   <<: *SampleOrgPolicies
-    #                   Admins:
-    #                       Type: Signature
-    #                       Rule: "OR('SampleOrg.member')"
-    #     Consortiums:
-    #         SampleConsortium:
-    #             Organizations:
-    #                 - <<: *SampleOrg
-    #                   Policies:
-    #                       <<: *SampleOrgPolicies
-    #                       Admins:
-    #                           Type: Signature
-    #                           Rule: "OR('SampleOrg.member')"
-
-    # # SampleDevModeKafka defines a configuration that differs from the
-    # # SampleDevModeSolo one only in that it uses the Kafka-based orderer.
-    # SampleDevModeKafka:
-    #     <<: *ChannelDefaults
-    #     Orderer:
-    #         <<: *OrdererDefaults
-    #         OrdererType: kafka
-    #         Organizations:
-    #             - <<: *SampleOrg
-    #               Policies:
-    #                   <<: *SampleOrgPolicies
-    #                   Admins:
-    #                       Type: Signature
-    #                       Rule: "OR('SampleOrg.member')"
-    #     Application:
-    #         <<: *ApplicationDefaults
-    #         Organizations:
-    #             - <<: *SampleOrg
-    #               Policies:
-    #                   <<: *SampleOrgPolicies
-    #                   Admins:
-    #                       Type: Signature
-    #                       Rule: "OR('SampleOrg.member')"
-    #     Consortiums:
-    #         SampleConsortium:
-    #             Organizations:
-    #                 - <<: *SampleOrg
-    #                   Policies:
-    #                       <<: *SampleOrgPolicies
-    #                       Admins:
-    #                           Type: Signature
-    #                           Rule: "OR('SampleOrg.member')"
-
-    # # SampleSingleMSPChannel defines a channel with only the sample org as a
-    # # member. It is designed to be used in conjunction with SampleSingleMSPSolo
-    # # and SampleSingleMSPKafka orderer profiles.   Note, for channel creation
-    # # profiles, only the 'Application' section and consortium # name are
-    # # considered.
-    # SampleSingleMSPChannel:
-    #     Consortium: SampleConsortium
-    #     Application:
-    #         <<: *ApplicationDefaults
-    #         Organizations:
-    #             - *SampleOrg
-
-
-
     ## Genesis Block
     OrdererChannel:
         <<: *ChannelDefaults
@@ -569,25 +375,21 @@ Profiles:
             OrdererType: kafka
             Organizations:
                 - <<: *OrdererA
-                - <<: *OrdererB
                   Policies:
                       <<: *OrdererAPolicies
-                      <<: *OrdererBPolicies
                       Admins:
                           Type: Signature
-                          Rule: "OR('OrdererA.admin', 'OrdererB.admin')"
+                          Rule: "OR('OrdererA.admin')"
                          
         Consortiums:
             SampleConsortium:
                 Organizations:
                     - <<: *OrgA
-                    - <<: *OrgB
                       Policies:
                           <<: *OrgAPolicies
-                          <<: *OrgBPolicies
                           Admins:
                               Type: Signature
-                              Rule: "OR('OrgA.admin', 'OrgB.admin')"
+                              Rule: "OR('OrgA.admin')"
                           
     ## TxChannel Genesis Block
     TxChannel:
@@ -596,4 +398,3 @@ Profiles:
             <<: *ApplicationDefaults
             Organizations:
                 - <<: *OrgA
-                - <<: *OrgB
