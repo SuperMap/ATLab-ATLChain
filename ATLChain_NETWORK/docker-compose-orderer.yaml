@@ -1,0 +1,66 @@
+# orderer node docker compose file
+
+version: '2'
+
+networks:
+    byfn:
+services:
+    zookeeper.atlchain.com:
+        container_name: zookeeper.atlchain.com
+        image: hyperledger/fabric-zookeeper:0.4.14
+        environment:
+            ZOOKEEPER_CLIENT_PORT: 32181
+            ZOOKEEPER_TICK_TIME: 2000
+        networks:
+            - byfn
+
+    kafka.atlchain.com:
+        container_name: kafka.atlchain.com
+        image: hyperledger/fabric-kafka:0.4.14
+        depends_on:
+            - zookeeper.atlchain.com
+        environment:
+            - KAFKA_BROKER_ID=1
+            - KAFKA_ZOOKEEPER_CONNECT=zookeeper.atlchain.com:2181
+            - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka.atlchain.com:9092
+            - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
+            - KAFKA_MESSAGE_MAX_BYTES=1048576 # 1 * 1024 * 1024 B
+            - KAFKA_REPLICA_FETCH_MAX_BYTES=1048576 # 1 * 1024 * 1024 B
+            - KAFKA_UNCLEAN_LEADER_ELECTION_ENABLE=false
+            - KAFKA_LOG_RETENTION_MS=-1
+            - KAFKA_MIN_INSYNC_REPLICAS=1
+            - KAFKA_DEFAULT_REPLICATION_FACTOR=1
+        networks:
+            - byfn
+
+    orderer0.orga.atlchain.com:
+        container_name: orderer0.orga.atlchain.com
+        image: hyperledger/fabric-orderer:1.4.0
+        depends_on:
+            - kafka.atlchain.com
+        environment:
+            - FABRIC_LOGGING_SPEC=INFO
+            - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
+            - ORDERER_GENERAL_GENESISMETHOD=file
+            - ORDERER_GENERAL_GENESISFILE=/var/hyperledger/orderer/orderer.genesis.block
+            - ORDERER_GENERAL_LOCALMSPID=OrdererA
+            - ORDERER_GENERAL_LOCALMSPDIR=/var/hyperledger/orderer/msp
+            # enabled TLS
+            - ORDERER_GENERAL_TLS_ENABLED=false
+            - ORDERER_GENERAL_TLS_PRIVATEKEY=/var/hyperledger/orderer/tls/server.key
+            - ORDERER_GENERAL_TLS_CERTIFICATE=/var/hyperledger/orderer/tls/server.crt
+            - ORDERER_GENERAL_TLS_ROOTCAS=[/var/hyperledger/orderer/tls/ca.crt]
+            - ORDERER_KAFKA_TOPIC_REPLICATIONFACTOR=1
+            - ORDERER_KAFKA_VERBOSE=true
+        volumes:
+            - ./channel-artifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
+            - ./crypto-config/ordererOrganizations/orga.atlchain.com/orderers/orderer0.orga.atlchain.com/msp:/var/hyperledger/orderer/msp
+            - ./crypto-config/ordererOrganizations/orga.atlchain.com/orderers/orderer0.orga.atlchain.com/tls/:/var/hyperledger/orderer/tls
+            - ./production/orderer0.orga.atlchain.com:/var/hyperledger/production/orderer
+        working_dir: /opt/gopath/src/github.com/hyperledger/fabric
+        command: orderer
+        networks:
+            - byfn
+        ports:
+            - 7050:7050
+

@@ -86,7 +86,7 @@ ca:
   # Name of this CA
   name: ca-orga
   # Key file (is only used to import a private key into BCCSP)
-  keyfile: ./msp/keystore/bce161b0a693f1ffb62ea679253bfc35c9fc489d772122d936f06b7b0153a5fd_sk
+  keyfile: ./msp/keystore/a694ecf659e023501bd4fe5d128328d1db1fb4ed4e4272e5645f02333c20193f_sk
   # Certificate file (default: ca-cert.pem)
   certfile: ./ca.orga.atlchain.com-cert.pem
   # Chain file

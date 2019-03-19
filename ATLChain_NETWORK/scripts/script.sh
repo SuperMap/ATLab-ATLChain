@@ -1,5 +1,8 @@
 #!/bin/bash
 
+CHANNEL_NAME=$1
+CC_SRC_PATH="github.com/chaincode/"
+
 echo
 echo " ____    _____      _      ____    _____ "
 echo "/ ___|  |_   _|    / \    |  _ \  |_   _|"
@@ -7,133 +10,100 @@ echo "\___ \    | |     / _ \   | |_) |   | |  "
 echo " ___) |   | |    / ___ \  |  _ <    | |  "
 echo "|____/    |_|   /_/   \_\ |_| \_\   |_|  "
 echo
-echo "Build atlchain demo"
+echo "Building your network ......"
 echo
-CHANNEL_NAME="$1"
-DELAY="$2"
-LANGUAGE="$3"
-TIMEOUT="$4"
-VERBOSE="$5"
-: ${CHANNEL_NAME:="mychannel"}
-: ${DELAY:="3"}
-: ${LANGUAGE:="golang"}
-: ${TIMEOUT:="10"}
-: ${VERBOSE:="false"}
-LANGUAGE=`echo "$LANGUAGE" | tr [:upper:] [:lower:]`
-COUNTER=1
-MAX_RETRY=10
 
-CC_SRC_PATH="github.com/chaincode/"
-if [ "$LANGUAGE" = "node" ]; then
-    CC_SRC_PATH="github.com/chaincode/"
-	# CC_SRC_PATH="/opt/gopath/src/github.com/chaincode/chaincode_example02/node/"
+# create channel
+set -x
+peer channel create -o orderer0.orga.atlchain.com:7050 -c $CHANNEL_NAME -f ./channel-artifacts/${CHANNEL_NAME}.tx >& log.txt 
+
+# peer channel create -o orderer0.orga.atlchain.com:7050 -c $CHANNEL_NAME -f ./channel-artifacts/atlchannel.tx --tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA >&log.txt
+res=$?
+set +x
+if [ $res -ne 0 ]; then
+    echo "===========$res============="
+    echo " ERROR !!! FAILED to create channel"
+    exit 1
 fi
 
-if [ "$LANGUAGE" = "java" ]; then
-    CC_SRC_PATH="github.com/chaincode/"
-	# CC_SRC_PATH="/opt/gopath/src/github.com/chaincode/chaincode_example02/java/"
+# join channel 
+set -x
+peer channel join -b $CHANNEL_NAME.block >& log.txt
+res=$?
+set +x
+if [ $res -ne 0 ]; then
+    echo "===========$res============="
+    echo " ERROR !!! FAILED to join channel"
+    exit 1
 fi
 
-echo "Channel name : "$CHANNEL_NAME
-
-# import utils
-. scripts/utils.sh
-
-createChannel() {
-	setGlobals 0 1
-
-	if [ -z "$CORE_PEER_TLS_ENABLED" -o "$CORE_PEER_TLS_ENABLED" = "false" ]; then
-        set -x
-		peer channel create -o orderer0.orga.atlchain.com:7050 -c $CHANNEL_NAME -f ./channel-artifacts/atlchannel.tx >&log.txt
-		res=$?
-        set +x
-	else
-		set -x
-		peer channel create -o orderer0.orga.atlchain.com:7050 -c $CHANNEL_NAME -f ./channel-artifacts/atlchannel.tx --tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA >&log.txt
-		res=$?
-		set +x
-	fi
-	cat log.txt
-	verifyResult $res "Channel creation failed"
-	echo "===================== Channel '$CHANNEL_NAME' created ===================== "
-	echo
-}
-
-joinChannel () {
-	for org in 1 2; do
-	    for peer in 0 1; do
-		    joinChannelWithRetry $peer $org
-
-            if [ $org -eq 1 ]; then
-                ORGNAME="a"
-            else
-                ORGNAME="b"
-            fi
-		    echo "===================== peer${peer}.org${ORGNAME} joined channel '$CHANNEL_NAME' ===================== "
-		    sleep $DELAY
-		    echo
-	    done
-	done
-}
-
-##
-# docker exec -it ca0.atlchain.com sed -i "s/org1/Org1/g" /etc/hyperledger/fabric-ca-server/fabric-ca-server-config.yaml 
-
-## Create channel
-echo "Creating channel..."
-createChannel
-
-## Join all the peers to the channel
-echo "Having all peers join the channel..."
-joinChannel
-
-## Set the anchor peers for each org in the channel
-echo "Updating anchor peers for orga..."
-updateAnchorPeers 0 1
-echo "Updating anchor peers for orgb..."
-updateAnchorPeers 0 2
-
-## Install chaincode on peer0.orga and peer0.orgb
-echo "Installing chaincode on peer0.orga..."
-installChaincode 0 1
-echo "Install chaincode on peer0.orgb..."
-installChaincode 0 2
-
-# Instantiate chaincode on peer0.orgb
-echo "Instantiating chaincode on peer0.orgb..."
-instantiateChaincode 0 2
-sleep $DELAY
-
-# Invoking chaincode on peer0.orga
-echo "Invoking chaincode on peer0.orga..."
-chaincodeInvoke 0 A
-
-# Query chaincode on peer0.orga
-echo "Querying chaincode on peer0.orga..."
-chaincodeQuery 0 1
-
-# Invoke chaincode on peer0.orga and peer0.orgb
-echo "Sending invoke transaction on peer0.orga peer0.orgb..."
-chaincodeInvoke 0 A 0 B
-
-## Install chaincode on peer1.orgb
-echo "Installing chaincode on peer1.orgb..."
-installChaincode 1 2
-
-# Query on chaincode on peer1.orgb, check if the result is 90
-echo "Querying chaincode on peer1.orgb..."
-chaincodeQuery 1 2
-
-cd demo/server
-if [ ! -d node_modules ]
-then
-    npm install
+# update anchor peer
+set -x
+peer channel update -o orderer0.orga.atlchain.com:7050 -c $CHANNEL_NAME -f ./channel-artifacts/${CORE_PEER_LOCALMSPID}anchors.tx >& log.txt 
+# peer channel update -o orderer0.orga.atlchain.com:7050 -c $CHANNEL_NAME -f ./channel-artifacts/${CORE_PEER_LOCALMSPID}anchors.tx --tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA >& log.txt
+res=$?
+set +x
+if [ $res -ne 0 ]; then
+    echo "===========$res============="
+    echo " ERROR !!! FAILED to update anchor peer"
+    exit 1
 fi
-nohup node app > app.log 2>&1 &
-nohup node http > http.log 2>&1 &
+
+# install chaincode 
+set -x
+peer chaincode install -v 1.0 -n atlchainCC -p ${CC_SRC_PATH} >& log.txt 
+res=$?
+set +x
+if [ $res -ne 0 ]; then
+    echo "===========$res============="
+    echo " ERROR !!! FAILED to install chaincode"
+    exit 1
+fi
+
+# instantiated chaincode 
+set -x
+peer chaincode instantiate -o orderer0.orga.atlchain.com:7050 -C $CHANNEL_NAME -n atlchainCC -v 1.0 -c '{"Args": ["init"]}' -P "AND('OrgA.peer')" >& log.txt 
+# peer chaincode instantiate -o orderer0.orga.atlchain.com:7050 --tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA -C $CHANNEL_NAME -n atlchainCC -v 1.0 -c '{"Args": ["init"]}'  -P "AND('OrgA.peer', 'OrgB.peer')" >& log.txt
+res=$?
+set +x
+if [ $res -ne 0 ]; then
+    echo "===========$res============="
+    echo " ERROR !!! FAILED to instantiate chaincode"
+    exit 1
+fi
+
+sleep 10
+
+# invoke 
+PEER0_ORGA_CA=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/orga.atlchain.com/peers/peer0.orga.atlchain.com/tls/ca.crt
+set -x
+peer chaincode invoke -o orderer0.orga.atlchain.com:7050 -C $CHANNEL_NAME -n atlchainCC --peerAddresses peer0.orga.atlchain.com:7051 -c '{"Args":["Put", "tryPutkey", "{\"tryAddrReceive\":\"trytestAddrA\", \"tryAddrSend\":\"trytestAddrB\"}", "trysignagure", "trypubKey"]}' >& log.txt
+# peer chaincode invoke -o orderer0.orga.atlchain.com:7050 --tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA -C $CHANNEL_NAME -n atlchainCC --peerAddresses peer0.orga.atlchain.com:7051 -c '{"Args":["Put", "tryPutkey", "{\"tryAddrReceive\":\"trytestAddrA\", \"tryAddrSend\":\"trytestAddrB\"}", "trysignagure", "trypubKey"]}' >&log.txt
+res=$?
+set +x
+if [ $res -ne 0 ]; then
+    echo "===========$res============="
+    echo " ERROR !!! FAILED to invoke chaincode"
+    # exit 1
+fi
+
+sleep 20
+
+# query
+set -x
+peer chaincode query -o orderer0.orga.atlchain.com:7050 -C $CHANNEL_NAME -n atlchainCC --peerAddresses peer0.orga.atlchain.com:7051 -c '{"Args":["Get", "{\"tryAddrSend\":\"trytestAddrB\"}"]}' >& log.txt
+# peer chaincode query -o orderer0.orga.atlchain.com:7050 --tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA -C $CHANNEL_NAME -n atlchainCC --peerAddresses peer0.orga.atlchain.com:7051 -c '{"Args":["Get", "{\"tryAddrSend\":\"trytestAddrB\"}"]}' >& log.txt
+res=$?
+set +x
+cat log.txt   
+if [ $res -ne 0 ]; then
+    echo "===========$res============="
+    echo " ERROR !!! FAILED to query chaincode"
+    exit 1
+fi
 
 echo
-echo "========= All GOOD, building ATLCHAIN DEMO execution completed =========== "
+echo "========= All GOOD, network built successfully=========== "
 echo
 
 echo
@@ -144,4 +114,3 @@ echo "| |___  | |\  | | |_| | "
 echo "|_____| |_| \_| |____/  "
 echo
 
-exit 0
