@@ -17,7 +17,7 @@ services:
         command: sh -c 'fabric-ca-server start --ca.certfile /etc/hyperledger/fabric-ca-server-config/ca.orga.atlchain.com-cert.pem --ca.keyfile /etc/hyperledger/fabric-ca-server-config/CA1_PRIVATE_KEY -b admin:adminpw -d'
         volumes:
             - ./crypto-config/peerOrganizations/orga.atlchain.com/ca/:/etc/hyperledger/fabric-ca-server-config
-            - ../ATLChain_NETWORK/ca-config/fabric-ca-server-config.yaml:/etc/hyperledger/fabric-ca-server/fabric-ca-server-config.yaml
+            - ./ca-config/fabric-ca-server-config.yaml:/etc/hyperledger/fabric-ca-server/fabric-ca-server-config.yaml
         container_name: ca0.atlchain.com
         networks:
             - byfn

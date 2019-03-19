@@ -4,6 +4,7 @@ export PATH=${PWD}/ATLChain_NETWORK/bin:$PATH
 export FABRIC_CFG_PATH=${PWD}/ATLChain_NETWORK
 
 CHANNEL_NAME="atlchannel"
+ORG_DOMAIN_NAME="orga.atlchain.com"
 
 #compose files
 DOCKER_COMPOSE_FILE_ORDERER="docker-compose-orderer.yaml"
@@ -107,7 +108,6 @@ function startOrderer() {
 }
 
 function startPeer() {
-    # genCerts
     docker-compose -f ${DOCKER_COMPOSE_FILE_PEER} up -d 2>&1
     if [ $? -ne 0 ]; then
         echo "ERROR !!!! Unable to start peer node"
@@ -197,14 +197,16 @@ if [ "$MODE" == "up" ]; then
         startCA
     elif [ "$NODE" == "cli" ]; then
         startCLI
-    elif [ "$NODE" == "all" ]; then
-        startAll
+    # elif [ "$NODE" == "all" ]; then
+    #     startAll
     else 
         printHelp
         exit 1
     fi
 elif [ "$MODE" == "down" ]; then
-    cleanFiles
+    if [ -d "crypto-config" ]; then
+        cleanFiles
+    fi
     if [ "$NODE" == "orderer" ]; then
         stopOrderer
     elif [ "$NODE" == "peer" ]; then
@@ -214,12 +216,14 @@ elif [ "$MODE" == "down" ]; then
         stopCA
     elif [ "$NODE" == "cli" ]; then
         stopCLI
-    elif [ "$NODE" == "all" ]; then
-        stopAll
+    # elif [ "$NODE" == "all" ]; then
+    #     stopAll
     else 
         printHelp
         exit 1
     fi
+elif [ "$MODE" == "generate" ]; then
+    genCerts
 else
     printHelp
     exit 1 
