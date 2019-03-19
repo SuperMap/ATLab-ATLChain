@@ -4,7 +4,6 @@ version: '2'
 
 networks:
     byfn:
-
 services:
     zookeeper.atlchain.com:
         container_name: zookeeper.atlchain.com

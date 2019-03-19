@@ -16,7 +16,22 @@ DOCKER_COMPOSE_FILE_CLI="docker-compose-cli.yaml"
 export COMPOSE_PROJECT_NAME=atl
 
 function printHelp() {
-    echo "print help"
+    echo "Usage: "
+    echo "  atlchain.sh <mode> [<node>]"
+    echo "      <mode> - one of 'up', 'down', 'generate', 'clean'"
+    echo "        - 'up' - bring up the network with docker-compose up"
+    echo "        - 'down' - clear the network with docker-compose down"
+    echo "        - 'generate' - generate crypto material and channel artifacts"
+    echo "        - 'clean' - clean files built during network running"
+    echo "      <node> - one of 'orderer', 'peer', 'ca', 'cli'"
+    echo "        - 'orderer' - orderer node"
+    echo "        - 'peer' - peer node"
+    echo "        - 'ca' - ca node"
+    echo "        - 'cli' - tool node, you can run commands in cli container"
+    echo "e.g."
+    echo "  atlchain.sh generate"
+    echo "  atlchain.sh up orderer"
+    echo "  atlchain.sh down peer"
 }
 
 # Generates Org certs using cryptogen tool
@@ -98,8 +113,6 @@ function genChannelArtifacts() {
 }
 
 function startOrderer() {
-    genCerts
-    genChannelArtifacts
     docker-compose -f ${DOCKER_COMPOSE_FILE_ORDERER} up -d 2>&1
     if [ $? -ne 0 ]; then
         echo "ERROR !!!! Unable to start orderer node"
@@ -204,9 +217,6 @@ if [ "$MODE" == "up" ]; then
         exit 1
     fi
 elif [ "$MODE" == "down" ]; then
-    if [ -d "crypto-config" ]; then
-        cleanFiles
-    fi
     if [ "$NODE" == "orderer" ]; then
         stopOrderer
     elif [ "$NODE" == "peer" ]; then
@@ -224,6 +234,9 @@ elif [ "$MODE" == "down" ]; then
     fi
 elif [ "$MODE" == "generate" ]; then
     genCerts
+    genChannelArtifacts
+elif [ "$MODE" == "clean" ]; then
+    cleanFiles
 else
     printHelp
     exit 1 
