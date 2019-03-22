@@ -232,8 +232,9 @@ elif [ "$MODE" == "down" ]; then
         printHelp
         exit 1
     fi
-elif [ "$MODE" == "generate" ]; then
+elif [ "$MODE" == "genCerts" ]; then
     genCerts
+elif [ "$MODE" == "genArti" ]; then
     genChannelArtifacts
 elif [ "$MODE" == "clean" ]; then
     cleanFiles
