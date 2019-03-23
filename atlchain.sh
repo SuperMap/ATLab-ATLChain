@@ -167,6 +167,10 @@ function stopOrderer() {
     docker-compose -f ${DOCKER_COMPOSE_FILE_ORDERER} down 2>&1
 }
 
+function stopKafka() {
+    docker-compose -f ${DOCKER_COMPOSE_FILE_KAFKA} down 2>&1
+}
+
 function stopPeer() {
     docker-compose -f ${DOCKER_COMPOSE_FILE_PEER} down 2>&1
 }
@@ -228,8 +232,10 @@ if [ "$MODE" == "up" ]; then
         exit 1
     fi
 elif [ "$MODE" == "down" ]; then
-    if [ "$NODE" == "orderer" ]; then
-        stopOrderer
+    if [ "$NODE" == "kafka" ]; then
+        stopKafka
+    elif [ "$NODE" == "orderer" ]; then
+        startOrderer
     elif [ "$NODE" == "peer" ]; then
         stopPeer
         stopCLI

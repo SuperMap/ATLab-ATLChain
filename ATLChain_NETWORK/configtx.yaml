@@ -243,7 +243,8 @@ Orderer: &OrdererDefaults
     # participation in ordering.
     # NOTE: In the solo case, this should be a one-item list.
     Addresses:
-        - orderer0.orga.atlchain.com:7050
+        - 172.16.18.8:7050
+        - 172.16.18.9:7050
 
     # Batch Timeout: The amount of time to wait before creating a batch.
     BatchTimeout: 2s
@@ -291,7 +292,7 @@ Orderer: &OrdererDefaults
         # this list to identify the brokers of the ordering service.
         # NOTE: Use IP:port notation.
         Brokers:
-            - kafka.atlchain.com:9092
+            - 172.16.15.66:9092
 
     # Organizations lists the orgs participating on the orderer side of the
     # network.

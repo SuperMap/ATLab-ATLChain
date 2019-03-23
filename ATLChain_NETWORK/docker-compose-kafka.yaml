@@ -32,4 +32,5 @@ services:
             - KAFKA_DEFAULT_REPLICATION_FACTOR=1
         networks:
             - byfn
-
+        ports:
+            - 9092:9092
