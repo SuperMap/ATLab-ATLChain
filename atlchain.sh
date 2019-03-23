@@ -7,6 +7,7 @@ CHANNEL_NAME="atlchannel"
 ORG_DOMAIN_NAME="orga.atlchain.com"
 
 #compose files
+DOCKER_COMPOSE_FILE_KAFKA="docker-compose-kafka.yaml"
 DOCKER_COMPOSE_FILE_ORDERER="docker-compose-orderer.yaml"
 DOCKER_COMPOSE_FILE_PEER="docker-compose-peer.yaml"
 DOCKER_COMPOSE_FILE_CA="docker-compose-ca.yaml"
@@ -112,6 +113,14 @@ function genChannelArtifacts() {
     echo 
 }
 
+function startKafka() {
+    docker-compose -f ${DOCKER_COMPOSE_FILE_KAFKA} up -d 2>&1
+    if [ $? -ne 0 ]; then
+        echo "ERROR !!!! Unable to start kafka"
+        exit 1
+    fi
+}
+
 function startOrderer() {
     docker-compose -f ${DOCKER_COMPOSE_FILE_ORDERER} up -d 2>&1
     if [ $? -ne 0 ]; then
@@ -202,7 +211,9 @@ NODE=$1
 shift
 # Determine whether starting or stopping
 if [ "$MODE" == "up" ]; then
-    if [ "$NODE" == "orderer" ]; then
+    if [ "$NODE" == "kafka" ]; then
+        startKafka
+    elif [ "$NODE" == "orderer" ]; then
         startOrderer
     elif [ "$NODE" == "peer" ]; then
         startPeer
