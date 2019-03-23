@@ -235,7 +235,7 @@ elif [ "$MODE" == "down" ]; then
     if [ "$NODE" == "kafka" ]; then
         stopKafka
     elif [ "$NODE" == "orderer" ]; then
-        startOrderer
+        stopOrderer
     elif [ "$NODE" == "peer" ]; then
         stopPeer
         stopCLI
