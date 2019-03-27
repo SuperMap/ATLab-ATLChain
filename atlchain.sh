@@ -5,6 +5,11 @@ export FABRIC_CFG_PATH=${PWD}/ATLChain_NETWORK
 
 CHANNEL_NAME="atlchannel"
 ORG_DOMAIN_NAME="orga.atlchain.com"
+PEER_ADDRESS=172.16.15.66
+PEER_PORT=7051
+CHAINCODE_PORT=7052
+ORDERER_ADDRESS=172.16.15.66
+ORDERER_PORT=7050
 
 #compose files
 DOCKER_COMPOSE_FILE_KAFKA="docker-compose-kafka.yaml"
@@ -135,8 +140,6 @@ function startPeer() {
         echo "ERROR !!!! Unable to start peer node"
         exit 1
     fi
-    startCLI
-    docker exec cli scripts/script.sh $CHANNEL_NAME
 }
 
 function startCA() {
@@ -238,7 +241,6 @@ elif [ "$MODE" == "down" ]; then
         stopOrderer
     elif [ "$NODE" == "peer" ]; then
         stopPeer
-        stopCLI
     elif [ "$NODE" == "ca" ]; then
         stopCA
     elif [ "$NODE" == "cli" ]; then

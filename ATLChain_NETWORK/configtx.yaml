@@ -1,4 +1,4 @@
-# Config file for configtxgen tool, define organizations and channel struction
+# Config file for configtxgen tool, define organizations and channel structure
 
 ---
 ################################################################################
@@ -61,7 +61,7 @@ Organizations:
                 Type: Signature
                 Rule: "OR('OrgA.admin')"
         AnchorPeers:
-            - Host: peer0.orga.atlchain.com
+            - Host: 172.16.15.66 
               Port: 7051
     
 ################################################################################
@@ -236,15 +236,14 @@ Orderer: &OrdererDefaults
 
     # Orderer Type: The orderer implementation to start.
     # Available types are "solo" and "kafka".
-    OrdererType: kafka
+    OrdererType: solo 
 
     # Addresses here is a nonexhaustive list of orderers the peers and clients can
     # connect to. Adding/removing nodes from this list has no impact on their
     # participation in ordering.
     # NOTE: In the solo case, this should be a one-item list.
     Addresses:
-        - 172.16.18.8:7050
-        - 172.16.18.9:7050
+        - 172.16.15.66:7050
 
     # Batch Timeout: The amount of time to wait before creating a batch.
     BatchTimeout: 2s
@@ -373,7 +372,7 @@ Profiles:
         <<: *ChannelDefaults
         Orderer:
             <<: *OrdererDefaults
-            OrdererType: kafka
+            # OrdererType: kafka
             Organizations:
                 - <<: *OrdererA
                   Policies:
