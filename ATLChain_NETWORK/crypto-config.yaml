@@ -3,7 +3,6 @@
 # ---------------------------------------------------------------------------
 OrdererOrgs:
   - Name: OrdererA
-    # Domain or IP
     Domain: orga.atlchain.com
     Specs:
       - Hostname: orderer0
@@ -13,7 +12,6 @@ OrdererOrgs:
 # ---------------------------------------------------------------------------
 PeerOrgs:
   - Name: OrgA
-    # Domain or IP
     Domain: orga.atlchain.com
     EnableNodeOUs: true
     # Allows for the definition of 1 or more hosts that are created sequentially

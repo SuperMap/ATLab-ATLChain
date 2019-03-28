@@ -5,11 +5,6 @@ export FABRIC_CFG_PATH=${PWD}/ATLChain_NETWORK
 
 CHANNEL_NAME="atlchannel"
 ORG_DOMAIN_NAME="orga.atlchain.com"
-PEER_ADDRESS=172.16.15.66
-PEER_PORT=7051
-CHAINCODE_PORT=7052
-ORDERER_ADDRESS=172.16.15.66
-ORDERER_PORT=7050
 
 #compose files
 DOCKER_COMPOSE_FILE_KAFKA="docker-compose-kafka.yaml"
@@ -19,15 +14,18 @@ DOCKER_COMPOSE_FILE_CA="docker-compose-ca.yaml"
 DOCKER_COMPOSE_FILE_CLI="docker-compose-cli.yaml"
 
 # default compose project name
-export COMPOSE_PROJECT_NAME=atl
+export COMPOSE_PROJECT_NAME=atlproj
+export DOCKER_COMPOSE_PEER_ADDRESS=172.16.15.66
+export DOCKER_COMPOSE_PEER_GOSSIP_BOOTSTRAP=172.16.15.66 
 
 function printHelp() {
     echo "Usage: "
     echo "  atlchain.sh <mode> [<node>]"
-    echo "      <mode> - one of 'up', 'down', 'generate', 'clean'"
+    echo "      <mode> - one of 'up', 'down', 'genCerts', 'genArti', 'clean'"
     echo "        - 'up' - bring up the network with docker-compose up"
     echo "        - 'down' - clear the network with docker-compose down"
-    echo "        - 'generate' - generate crypto material and channel artifacts"
+    echo "        - 'genCerts' - generate crypto material"
+    echo "        - 'genArti' - generate channel artifacts"
     echo "        - 'clean' - clean files built during network running"
     echo "      <node> - one of 'orderer', 'peer', 'ca', 'cli'"
     echo "        - 'orderer' - orderer node"
@@ -35,7 +33,8 @@ function printHelp() {
     echo "        - 'ca' - ca node"
     echo "        - 'cli' - tool node, you can run commands in cli container"
     echo "e.g."
-    echo "  atlchain.sh generate"
+    echo "  atlchain.sh genCerts"
+    echo "  atlchain.sh genArti"
     echo "  atlchain.sh up orderer"
     echo "  atlchain.sh down peer"
 }
@@ -161,9 +160,9 @@ function startCLI() {
 
 # Remove the files generated
 function cleanFiles() {
-    rm -rf crypto-config/
-    rm -rf channel-artifacts/*
-    rm -rf production/
+    rm -rf crypto-config
+    rm -rf channel-artifacts
+    rm -rf production
 }
 
 function stopOrderer() {
@@ -219,14 +218,19 @@ shift
 # Determine whether starting or stopping
 if [ "$MODE" == "up" ]; then
     if [ "$NODE" == "kafka" ]; then
+        export COMPOSE_PROJECT_NAME=atlprojk
         startKafka
     elif [ "$NODE" == "orderer" ]; then
+        export COMPOSE_PROJECT_NAME=atlprojo
         startOrderer
     elif [ "$NODE" == "peer" ]; then
+        export COMPOSE_PROJECT_NAME=atlprojp
         startPeer
     elif [ "$NODE" == "ca" ]; then
+        export COMPOSE_PROJECT_NAME=atlprojc
         startCA
     elif [ "$NODE" == "cli" ]; then
+        export COMPOSE_PROJECT_NAME=atlprojcl
         startCLI
     # elif [ "$NODE" == "all" ]; then
     #     startAll
@@ -236,14 +240,19 @@ if [ "$MODE" == "up" ]; then
     fi
 elif [ "$MODE" == "down" ]; then
     if [ "$NODE" == "kafka" ]; then
+        export COMPOSE_PROJECT_NAME=atlprojk
         stopKafka
     elif [ "$NODE" == "orderer" ]; then
+        export COMPOSE_PROJECT_NAME=atlprojo
         stopOrderer
     elif [ "$NODE" == "peer" ]; then
+        export COMPOSE_PROJECT_NAME=atlprojp
         stopPeer
     elif [ "$NODE" == "ca" ]; then
+        export COMPOSE_PROJECT_NAME=atlprojc
         stopCA
     elif [ "$NODE" == "cli" ]; then
+        export COMPOSE_PROJECT_NAME=atlprojcl
         stopCLI
     # elif [ "$NODE" == "all" ]; then
     #     stopAll
