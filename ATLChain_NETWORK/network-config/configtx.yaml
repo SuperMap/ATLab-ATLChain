@@ -97,7 +97,7 @@ Organizations:
                 Rule: "OR('OrgA.admin')"
     
         AnchorPeers:
-            - Host: 127.0.0.1
+            - Host: peer0.orga.atlchain.com
               Port: 7051
     
     - &OrgB
@@ -119,7 +119,7 @@ Organizations:
                 Rule: "OR('OrgB.admin')"
 
         AnchorPeers:
-            - Host: 127.0.0.1
+            - Host: peer0.orgb.atlchain.com
               Port: 7051
 
 
@@ -303,7 +303,8 @@ Orderer: &OrdererDefaults
     # participation in ordering.
     # NOTE: In the solo case, this should be a one-item list.
     Addresses:
-        - 127.0.0.1:7050
+        - orderer.orga.atlchain.com:7050
+        - orderer.orgb.atlchain.com:7050
 
     # Batch Timeout: The amount of time to wait before creating a batch.
     BatchTimeout: 2s

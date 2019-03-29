@@ -22,20 +22,20 @@ General:
     LedgerType: file
 
     # Listen address: The IP on which to bind to listen.
-    ListenAddress: 127.0.0.1
+    ListenAddress: 0.0.0.0
 
     # Listen port: The port on which to bind to listen.
     ListenPort: 7050
 
     # TLS: TLS settings for the GRPC server.
     TLS:
-        Enabled: false
+        Enabled: true
         # PrivateKey governs the file location of the private key of the TLS certificate.
-        PrivateKey: tls/server.key
+        PrivateKey: ./crypto-config/ordererOrganizations/orga.atlchain.com/orderers/orderer.orga.atlchain.com/tls/server.key
         # Certificate governs the file location of the server TLS certificate.
-        Certificate: tls/server.crt
+        Certificate: ./crypto-config/ordererOrganizations/orga.atlchain.com/orderers/orderer.orga.atlchain.com/tls/server.crt
         RootCAs:
-          - tls/ca.crt
+          - ./crypto-config/ordererOrganizations/orga.atlchain.com/orderers/orderer.orga.atlchain.com/tls/ca.crt
         ClientAuthRequired: false
         ClientRootCAs:
     # Keepalive settings for the GRPC server.
