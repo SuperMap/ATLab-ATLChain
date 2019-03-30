@@ -204,6 +204,13 @@ function stopAll() {
     stopCLI
 }
 
+function addOrg() {
+
+    cryptogen generate --config=./orgc-crypto.yaml
+
+    configtxgen -printOrg OrgC > ./channel-artifacts/orgc.json
+}
+
 # Network config files in ATLChain_NETWORK directory
 cd ATLChain_NETWORK
 # untar bin package
@@ -275,6 +282,8 @@ elif [ "$MODE" == "generate" ]; then
     genChannelArtifacts
 elif [ "$MODE" == "clean" ]; then
     cleanFiles
+elif [ "$MODE" == "addorg" ]; then
+    addOrg
 else
     printHelp
     exit 1 
