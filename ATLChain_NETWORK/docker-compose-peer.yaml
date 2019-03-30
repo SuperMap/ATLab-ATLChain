@@ -7,22 +7,39 @@ networks:
     atln:
 
 services:
+    couchdb.orga.atlchain.com:
+        container_name: couchdb.orga.atlchain.com
+        image: hyperledger/fabric-couchdb:0.4.14
+        # Populate the COUCHDB_USER and COUCHDB_PASSWORD to set an admin user and password
+        # for CouchDB.  This will prevent CouchDB from operating in an "Admin Party" mode.
+        environment:
+            - COUCHDB_USER=
+            - COUCHDB_PASSWORD=
+        # Comment/Uncomment the port mapping if you want to hide/expose the CouchDB service,
+        # for example map it to utilize Fauxton User Interface in dev environments.
+        # ports:
+            # - "5984:5984"
+        networks:
+            - atln
+
     peer0.orga.atlchain.com:
         container_name: peer0.orga.atlchain.com
         image: hyperledger/fabric-peer:1.4.0
+        depends_on:
+            - couchdb.orga.atlchain.com
         environment:
             # peer env
             - CORE_PEER_ID=peer0.orga.atlchain.com
-            - CORE_PEER_ADDRESS=${DOCKER_COMPOSE_PEER_ADDRESS}:7051
+            - CORE_PEER_ADDRESS=${DOCKER_COMPOSE_PEER_ADDRESS}
             - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
-            - CORE_PEER_CHAINCODEADDRESS=${DOCKER_COMPOSE_PEER_ADDRESS}:7052
+            - CORE_PEER_CHAINCODEADDRESS=${DOCKER_COMPOSE_PEER_CC_ADDRESS}
             - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
-            - CORE_PEER_GOSSIP_BOOTSTRAP=${DOCKER_COMPOSE_PEER_GOSSIP_BOOTSTRAP}:7051
-            - CORE_PEER_GOSSIP_EXTERNALENDPOINT=${DOCKER_COMPOSE_PEER_ADDRESS}:7051
+            - CORE_PEER_GOSSIP_BOOTSTRAP=${DOCKER_COMPOSE_PEER_GOSSIP_BOOTSTRAP}
+            - CORE_PEER_GOSSIP_EXTERNALENDPOINT=${DOCKER_COMPOSE_PEER_ADDRESS}
             - CORE_PEER_LOCALMSPID=OrgA
             # state database
-            - CORE_LEDGER_STATE_STATEDATABASE= goleveldb # CouchDB
-            - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb0:5984
+            - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
+            - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb.orga.atlchain.com:5984
             - CORE_LEDGER_STATE_COUCHDBCONFIG_USERNAME=
             - CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD=
             # basic env
@@ -41,13 +58,12 @@ services:
         command: peer node start
         volumes:
             - /var/run/:/host/var/run/
+            - ./hosts:/etc/hosts
             - ./crypto-config/peerOrganizations/orga.atlchain.com/peers/peer0.orga.atlchain.com/msp:/etc/hyperledger/fabric/msp
             - ./crypto-config/peerOrganizations/orga.atlchain.com/peers/peer0.orga.atlchain.com/tls:/etc/hyperledger/fabric/tls
             - peer0.orga.atlchain.com:/var/hyperledger/production
         ports:
-          - 7051:7051
-          - 7052:7052
-          - 7053:7053
-
+          - 7061:7051
+          - 7062:7052
         networks:
             - atln

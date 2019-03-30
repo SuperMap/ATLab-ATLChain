@@ -15,8 +15,13 @@ DOCKER_COMPOSE_FILE_CLI="docker-compose-cli.yaml"
 
 # default compose project name
 export COMPOSE_PROJECT_NAME=atlproj
-export DOCKER_COMPOSE_PEER_ADDRESS=172.16.15.66
-export DOCKER_COMPOSE_PEER_GOSSIP_BOOTSTRAP=172.16.15.66 
+
+export DOCKER_COMPOSE_PEER_ADDRESS=peer0.orga.atlchain.com:7051
+export DOCKER_COMPOSE_PEER_CC_ADDRESS=peer0.orga.atlchain.com:7052
+export DOCKER_COMPOSE_PEER_GOSSIP_BOOTSTRAP=peer0.orga.atlchain.com:7051 
+
+export CORE_PEER_ADDRESS=peer0.orga.atlchain.com:7061 
+export ORERER_ADDRESS=orderer0.orga.atlchain.com:7060
 
 function printHelp() {
     echo "Usage: "
@@ -204,6 +209,7 @@ cd ATLChain_NETWORK
 # untar bin package
 if [ ! -d "bin" ] 
 then
+    echo "extract binary files..."
     tar xvf bin.tar.xz
 fi
 
@@ -263,6 +269,9 @@ elif [ "$MODE" == "down" ]; then
 elif [ "$MODE" == "genCerts" ]; then
     genCerts
 elif [ "$MODE" == "genArti" ]; then
+    genChannelArtifacts
+elif [ "$MODE" == "generate" ]; then
+    genCerts
     genChannelArtifacts
 elif [ "$MODE" == "clean" ]; then
     cleanFiles

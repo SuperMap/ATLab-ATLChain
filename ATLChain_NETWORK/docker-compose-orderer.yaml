@@ -27,11 +27,12 @@ services:
         working_dir: /opt/gopath/src/github.com/hyperledger/fabric
         command: orderer
         volumes:
+            - ./hosts:/etc/hosts
             - ./channel-artifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
             - ./crypto-config/ordererOrganizations/orga.atlchain.com/orderers/orderer0.orga.atlchain.com/msp:/var/hyperledger/orderer/msp
             - ./crypto-config/ordererOrganizations/orga.atlchain.com/orderers/orderer0.orga.atlchain.com/tls:/var/hyperledger/orderer/tls
             - orderer0.orga.atlchain.com:/var/hyperledger/production/orderer
         ports:
-          - 7050:7050
+          - 7060:7050
         networks:
             - atln

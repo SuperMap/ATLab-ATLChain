@@ -61,8 +61,8 @@ Organizations:
                 Type: Signature
                 Rule: "OR('OrgA.admin')"
         AnchorPeers:
-            - Host: 172.16.15.66 
-              Port: 7051
+            - Host: peer0.orga.atlchain.com
+              Port: 7061
     
 ################################################################################
 #
@@ -236,14 +236,14 @@ Orderer: &OrdererDefaults
 
     # Orderer Type: The orderer implementation to start.
     # Available types are "solo" and "kafka".
-    OrdererType: solo 
+    OrdererType: kafka
 
     # Addresses here is a nonexhaustive list of orderers the peers and clients can
     # connect to. Adding/removing nodes from this list has no impact on their
     # participation in ordering.
     # NOTE: In the solo case, this should be a one-item list.
     Addresses:
-        - 172.16.15.66:7050
+        - orderer0.orga.atlchain.com:7060
 
     # Batch Timeout: The amount of time to wait before creating a batch.
     BatchTimeout: 2s
@@ -291,7 +291,7 @@ Orderer: &OrdererDefaults
         # this list to identify the brokers of the ordering service.
         # NOTE: Use IP:port notation.
         Brokers:
-            - 172.16.15.66:9092
+            - kafka.atlchain.com:9092
 
     # Organizations lists the orgs participating on the orderer side of the
     # network.
@@ -372,7 +372,7 @@ Profiles:
         <<: *ChannelDefaults
         Orderer:
             <<: *OrdererDefaults
-            # OrdererType: kafka
+            OrdererType: kafka
             Organizations:
                 - <<: *OrdererA
                   Policies:
