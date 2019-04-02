@@ -7,6 +7,16 @@ OrdererOrgs:
     Specs:
       - Hostname: orderer0
 
+  - Name: OrdererB
+    Domain: orgb.atlchain.com
+    Specs:
+      - Hostname: orderer0
+
+  - Name: OrdererC
+    Domain: orgc.atlchain.com
+    Specs:
+      - Hostname: orderer0
+
 # ---------------------------------------------------------------------------
 # "PeerOrgs" - Definition of organizations managing peer nodes
 # ---------------------------------------------------------------------------
@@ -19,17 +29,25 @@ PeerOrgs:
     # You may override the number of nodes (Count), the starting index (Start)
     # or the template used to construct the name (Hostname).
     Template:
-      Count: 1
+      Count: 2
       # Start: 5
     Users:
     # Count: The number of user accounts _in addition_ to Admin
       Count: 2
 
     # Copy the following example when need more orgs
-    # - Name: OrgB
-    #   Domain: orgb.atlchain.com
-    #   EnableNodeOUs: true
-    #   Template:
-    #     Count: 2
-    #   Users:
-    #     Count: 2
+  - Name: OrgB
+    Domain: orgb.atlchain.com
+    EnableNodeOUs: true
+    Template:
+      Count: 2
+    Users:
+      Count: 2
+
+  - Name: OrgC
+    Domain: orgc.atlchain.com
+    EnableNodeOUs: true
+    Template:
+      Count: 2
+    Users:
+      Count: 2

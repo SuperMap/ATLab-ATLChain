@@ -46,6 +46,36 @@ Organizations:
                 Type: Signature
                 Rule: "OR('OrdererA.admin')"
 
+    - &OrdererB
+        Name: OrdererB
+        ID: OrdererB
+        MSPDir: ./crypto-config/ordererOrganizations/orgb.atlchain.com/msp
+        Policies: &OrdererBPolicies
+            Readers:
+                Type: Signature
+                Rule: "OR('OrdererB.member', 'OrdererB.admin', 'OrdererB.peer', 'OrdererB.client')" 
+            Writers:
+                Type: Signature
+                Rule: "OR('OrdererB.member', 'OrdererB.admin', 'OrdererB.peer', 'OrdererB.client')" 
+            Admins:
+                Type: Signature
+                Rule: "OR('OrdererB.admin')"
+
+    - &OrdererC
+        Name: OrdererC
+        ID: OrdererC
+        MSPDir: ./crypto-config/ordererOrganizations/orgc.atlchain.com/msp
+        Policies: &OrdererCPolicies
+            Readers:
+                Type: Signature
+                Rule: "OR('OrdererC.member', 'OrdererC.admin', 'OrdererC.peer', 'OrdererC.client')" 
+            Writers:
+                Type: Signature
+                Rule: "OR('OrdererC.member', 'OrdererC.admin', 'OrdererC.peer', 'OrdererC.client')" 
+            Admins:
+                Type: Signature
+                Rule: "OR('OrdererC.admin')"
+
     - &OrgA
         Name: OrgA
         ID: OrgA
@@ -64,6 +94,42 @@ Organizations:
             - Host: peer0.orga.atlchain.com
               Port: 7061
     
+    - &OrgB
+        Name: OrgB
+        ID: OrgB
+        MSPDir: ./crypto-config/peerOrganizations/orgb.atlchain.com/msp
+        Policies: &OrgBPolicies
+            Readers:
+                Type: Signature
+                Rule: "OR('OrgB.admin', 'OrgB.peer', 'OrgB.client', 'OrgB.member')"
+            Writers:
+                Type: Signature
+                Rule: "OR('OrgB.admin', 'OrgB.peer', 'OrgB.client', 'OrgB.member')"
+            Admins:
+                Type: Signature
+                Rule: "OR('OrgB.admin')"
+        AnchorPeers:
+            - Host: peer0.orgb.atlchain.com
+              Port: 7061
+    
+    - &OrgC
+        Name: OrgC
+        ID: OrgC
+        MSPDir: ./crypto-config/peerOrganizations/orgc.atlchain.com/msp
+        Policies: &OrgCPolicies
+            Readers:
+                Type: Signature
+                Rule: "OR('OrgC.admin', 'OrgC.peer', 'OrgC.client', 'OrgC.member')"
+            Writers:
+                Type: Signature
+                Rule: "OR('OrgC.admin', 'OrgC.peer', 'OrgC.client', 'OrgC.member')"
+            Admins:
+                Type: Signature
+                Rule: "OR('OrgC.admin')"
+        AnchorPeers:
+            - Host: peer0.orgc.atlchain.com
+              Port: 7061
+ 
 ################################################################################
 #
 #   CAPABILITIES
@@ -244,6 +310,8 @@ Orderer: &OrdererDefaults
     # NOTE: In the solo case, this should be a one-item list.
     Addresses:
         - orderer0.orga.atlchain.com:7060
+        - orderer0.orgb.atlchain.com:7060
+        - orderer0.orgc.atlchain.com:7060
 
     # Batch Timeout: The amount of time to wait before creating a batch.
     BatchTimeout: 2s
@@ -291,7 +359,7 @@ Orderer: &OrdererDefaults
         # this list to identify the brokers of the ordering service.
         # NOTE: Use IP:port notation.
         Brokers:
-            - kafka.atlchain.com:9092
+            - kafka0.atlchain.com:9092
 
     # Organizations lists the orgs participating on the orderer side of the
     # network.
@@ -375,21 +443,29 @@ Profiles:
             OrdererType: kafka
             Organizations:
                 - <<: *OrdererA
+                - <<: *OrdererB
+                - <<: *OrdererC
                   Policies:
                       <<: *OrdererAPolicies
+                      <<: *OrdererBPolicies
+                      <<: *OrdererCPolicies
                       Admins:
                           Type: Signature
-                          Rule: "OR('OrdererA.admin')"
+                          Rule: "OR('OrdererA.admin', 'OrdererB.admin', 'OrdererC.admin')"
                          
         Consortiums:
             SampleConsortium:
                 Organizations:
                     - <<: *OrgA
+                    - <<: *OrgB
+                    - <<: *OrgC
                       Policies:
                           <<: *OrgAPolicies
+                          <<: *OrgBPolicies
+                          <<: *OrgCPolicies
                           Admins:
                               Type: Signature
-                              Rule: "OR('OrgA.admin')"
+                              Rule: "OR('OrgA.admin', 'OrgB.admin', 'OrgC.admin')"
                           
     ## TxChannel Genesis Block
     TxChannel:
@@ -398,3 +474,5 @@ Profiles:
             <<: *ApplicationDefaults
             Organizations:
                 - <<: *OrgA
+                - <<: *OrgB
+                - <<: *OrgC

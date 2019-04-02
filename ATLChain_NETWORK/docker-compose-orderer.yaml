@@ -1,21 +1,21 @@
 version: '2'
 
 volumes:
-    orderer0.orga.atlchain.com:
+    orderer0.orgc.atlchain.com:
 
 networks:
   atln:
 
 services:
-    orderer0.orga.atlchain.com:
-        container_name: orderer0.orga.atlchain.com
+    orderer0.orgc.atlchain.com:
+        container_name: orderer0.orgc.atlchain.com
         image: hyperledger/fabric-orderer:1.4.0
         environment:
-            - FABRIC_LOGGING_SPEC=INFO
+            - FABRIC_LOGGING_SPEC=DEBUG
             - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
             - ORDERER_GENERAL_GENESISMETHOD=file
             - ORDERER_GENERAL_GENESISFILE=/var/hyperledger/orderer/orderer.genesis.block
-            - ORDERER_GENERAL_LOCALMSPID=OrdererA
+            - ORDERER_GENERAL_LOCALMSPID=OrdererC
             - ORDERER_GENERAL_LOCALMSPDIR=/var/hyperledger/orderer/msp
             # enabled TLS
             - ORDERER_GENERAL_TLS_ENABLED=true
@@ -29,9 +29,9 @@ services:
         volumes:
             - ./hosts:/etc/hosts
             - ./channel-artifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
-            - ./crypto-config/ordererOrganizations/orga.atlchain.com/orderers/orderer0.orga.atlchain.com/msp:/var/hyperledger/orderer/msp
-            - ./crypto-config/ordererOrganizations/orga.atlchain.com/orderers/orderer0.orga.atlchain.com/tls:/var/hyperledger/orderer/tls
-            - orderer0.orga.atlchain.com:/var/hyperledger/production/orderer
+            - ./crypto-config/ordererOrganizations/orgc.atlchain.com/orderers/orderer0.orgc.atlchain.com/msp:/var/hyperledger/orderer/msp
+            - ./crypto-config/ordererOrganizations/orgc.atlchain.com/orderers/orderer0.orgc.atlchain.com/tls:/var/hyperledger/orderer/tls
+            - orderer0.orgc.atlchain.com:/var/hyperledger/production/orderer
         ports:
           - 7060:7050
         networks:

@@ -4,8 +4,8 @@ networks:
     atln:
 
 services:
-    zookeeper.atlchain.com:
-        container_name: zookeeper.atlchain.com
+    zookeeper0.atlchain.com:
+        container_name: zookeeper0.atlchain.com
         image: hyperledger/fabric-zookeeper:0.4.14
         environment:
             ZOOKEEPER_CLIENT_PORT: 32181
@@ -13,15 +13,15 @@ services:
         networks:
             - atln
 
-    kafka.atlchain.com:
-      container_name: kafka.atlchain.com
+    kafka0.atlchain.com:
+      container_name: kafka0.atlchain.com
       image: hyperledger/fabric-kafka:0.4.14
       depends_on:
-          - zookeeper.atlchain.com
+          - zookeeper0.atlchain.com
       environment:
           - KAFKA_BROKER_ID=1
-          - KAFKA_ZOOKEEPER_CONNECT=zookeeper.atlchain.com:2181
-          - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka.atlchain.com:9092
+          - KAFKA_ZOOKEEPER_CONNECT=zookeeper0.atlchain.com:2181
+          - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka0.atlchain.com:9092
           - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
           - KAFKA_MESSAGE_MAX_BYTES=1048576 # 1 * 1024 * 1024 B
           - KAFKA_REPLICA_FETCH_MAX_BYTES=1048576 # 1 * 1024 * 1024 B

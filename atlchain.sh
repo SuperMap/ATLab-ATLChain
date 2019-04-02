@@ -4,7 +4,7 @@ export PATH=${PWD}/ATLChain_NETWORK/bin:$PATH
 export FABRIC_CFG_PATH=${PWD}/ATLChain_NETWORK
 
 CHANNEL_NAME="atlchannel"
-ORG_DOMAIN_NAME="orga.atlchain.com"
+ORG_DOMAIN_NAME="orgc.atlchain.com"
 
 #compose files
 DOCKER_COMPOSE_FILE_KAFKA="docker-compose-kafka.yaml"
@@ -16,12 +16,12 @@ DOCKER_COMPOSE_FILE_CLI="docker-compose-cli.yaml"
 # default compose project name
 export COMPOSE_PROJECT_NAME=atlproj
 
-export DOCKER_COMPOSE_PEER_ADDRESS=peer0.orga.atlchain.com:7051
-export DOCKER_COMPOSE_PEER_CC_ADDRESS=peer0.orga.atlchain.com:7052
-export DOCKER_COMPOSE_PEER_GOSSIP_BOOTSTRAP=peer0.orga.atlchain.com:7051 
+export DOCKER_COMPOSE_PEER_ADDRESS=peer0.orgc.atlchain.com:7051
+export DOCKER_COMPOSE_PEER_CC_ADDRESS=peer0.orgc.atlchain.com:7052
+export DOCKER_COMPOSE_PEER_GOSSIP_BOOTSTRAP=peer0.orgc.atlchain.com:7051 
 
-export CORE_PEER_ADDRESS=peer0.orga.atlchain.com:7061 
-export ORERER_ADDRESS=orderer0.orga.atlchain.com:7060
+export CORE_PEER_ADDRESS=peer0.orgc.atlchain.com:7061 
+export ORERER_ADDRESS=orderer0.orgc.atlchain.com:7060
 
 function printHelp() {
     echo "Usage: "
@@ -205,7 +205,6 @@ function stopAll() {
 }
 
 function addOrg() {
-
     cryptogen generate --config=./orgc-crypto.yaml
 
     configtxgen -printOrg OrgC > ./channel-artifacts/orgc.json
