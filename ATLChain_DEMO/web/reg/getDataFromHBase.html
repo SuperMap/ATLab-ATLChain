@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="jquery-2.1.4.min.js"></script>
+    <script src="js.js"></script>
+    <link rel="stylesheet" href="css.css">
+    <meta charset="utf-8">
+    <title>ATLChain</title>
+</head>
+
+<body>
+    <div id="bar">
+    </div>
+
+    <div id="header">
+    </div>
+
+    <div id="hbase_div">
+        <h2 style="text-align: center">获取HBASE数据</h2>
+        <form>
+            <fieldset>
+            <div id="content_hbase_div">
+                <p>
+                    <label for="key_hbase_label">数据哈希:</label>
+                    <input type="text" id="key_hbase_input">
+                </p>
+            </div>
+            <p>
+                <button type="button" id="hbase_btn">提交</button>
+            </p>
+            </fieldset>
+        </form>
+    </div>
+
+    <hr>
+
+    <div id="result_div">
+        <table width="100%" border="0" cellspacing="0" cellpadding="0" align="center">
+            <tr>
+                <td align="center" class="biaoti" height="60">查询结果</td>
+            </tr>
+        </table>
+        <table width="100%" border="0" cellspacing="1" cellpadding="4" bgcolor="#cccccc" class="tabtop13" align="center" id="result_input">
+
+        </table>
+    </div>
+</body>
+</html>
