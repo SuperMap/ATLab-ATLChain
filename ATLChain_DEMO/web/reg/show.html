@@ -9,6 +9,9 @@
 </head>
 
 <body>
+    <div id="bar">
+    </div>
+
     <div id="header">
     </div>
 
@@ -16,12 +19,33 @@
         <h2 style="text-align: center">展示记录</h2>
         <form>
             <fieldset>
-                <div id="content_show_div">
-                    <p>展示结果</p>
-                </div>
+                <table width="100%" border="0" cellspacing="1" cellpadding="4" bgcolor="#cccccc" class="tabtop13" align="center" id="show_result">
+                    <tr>
+                        <td><b> 编号： </b> 张三 </td>
+                    </tr>
+                    <tr>
+                        <td><b> 姓名： </b> 张三 展示记录展示记录展示记录展示记录展示记录展示记录展示记录展示记录展示记录展示记录展示记录展示记录 </td>
+                    </tr>
+                    <tr>
+                        <td><b> 日期： </b> 张三 </td>
+                    </tr>
+                    <tr>
+                        <td><b> 状态： </b> 张三 </td>
+                    </tr>
+                </table>
+                
+                <p>
+                    <label for="Prvkey_put_label">签名密钥（本地签名，不上传）:</label>
+                    <input type="file" id="Prvkey_put_input">
+                </p>
+                <p>
+                    <label for="Pubkey_put_label">身份证书:</label>
+                    <input type="file" id="Pubkey_put_input">
+                </p>
 
                 <p>
-                    <button type="button" id="show_btn">提交</button>
+                    <button type="button" id="show_commit">通过</button>
+                    <button type="button" id="show_reject">提交</button>
                 </p>
             </fieldset>
         </form>
