@@ -9,40 +9,36 @@
 </head>
 
 <body>
+    <div id="bar">
+    </div>
+
     <div id="header">
     </div>
 
     <div id="get_addr_div">
-        <h2 style="text-align: center">查询</h2>
+        <h2 style="text-align: center">查询记录</h2>
         <form>
             <fieldset>
-            <p>
-                <label for="Type_get_label">选择查询类型:</label>
-                <select id="get_select" style="height:25px">
-                    <option value="estate">不动产证书</option>
-                    <option value="transaction">数据记录</option>
-                </select>
-            </p>
-            <div id="content_get_div">
+                <div id="content_get_div">
+                    <p>
+                        <label for="ZZBH_op1_get_label">证照编号:</label>
+                        <input type="text" id="ZZBH_op1_get_input">
+                    </p>
+                    <p>
+                        <label for="CZZT_op1_get_label">持证主体:</label>
+                        <input type="text" id="CZZT_op1_get_input">
+                    </p>
+                    <p>
+                        <label for="RecordID_op1_get_label">交易ID:</label>
+                        <input type="text" id="RecordID_op1_get_input">
+                    </p>
+                </div>
                 <p>
-                    <label for="ZZBH_op1_get_label">证照编号:</label>
-                    <input type="text" id="ZZBH_op1_get_input">
+                    任填一项即可查询
                 </p>
                 <p>
-                    <label for="CZZT_op1_get_label">持证主体:</label>
-                    <input type="text" id="CZZT_op1_get_input">
+                    <button type="button" id="get_btn">提交查询</button>
                 </p>
-                <p>
-                    <label for="RecordID_op1_get_label">交易ID:</label>
-                    <input type="text" id="RecordID_op1_get_input">
-                </p>
-            </div>
-            <p>
-                任填一项即可查询
-            </p>
-            <p>
-                <button type="button" id="get_btn">提交查询</button>
-            </p>
             </fieldset>
         </form>
     </div>
@@ -56,7 +52,34 @@
             </tr>
         </table>
         <table width="100%" border="0" cellspacing="1" cellpadding="4" bgcolor="#cccccc" class="tabtop13" align="center" id="result_input">
-
+                <tr>
+                    <td><b> 证照编号： </b> a01 </td>
+                    <td><b> 持证主体： </b> 张三 </td>
+                    <td><b> 日期： </b> 20190203 </td>
+                    <td><b> 状态： </b> 已登记 </td>
+                    <td> <a href="show.html">详情</a> </td>
+                </tr>
+                <tr>
+                    <td><b> 证照编号： </b> a02 </td>
+                    <td><b> 持证主体： </b> 张三 </td>
+                    <td><b> 日期： </b> 20190311 </td>
+                    <td><b> 状态： </b> 已完税 </td>
+                    <td> <a href="show.html">详情</a> </td>
+                </tr>
+                <tr>
+                    <td><b> 证照编号： </b> a03 </td>
+                    <td><b> 持证主体： </b> 张三 </td>
+                    <td><b> 日期： </b> 20190422 </td>
+                    <td><b> 状态： </b> 已交易 </td>
+                    <td> <a href="show.html">详情</a> </td>
+                </tr>
+                <tr>
+                    <td><b> 证照编号： </b> a04 </td>
+                    <td><b> 持证主体： </b> 张三 </td>
+                    <td><b> 日期： </b> 20190109 </td>
+                    <td><b> 状态： </b> 税务驳回 </td>
+                    <td> <a href="show.html">详情</a> </td>
+                </tr>
         </table>
     </div>
 </body>

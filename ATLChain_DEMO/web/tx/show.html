@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="jquery-2.1.4.min.js"></script>
+    <script src="js.js"></script>
+    <link rel="stylesheet" href="css.css">
+    <meta charset="utf-8">
+    <title>ATLChain</title>
+</head>
+
+<body>
+    <div id="bar">
+    </div>
+
+    <div id="header">
+    </div>
+
+    <div id="show_addr_div">
+        <h2 style="text-align: center">展示记录</h2>
+        <form>
+            <fieldset>
+                <table width="100%" border="0" cellspacing="1" cellpadding="4" bgcolor="#cccccc" class="tabtop13" align="center" id="show_result">
+                    <tr>
+                        <td><b> 证照编号： </b> a01 </td>
+                    </tr>
+                    <tr>
+                        <td><b> 持证主体： </b> 张三 </td>
+                    </tr>
+                    <tr>
+                        <td><b> 日期： </b> 20190203 </td>
+                    </tr>
+                    <tr>
+                        <td><b> 不动产权证号： </b> 蒙(2016)XXXX旗不动产证明第0000118号 </td>
+                    </tr>
+                    <tr>
+                        <td><b> 权利人证件号： </b> 121522********727E </td>
+                    </tr>
+                    <tr>
+                        <td><b> 证照颁发机构： </b> XXX不动产登记机构 </td>
+                    </tr>
+                    <tr>
+                        <td><b> 证照颁发日期： </b> 2019年1月16日 </td>
+                    </tr>
+                    <tr>
+                        <td><b> 坐落： </b> XXX小区A12号楼1单元602室 </td>
+                    </tr>
+                    <tr>
+                        <td><b> 面积： </b> 宗地面积23942.21㎡ </td>
+                    </tr>
+                    <tr>
+                        <td><b> 状态： </b> 已登记 </td>
+                    </tr>
+                </table>
+                
+                <p>
+                    <label for="Prvkey_put_label">签名密钥（本地签名，不上传）:</label>
+                    <input type="file" id="Prvkey_put_input">
+                </p>
+                <p>
+                    <label for="Pubkey_put_label">身份证书:</label>
+                    <input type="file" id="Pubkey_put_input">
+                </p>
+
+                <p>
+                    <button type="button" id="show_commit">通过</button>
+                    <button type="button" id="show_reject">驳回</button>
+                </p>
+            </fieldset>
+        </form>
+    </div>
+</body>
+</html>
