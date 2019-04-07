@@ -4,7 +4,7 @@
 # blockchain network that are necessary for the applications to interact with it. These are all
 # knowledge that must be acquired from out-of-band sources. This file provides such a source.
 #
-name: "ATLChain-OrgA"
+name: "ATLChain-OrgC"
 
 #
 # Any properties with an "x-" prefix will be treated as application-specific, exactly like how naming
@@ -19,7 +19,7 @@ x-type: "hlfv1"
 #
 # Describe what the target network is/does.
 #
-description: "ATLChain - client definition for OrgA"
+description: "ATLChain - client definition for OrgC"
 
 #
 # Schema version of the content. Used by the SDK to apply the corresponding parsing rules.
@@ -32,7 +32,7 @@ version: "1.0"
 client:
   # Which organization does this application instance belong to? The value must be the name of an org
   # defined under "organizations"
-  organization: OrgA
+  organization: OrgC
 
   # Some SDKs support pluggable KV stores, the properties under "credentialStore"
   # are implementation specific
@@ -40,14 +40,14 @@ client:
     # [Optional]. Specific to FileKeyValueStore.js or similar implementations in other SDKs. Can be others
     # if using an alternative impl. For instance, CouchDBKeyValueStore.js would require an object
     # here for properties like url, db name, etc.
-    path: "./fabric-client-kv-orga"
+    path: "./fabric-client-kv-orgc"
 
     # [Optional]. Specific to the CryptoSuite implementation. Software-based implementations like
     # CryptoSuite_ECDSA_AES.js in node SDK requires a key store. PKCS#11 based implementations does
     # not.
     cryptoStore:
       # Specific to the underlying KeyValueStore that backs the crypto key store.
-      path: "./fabric-client-kv-orga"
+      path: "./fabric-client-kv-orgc"
 
     # [Optional]. Specific to Composer environment
     wallet: wallet-name

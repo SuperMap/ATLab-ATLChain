@@ -165,6 +165,15 @@ function startCLI() {
     fi
 }
 
+# Start a CA container
+function startCA() {
+    docker-compose -f ${DOCKER_COMPOSE_FILE_CA} up -d 2>&1
+    if [ $? -ne 0 ]; then
+        echo "ERROR !!!! Unable to start CA node"
+        exit 1
+    fi
+}
+
 # Remove the files generated
 function cleanFiles() {
     rm -rf crypto-config
@@ -190,6 +199,14 @@ function stopCA() {
 
 function stopCLI() {
     docker-compose -f ${DOCKER_COMPOSE_FILE_CLI} down 2>&1
+}
+
+function stopCA() {
+    docker-compose -f ${DOCKER_COMPOSE_FILE_CA} down 2>&1
+    if [ $? -ne 0 ]; then
+        echo "ERROR !!!! Unable to stop CA node"
+        exit 1
+    fi
 }
 
 function startAll() {
@@ -246,8 +263,8 @@ if [ "$MODE" == "up" ]; then
     elif [ "$NODE" == "cli" ]; then
         export COMPOSE_PROJECT_NAME=atlprojcl
         startCLI
-    # elif [ "$NODE" == "all" ]; then
-    #     startAll
+    elif [ "$NODE" == "all" ]; then
+        startAll
     else 
         printHelp
         exit 1
@@ -268,8 +285,8 @@ elif [ "$MODE" == "down" ]; then
     elif [ "$NODE" == "cli" ]; then
         export COMPOSE_PROJECT_NAME=atlprojcl
         stopCLI
-    # elif [ "$NODE" == "all" ]; then
-    #     stopAll
+    elif [ "$NODE" == "all" ]; then
+        stopAll
     else 
         printHelp
         exit 1

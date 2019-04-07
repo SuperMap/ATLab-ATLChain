@@ -45,6 +45,8 @@ channels:
     # be "names" of orgs defined under "organizations/peers"
     orderers:
       - orderer0.orga.atlchain.com
+      - orderer0.orgb.atlchain.com
+      - orderer0.orgc.atlchain.com
 
     # Required. list of peers from participating orgs
     peers:
@@ -132,9 +134,9 @@ organizations:
     # this way. The SDK should allow applications to set the org admin identity via APIs, and only use
     # this route as an alternative when it exists.
     adminPrivateKey:
-      path: ../../crypto/peerOrganizations/orga.atlchain.com/users/Admin@orga.atlchain.com/msp/keystore/ADMIN_ORGA_PRIVATE_KEY
+      path: ../../ATLChain_NETWORK/crypto-config/peerOrganizations/orga.atlchain.com/users/Admin@orga.atlchain.com/msp/keystore/9de084ee2da133b54ce77ad76249b473b1c3d9d14c67b11536f2a3e138f14280_sk
     signedCert:
-      path: ../../crypto/peerOrganizations/orga.atlchain.com/users/Admin@orga.atlchain.com/msp/signcerts/Admin@orga.atlchain.com-cert.pem
+      path: ../../ATLChain_NETWORK/crypto-config/peerOrganizations/orga.atlchain.com/users/Admin@orga.atlchain.com/msp/signcerts/Admin@orga.atlchain.com-cert.pem
 
   # the profile will contain public information about organizations other than the one it belongs to.
   # These are necessary information to make transaction lifecycles work, including MSP IDs and
@@ -149,9 +151,9 @@ organizations:
     certificateAuthorities:
       - ca0.orgb.atlchain.com
     adminPrivateKey:
-      path: ../../crypto/peerOrganizations/orgb.atlchain.com/users/Admin@orgb.atlchain.com/msp/keystore/ADMIN_ORGB_PRIVATE_KEY
+      path: ../../ATLChain_NETWORK/crypto-config/peerOrganizations/orgb.atlchain.com/users/Admin@orgb.atlchain.com/msp/keystore/1429b25795a92c244661014541432c444c0ff01dd37ba1f769c7bc2a5ddc14b2_sk
     signedCert:
-      path: ../../crypto/peerOrganizations/orgb.atlchain.com/users/Admin@orgb.atlchain.com/msp/signcerts/Admin@orgb.atlchain.com-cert.pem
+      path: ../../ATLChain_NETWORK/crypto-config/peerOrganizations/orgb.atlchain.com/users/Admin@orgb.atlchain.com/msp/signcerts/Admin@orgb.atlchain.com-cert.pem
 
   OrgC:
     mspid: OrgC
@@ -161,9 +163,9 @@ organizations:
     certificateAuthorities:
       - ca0.orgc.atlchain.com
     adminPrivateKey:
-      path: ../../crypto/peerOrganizations/orgc.atlchain.com/users/Admin@orgc.atlchain.com/msp/keystore/ADMIN_ORGC_PRIVATE_KEY
+      path: ../../ATLChain_NETWORK/crypto-config/peerOrganizations/orgc.atlchain.com/users/Admin@orgc.atlchain.com/msp/keystore/7f1c2b2e4c7960f9a84e1d1434744c93e4e8088ef3504d36827e02e46d7a1e1c_sk
     signedCert:
-      path: ../../crypto/peerOrganizations/orgc.atlchain.com/users/Admin@orgc.atlchain.com/msp/signcerts/Admin@orgc.atlchain.com-cert.pem
+      path: ../../ATLChain_NETWORK/crypto-config/peerOrganizations/orgc.atlchain.com/users/Admin@orgc.atlchain.com/msp/signcerts/Admin@orgc.atlchain.com-cert.pem
 #
 # List of orderers to send transaction and channel create/update requests to. For the time
 # being only one orderer is needed. If more than one is defined, which one get used by the

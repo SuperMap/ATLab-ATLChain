@@ -1,7 +1,7 @@
 // enroll
 
-var RESTURL = "http://127.0.0.1:10002";
-var FileURL = "http://127.0.0.1:10001";
+var RESTURL = "http://127.0.0.1:4000";
+var FileURL = "http://127.0.0.1:4444";
 
 $(document).ready(function(){
     // 设置预设值
@@ -433,7 +433,7 @@ $(document).ready(function(){
             },
             success:function(data){
                 console.log(data);
-                $("#result_input").html(FormatOutputUsual(data));
+                $("#result_input").html(FormatOutputTable(data));
                 if(data == "[]"){
                     alert("未查询到结果");
                 }
@@ -693,6 +693,114 @@ function FormatOutputHDFS(data){
 
 function FormatOutputText(data){
     return "<p>" + data + "</p>"
+}
+
+function FormatOutputTable(data){
+    var jsonData = JSON.parse(data);
+    // console.log(jsonData);
+
+    var str = "<tr>";
+    var keyName = "";
+    for(var i = 0; i < jsonData.length; i++){
+        str += "<td><b> 序号： </b>" + (i+1) + "</td>";
+        for(var key in jsonData[i]){
+            if(key == "Key"){
+                continue;
+            }
+            if(key == "TxId"){
+                continue;
+            }
+            switch(key) {
+                case "TxId":
+                    keyName = "FabricTxID";
+                    break;
+                case "Timestamp":
+                    keyName = "时间戳";
+                    break;
+                case "IsDelete":
+                    keyName = "是否删除";
+                    break;
+                default:
+                    break;
+            }
+            if(key == "Value" || key == "Record"){
+                str += "<p><label><b>交易ID:</b></label>" + jsonData[i][key]["recordID"] + "</p>";
+                if(!jsonData[i][key].hasOwnProperty("parentRecordID")){
+                    str += "<p><label><b>父交易ID:</b></label>" + jsonData[i][key]["parentTxID"] + "</p>";
+                } else {
+                    str += "<p><label><b>父交易ID:</b></label>" + jsonData[i][key]["parentRecordID"] + "</p>";
+                }
+                for(var key2 in jsonData[i][key]){
+                    switch(key2) {
+                        case "signature":
+                            keyName = "数字签名";
+                            break;
+                        // transaction
+                        case "hash":
+                            keyName = "数据哈希";
+                            break;
+                        case "parentRecordID":
+                        case "parentTxID":
+                            keyName = "父交易ID";
+                            break;
+                        case "price":
+                            keyName = "价格";
+                            break;
+                        case "addrrec":
+                            keyName = "接收方地址";
+                            break;
+                        case "addrsend":
+                            keyName = "发送方地址";
+                            break;
+                        case "storageType":
+                            keyName = "存储类型";
+                            break;
+                        case "recordID":
+                            keyName = "交易ID";
+                            break;
+                        // estate
+                        case "ZZBH":
+                            keyName = "证照编号";
+                            break;
+                        case "KZ_BDCQZH":
+                            keyName = "不动产权证号";
+                            break;
+                        case "CZZT":
+                            keyName = "持证主体";
+                            break;
+                        case "KZ_QLRZJH":
+                            keyName = "权利人证件号";
+                            break;
+                        case "ZZBFJG":
+                            keyName = "证照颁发机构";
+                            break;
+                        case "ZZBFRQ":
+                            keyName = "证照颁发日期";
+                            break;
+                        case "KZ_ZL":
+                            keyName = "坐落";
+                            break;
+                        case "KZ_MJ":
+                            keyName = "面积";
+                            break;
+                        default:
+                            break;
+                    }
+                    if(keyName == "交易ID" || keyName == "父交易ID"){
+                        continue;
+                    }
+
+                    str += "<td><b> " + keyName + ":</b>" + jsonData[i][key][key2] + "</td>";
+                    keyName = "null";
+                }
+            } else {
+                str += "<td><b> " + keyName + ":</b>" + jsonData[i][key][key2] + "</td>";
+                keyName = "null";
+            }
+        }
+    str += "<td> <a href=\"show.html\">详情</a> </td></tr>"
+    }
+    return str;
 }
 
 function FormatOutputUsual(data){

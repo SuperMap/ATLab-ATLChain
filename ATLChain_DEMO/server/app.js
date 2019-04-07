@@ -149,7 +149,7 @@ app.post('/login', async function(req, res) {
 
     var jsonObj = JSON.parse(cert);
     var filename = jsonObj.enrollment.signingIdentity + "-pub";
-    var address = account.getAddress('./fabric-client-kv-orga/' + filename);
+    var address = account.getAddress('./fabric-client-kv-orgc/' + filename);
 
     console.log("address:" + address);
 
@@ -191,19 +191,19 @@ app.post('/users', async function(req, res) {
 	logger.debug('-- returned from registering the username %s for organization %s',username,orgName);
 	if (response && typeof response !== 'string') {
 
-        var fdata = fs.readFileSync('./fabric-client-kv-orga/' + username);
+        var fdata = fs.readFileSync('./fabric-client-kv-orgc/' + username);
         var jsonObj = JSON.parse(fdata);
         var filename = jsonObj.enrollment.signingIdentity + "-priv";
         var pubkeyFile = jsonObj.enrollment.signingIdentity + "-pub";
         
 		logger.debug("private key file: " + filename);
         
-        fs.writeFileSync('../web/public/msp/' + username, fdata);
-        fs.writeFileSync('../web/public/msp/' + filename, fs.readFileSync('./fabric-client-kv-orga/' + filename));
+        fs.writeFileSync('../web/reg/msp/' + username, fdata);
+        fs.writeFileSync('../web/reg/msp/' + filename, fs.readFileSync('./fabric-client-kv-orgc/' + filename));
 
 		logger.debug('Successfully registered the username %s for organization %s',username,orgName);
         response.filename = filename;
-		response.address = account.getAddress('./fabric-client-kv-orga/' + pubkeyFile);
+		response.address = account.getAddress('./fabric-client-kv-orgc/' + pubkeyFile);
         console.log("username:" + username);
 		logger.debug("address: " + response.address);
 		res.json(response);
@@ -326,7 +326,7 @@ app.post('/channels/:channelName/chaincodes/:chaincodeName/putTx', async functio
             })
             break;
         case "hdfs" :
-            await fs.writeFileSync('../web/public/tmp/' + hash, data);
+            await fs.writeFileSync('../web/reg/tmp/' + hash, data);
 
             // hdfsClient.put("/tmp/" + hash, hdfsDir + hash, function(){
             //     logger.info("Put into HDFS finish");
@@ -407,7 +407,7 @@ app.post('/channels/:channelName/chaincodes/:chaincodeName/AddRecord', async fun
             })
             break;
         case "hdfs" :
-            await fs.writeFileSync('../web/public/tmp/' + hash, imgdata, 'binary');
+            await fs.writeFileSync('../web/reg/tmp/' + hash, imgdata, 'binary');
 
             // hdfsClient.put("/tmp/" + hash, hdfsDir + hash, function(){
             //     logger.info("Put into HDFS finish");
