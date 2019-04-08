@@ -79,10 +79,6 @@ tls:
 #  root CA certificate.
 #############################################################################
 ca:
-  
-  # keyfile: ./msp/keystore/223dfce6d48623a6f0caada4bacc64f38f7a9b37be2543d76d992d778ec41559_sk
-  # certfile: ./ca.orgb.atlchain.com-cert.pem
-  
   # Name of this CA
   name: ca-orga
   # Key file (is only used to import a private key into BCCSP)

@@ -3,9 +3,9 @@
 CHANNEL_NAME=$1
 CC_SRC_PATH="github.com/chaincode/"
 
-export ORERER_ADDRESS=orderer0.orga.atlchain.com:7060
-export PEER_ADDRESS=peer0.orga.atlchain.com:7061 
-export PEER_TLS_CERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/orga.atlchain.com/peers/peer0.orga.atlchain.com/tls/server.crt
+export ORERER_ADDRESS=orderer0.orgc.atlchain.com:7060
+export PEER_ADDRESS=peer0.orgc.atlchain.com:7061 
+export PEER_TLS_CERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/orgc.atlchain.com/peers/peer0.orgc.atlchain.com/tls/server.crt
 
 echo
 echo " ____    _____      _      ____    _____ "
@@ -74,31 +74,31 @@ fi
 
 sleep 5
 
-# # invoke 
-# PEER0_ORGA_CA=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/orga.atlchain.com/peers/peer0.orga.atlchain.com/tls/ca.crt
-# set -x
-# peer chaincode invoke -o ${ORERER_ADDRESS} -C $CHANNEL_NAME -n atlchainCC --peerAddresses ${PEER_ADDRESS} --tlsRootCertFiles ${PEER_TLS_CERT_FILE} -c '{"Args":["Put", "tryPutkey", "{\"tryAddrReceive\":\"trytestAddrA\", \"tryAddrSend\":\"trytestAddrB\"}", "trysignagure", "trypubKey"]}' --tls true --cafile $ORDERER_CA >& log.txt
-# res=$?
-# set +x
-# if [ $res -ne 0 ]; then
-#     echo "===========$res============="
-#     echo " ERROR !!! FAILED to invoke chaincode"
-#     # exit 1
-# fi
-# 
-# sleep 20
-# 
-# # query
-# set -x
-# peer chaincode query -o ${ORERER_ADDRESS} -C $CHANNEL_NAME -n atlchainCC --peerAddresses ${PEER_ADDRESS} --tlsRootCertFiles ${PEER_TLS_CERT_FILE} --tls true --cafile $ORDERER_CA -c '{"Args":["Get", "{\"tryAddrSend\":\"trytestAddrB\"}"]}' >& log.txt
-# res=$?
-# set +x
-# cat log.txt   
-# if [ $res -ne 0 ]; then
-#     echo "===========$res============="
-#     echo " ERROR !!! FAILED to query chaincode"
-#     exit 1
-# fi
+# invoke 
+PEER0_ORGA_CA=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/orgc.atlchain.com/peers/peer0.orgc.atlchain.com/tls/ca.crt
+set -x
+peer chaincode invoke -o ${ORERER_ADDRESS} -C $CHANNEL_NAME -n atlchainCC --peerAddresses ${PEER_ADDRESS} --tlsRootCertFiles ${PEER_TLS_CERT_FILE} -c '{"Args":["Put", "tryPutkey", "{\"tryAddrReceive\":\"trytestAddrA\", \"tryAddrSend\":\"trytestAddrB\"}", "trysignagure", "trypubKey"]}' --tls true --cafile $ORDERER_CA >& log.txt
+res=$?
+set +x
+if [ $res -ne 0 ]; then
+    echo "===========$res============="
+    echo " ERROR !!! FAILED to invoke chaincode"
+    # exit 1
+fi
+
+sleep 20
+
+# query
+set -x
+peer chaincode query -o ${ORERER_ADDRESS} -C $CHANNEL_NAME -n atlchainCC --peerAddresses ${PEER_ADDRESS} --tlsRootCertFiles ${PEER_TLS_CERT_FILE} --tls true --cafile $ORDERER_CA -c '{"Args":["Get", "{\"tryAddrSend\":\"trytestAddrB\"}"]}' >& log.txt
+res=$?
+set +x
+cat log.txt   
+if [ $res -ne 0 ]; then
+    echo "===========$res============="
+    echo " ERROR !!! FAILED to query chaincode"
+    exit 1
+fi
 
 echo
 echo "========= All GOOD, network built successfully=========== "

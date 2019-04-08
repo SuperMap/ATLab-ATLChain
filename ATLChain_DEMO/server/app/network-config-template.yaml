@@ -122,7 +122,7 @@ organizations:
     # dynamic certificate management (enroll, revoke, re-enroll). The following section is only for
     # Fabric-CA servers.
     certificateAuthorities:
-      - ca0.orga.atlchain.com
+      - ca.orga.atlchain.com
 
     # [Optional]. If the application is going to make requests that are reserved to organization
     # administrators, including creating/updating channels, installing/instantiating chaincodes, it
@@ -147,7 +147,7 @@ organizations:
       - peer0.orgb.atlchain.com
       - peer1.orgb.atlchain.com
     certificateAuthorities:
-      - ca0.orgb.atlchain.com
+      - ca.orgb.atlchain.com
     adminPrivateKey:
       path: ../../crypto/peerOrganizations/orgb.atlchain.com/users/Admin@orgb.atlchain.com/msp/keystore/ADMIN_ORGB_PRIVATE_KEY
     signedCert:
@@ -159,7 +159,7 @@ organizations:
       - peer0.orgc.atlchain.com
       - peer1.orgc.atlchain.com
     certificateAuthorities:
-      - ca0.orgc.atlchain.com
+      - ca.orgc.atlchain.com
     adminPrivateKey:
       path: ../../crypto/peerOrganizations/orgc.atlchain.com/users/Admin@orgc.atlchain.com/msp/keystore/ADMIN_ORGC_PRIVATE_KEY
     signedCert:
@@ -259,8 +259,8 @@ peers:
 # Certificate Authority instead of Fabric-CA, in which case this section would not be specified.
 #
 certificateAuthorities:
-  ca0.orga.atlchain.com:
-    url: http://ca0.orga.atlchain.com:7054
+  ca.orga.atlchain.com:
+    url: http://ca.orga.atlchain.com:7054
     # the properties specified under this object are passed to the 'http' client verbatim when
     # making the request to the Fabric-CA server
     httpOptions:
@@ -276,8 +276,8 @@ certificateAuthorities:
     # [Optional] The optional name of the CA.
     caName: ca-orga
 
-  ca0.orgb.atlchain.com:
-    url: https://ca0.orgb.atlchain.com:7054
+  ca.orgb.atlchain.com:
+    url: https://ca.orgb.atlchain.com:7054
     httpOptions:
       verify: false
     tlsCACerts:
@@ -288,8 +288,8 @@ certificateAuthorities:
     # [Optional] The optional name of the CA.
     caName: ca-orgb
 
-  ca0.orgc.atlchain.com:
-    url: https://ca0.orgc.atlchain.com:7054
+  ca.orgc.atlchain.com:
+    url: https://ca.orgc.atlchain.com:7054
     httpOptions:
       verify: false
     tlsCACerts:

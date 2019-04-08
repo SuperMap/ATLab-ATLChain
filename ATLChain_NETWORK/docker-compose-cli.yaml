@@ -17,7 +17,7 @@ services:
             - CORE_PEER_ID=cli
             - CORE_PEER_ADDRESS=${CORE_PEER_ADDRESS}
             - CORE_PEER_LOCALMSPID=OrgC
-            - CORE_PEER_TLS_ENABLED=true
+            - CORE_PEER_TLS_ENABLED=false
             - CORE_PEER_TLS_CERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/orgc.atlchain.com/peers/peer0.orgc.atlchain.com/tls/server.crt
             - CORE_PEER_TLS_KEY_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/orgc.atlchain.com/peers/peer0.orgc.atlchain.com/tls/server.key
             - CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/orgc.atlchain.com/peers/peer0.orgc.atlchain.com/tls/ca.crt

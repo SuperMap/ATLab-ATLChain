@@ -46,7 +46,7 @@ channels:
     orderers:
       - orderer0.orga.atlchain.com
       - orderer0.orgb.atlchain.com
-      - orderer0.orgc.atlchain.com
+      #- orderer0.orgc.atlchain.com
 
     # Required. list of peers from participating orgs
     peers:
@@ -88,17 +88,17 @@ channels:
         ledgerQuery: true
         eventSource: false
 
-      peer0.orgc.atlchain.com:
-        endorsingPeer: true
-        chaincodeQuery: true
-        ledgerQuery: true
-        eventSource: true
+      # peer0.orgc.atlchain.com:
+      #   endorsingPeer: true
+      #   chaincodeQuery: true
+      #   ledgerQuery: true
+      #   eventSource: true
 
-      peer1.orgc.atlchain.com:
-        endorsingPeer: false
-        chaincodeQuery: true
-        ledgerQuery: true
-        eventSource: false
+      # peer1.orgc.atlchain.com:
+      #   endorsingPeer: false
+      #   chaincodeQuery: true
+      #   ledgerQuery: true
+      #   eventSource: false
 
     # [Optional]. what chaincodes are expected to exist on this channel? The application can use
     # this information to validate that the target peers are in the expected state by comparing
@@ -124,7 +124,7 @@ organizations:
     # dynamic certificate management (enroll, revoke, re-enroll). The following section is only for
     # Fabric-CA servers.
     certificateAuthorities:
-      - ca0.orga.atlchain.com
+      - ca.orga.atlchain.com
 
     # [Optional]. If the application is going to make requests that are reserved to organization
     # administrators, including creating/updating channels, installing/instantiating chaincodes, it
@@ -134,9 +134,9 @@ organizations:
     # this way. The SDK should allow applications to set the org admin identity via APIs, and only use
     # this route as an alternative when it exists.
     adminPrivateKey:
-      path: ../../ATLChain_NETWORK/crypto-config/peerOrganizations/orga.atlchain.com/users/Admin@orga.atlchain.com/msp/keystore/9de084ee2da133b54ce77ad76249b473b1c3d9d14c67b11536f2a3e138f14280_sk
+      path: ../../ATLChain_NETWORK/network-config/crypto-config/peerOrganizations/orga.atlchain.com/users/Admin@orga.atlchain.com/msp/keystore/ffde6c081ccdbc5775b9949248399b4b61fe42d82a5e819ff07570508715360e_sk
     signedCert:
-      path: ../../ATLChain_NETWORK/crypto-config/peerOrganizations/orga.atlchain.com/users/Admin@orga.atlchain.com/msp/signcerts/Admin@orga.atlchain.com-cert.pem
+      path: ../../ATLChain_NETWORK/network-config/crypto-config/peerOrganizations/orga.atlchain.com/users/Admin@orga.atlchain.com/msp/signcerts/Admin@orga.atlchain.com-cert.pem
 
   # the profile will contain public information about organizations other than the one it belongs to.
   # These are necessary information to make transaction lifecycles work, including MSP IDs and
@@ -149,23 +149,23 @@ organizations:
       - peer0.orgb.atlchain.com
       - peer1.orgb.atlchain.com
     certificateAuthorities:
-      - ca0.orgb.atlchain.com
+      - ca.orgb.atlchain.com
     adminPrivateKey:
-      path: ../../ATLChain_NETWORK/crypto-config/peerOrganizations/orgb.atlchain.com/users/Admin@orgb.atlchain.com/msp/keystore/1429b25795a92c244661014541432c444c0ff01dd37ba1f769c7bc2a5ddc14b2_sk
+      path: ../../ATLChain_NETWORK/network-config/crypto-config/peerOrganizations/orgb.atlchain.com/users/Admin@orgb.atlchain.com/msp/keystore/3fe3d3738596d02c7ed76a1dc345dd54ddb9498a26a020bb175f0e6d59c8dcfc_sk
     signedCert:
-      path: ../../ATLChain_NETWORK/crypto-config/peerOrganizations/orgb.atlchain.com/users/Admin@orgb.atlchain.com/msp/signcerts/Admin@orgb.atlchain.com-cert.pem
+      path: ../../ATLChain_NETWORK/network-config/crypto-config/peerOrganizations/orgb.atlchain.com/users/Admin@orgb.atlchain.com/msp/signcerts/Admin@orgb.atlchain.com-cert.pem
 
-  OrgC:
-    mspid: OrgC
-    peers:
-      - peer0.orgc.atlchain.com
-      - peer1.orgc.atlchain.com
-    certificateAuthorities:
-      - ca0.orgc.atlchain.com
-    adminPrivateKey:
-      path: ../../ATLChain_NETWORK/crypto-config/peerOrganizations/orgc.atlchain.com/users/Admin@orgc.atlchain.com/msp/keystore/7f1c2b2e4c7960f9a84e1d1434744c93e4e8088ef3504d36827e02e46d7a1e1c_sk
-    signedCert:
-      path: ../../ATLChain_NETWORK/crypto-config/peerOrganizations/orgc.atlchain.com/users/Admin@orgc.atlchain.com/msp/signcerts/Admin@orgc.atlchain.com-cert.pem
+  # OrgC:
+  #   mspid: OrgC
+  #   peers:
+  #     - peer0.orgc.atlchain.com
+  #     - peer1.orgc.atlchain.com
+  #   certificateAuthorities:
+  #     - ca.orgc.atlchain.com
+  #   adminPrivateKey:
+  #     path: ../../ATLChain_NETWORK/network-config/crypto-config/peerOrganizations/orgc.atlchain.com/users/Admin@orgc.atlchain.com/msp/keystore/fa7dd7a43ff394446031ad81c4dbf579c13b4ff789fd8894c5e96355c71603d2_sk
+  #   signedCert:
+  #     path: ../../ATLChain_NETWORK/network-config/crypto-config/peerOrganizations/orgc.atlchain.com/users/Admin@orgc.atlchain.com/msp/signcerts/Admin@orgc.atlchain.com-cert.pem
 #
 # List of orderers to send transaction and channel create/update requests to. For the time
 # being only one orderer is needed. If more than one is defined, which one get used by the
@@ -173,7 +173,7 @@ organizations:
 #
 orderers:
   orderer0.orga.atlchain.com:
-    url: grpc://orderer0.orga.atlchain.com:7060
+    url: grpc://orderer0.orga.atlchain.com:7050
 
     # these are standard properties defined by the gRPC library
     # they will be passed in as-is to gRPC client constructor
@@ -184,7 +184,7 @@ orderers:
       path:
 
   orderer0.orgb.atlchain.com:
-    url: grpc://orderer0.orgb.atlchain.com:7060
+    url: grpc://orderer0.orgb.atlchain.com:7050
 
     # these are standard properties defined by the gRPC library
     # they will be passed in as-is to gRPC client constructor
@@ -194,16 +194,16 @@ orderers:
     tlsCACerts:
       path: 
 
-  orderer0.orgc.atlchain.com:
-    url: grpc://orderer0.orgc.atlchain.com:7060
+  # orderer0.orgc.atlchain.com:
+  #   url: grpc://orderer0.orgc.atlchain.com:7060
 
-    # these are standard properties defined by the gRPC library
-    # they will be passed in as-is to gRPC client constructor
-    grpcOptions:
-      ssl-target-name-override: orderer0.orgc.atlchain.com
+  #   # these are standard properties defined by the gRPC library
+  #   # they will be passed in as-is to gRPC client constructor
+  #   grpcOptions:
+  #     ssl-target-name-override: orderer0.orgc.atlchain.com
 
-    tlsCACerts:
-      path: 
+  #   tlsCACerts:
+  #     path: 
 
 #
 # List of peers to send various requests to, including endorsement, query
@@ -212,48 +212,48 @@ orderers:
 peers:
   peer0.orga.atlchain.com:
     # this URL is used to send endorsement and query requests
-    url: grpc://peer0.orga.atlchain.com:7061
+    url: grpc://peer0.orga.atlchain.com:7051
     grpcOptions:
       ssl-target-name-override: peer0.orga.atlchain.com
     tlsCACerts:
       path: 
 
   peer1.orga.atlchain.com:
-    url: grpc://peer1.orga.atlchain.com:7061
+    url: grpc://peer1.orga.atlchain.com:7051
     grpcOptions:
       ssl-target-name-override: peer1.orga.atlchain.com
     tlsCACerts:
       path: 
 
   peer0.orgb.atlchain.com:
-    url: grpc://peer0.orgb.atlchain.com:7061
+    url: grpc://peer0.orgb.atlchain.com:7051
     grpcOptions:
       ssl-target-name-override: peer0.orgb.atlchain.com
     tlsCACerts:
       path: 
 
   peer1.orgb.atlchain.com:
-    url: grpc://peer1.orgb.atlchain.com:7061
-    eventUrl: grpc://peer1.orgb.atlchain.com:7063
+    url: grpc://peer1.orgb.atlchain.com:7051
+    eventUrl: grpc://peer1.orgb.atlchain.com:7053
     grpcOptions:
       ssl-target-name-override: peer1.orgb.atlchain.com
     tlsCACerts:
       path: 
 
-  peer0.orgc.atlchain.com:
-    url: grpc://peer0.orgc.atlchain.com:7061
-    grpcOptions:
-      ssl-target-name-override: peer0.orgc.atlchain.com
-    tlsCACerts:
-      path: 
+  # peer0.orgc.atlchain.com:
+  #   url: grpc://peer0.orgc.atlchain.com:7061
+  #   grpcOptions:
+  #     ssl-target-name-override: peer0.orgc.atlchain.com
+  #   tlsCACerts:
+  #     path: 
 
-  peer1.orgc.atlchain.com:
-    url: grpc://peer1.orgc.atlchain.com:7061
-    eventUrl: grpc://peer1.orgc.atlchain.com:7063
-    grpcOptions:
-      ssl-target-name-override: peer1.orgc.atlchain.com
-    tlsCACerts:
-      path: 
+  # peer1.orgc.atlchain.com:
+  #   url: grpc://peer1.orgc.atlchain.com:7061
+  #   eventUrl: grpc://peer1.orgc.atlchain.com:7063
+  #   grpcOptions:
+  #     ssl-target-name-override: peer1.orgc.atlchain.com
+  #   tlsCACerts:
+  #     path: 
 
 #
 # Fabric-CA is a special kind of Certificate Authority provided by Hyperledger Fabric which allows
@@ -261,8 +261,8 @@ peers:
 # Certificate Authority instead of Fabric-CA, in which case this section would not be specified.
 #
 certificateAuthorities:
-  ca0.orga.atlchain.com:
-    url: http://ca0.orga.atlchain.com:7054
+  ca.orga.atlchain.com:
+    url: http://ca.orga.atlchain.com:7054
     # the properties specified under this object are passed to the 'http' client verbatim when
     # making the request to the Fabric-CA server
     httpOptions:
@@ -278,8 +278,8 @@ certificateAuthorities:
     # [Optional] The optional name of the CA.
     caName: ca-orga
 
-  ca0.orgb.atlchain.com:
-    url: https://ca0.orgb.atlchain.com:7054
+  ca.orgb.atlchain.com:
+    url: http://ca.orgb.atlchain.com:7054
     httpOptions:
       verify: false
     tlsCACerts:
@@ -290,14 +290,14 @@ certificateAuthorities:
     # [Optional] The optional name of the CA.
     caName: ca-orgb
 
-  ca0.orgc.atlchain.com:
-    url: https://ca0.orgc.atlchain.com:7054
-    httpOptions:
-      verify: false
-    tlsCACerts:
-      path: 
-    registrar:
-      - enrollId: admin
-        enrollSecret: adminpw
-    # [Optional] The optional name of the CA.
-    caName: ca-orgc
+  # ca.orgc.atlchain.com:
+  #   url: https://ca.orgc.atlchain.com:7054
+  #   httpOptions:
+  #     verify: false
+  #   tlsCACerts:
+  #     path: 
+  #   registrar:
+  #     - enrollId: admin
+  #       enrollSecret: adminpw
+  #   # [Optional] The optional name of the CA.
+  #   caName: ca-orgc
