@@ -30,7 +30,7 @@
                 </p>
                 <p>
                     <label for="CZZT_op1_get_label">持证主体:</label>
-                    <input type="text" id="CZZT_op1_get_input">
+                    <input type="text" id="CZZT_op1_get_input" value="张三">
                 </p>
                 <p>
                     <label for="RecordID_op1_get_label">交易ID:</label>
@@ -50,13 +50,19 @@
     <hr>
 
     <div id="result_div">
-        <table width="100%" border="0" cellspacing="0" cellpadding="0" align="center">
-            <tr>
-                <td align="center" class="biaoti" height="60">查询结果</td>
-            </tr>
-        </table>
-        <table width="100%" border="0" cellspacing="1" cellpadding="4" bgcolor="#cccccc" class="tabtop13" align="center" id="result_input">
-        </table>
+        <form>
+            <fieldset>
+                <table width="100%" border="0" cellspacing="0" cellpadding="0" align="center">
+                    <tr>
+                        <td align="center" class="biaoti" height="60"><span id="get_result_title">查询结果</span></td>
+                    </tr>
+                </table>
+                <table width="100%" border="0" cellspacing="1" cellpadding="4" bgcolor="#cccccc" class="tabtop13" align="left" id="result_input">
+                </table>
+                <div id="show_result_button"> 
+                </div>
+            </fieldset>
+        </form>
     </div>
 </body>
 </html>

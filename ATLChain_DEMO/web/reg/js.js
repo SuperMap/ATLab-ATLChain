@@ -689,7 +689,9 @@ $(document).ready(function(){
                     },
                     success:function(data){
                         console.log(data);
+                        $("#get_result_title").text("查询结果");
                         $("#result_input").html(FormatOutputTable(data));
+                        $("#show_result_button").html("");
                         if(data == "[]"){
                             alert("未查询到结果");
                         }
@@ -702,6 +704,45 @@ $(document).ready(function(){
             default:
                 break;
         }
+    });
+
+    function showDetail(txid){
+        var args = '{';
+        console.log("show details ......");
+        args += '"recordID":"' + $(".detailTxID").html() + '"';     
+        console.log("txID: " + args);
+        args += '}';
+        $.ajax({
+            type:'post',
+            url: RESTURL + '/channels/atlchannel/chaincodes/atlchainCC/GetRecord',
+            data:JSON.stringify({
+                'fcn': 'Get',
+                'peer': 'peer0.orga.atlchain.com',
+                'args':[args],
+                'username':getCookie("username"),
+                'orgname':getCookie("orgname")
+            }),
+            headers: {
+                "authorization": "Bearer " + getCookie("token") ,
+                "content-type": "application/json"
+            },
+            success:function(data){
+                console.log(data);
+                $("#get_result_title").text("详细结果");
+                $("#result_input").html(FormatOutputTableDetail(data));
+                $("#show_result_button").html(FormatOutputTableDetailButton());
+                if(data == "[]"){
+                    alert("未查询到结果");
+                }
+            },
+            error:function(err){
+                console.log(err);
+            }
+        });
+    }
+
+    $('body').on('click', '.detailLink' , function(){
+        showDetail($(".detailLink").html().trim(), "");
     });
 
     $("#hbase_btn").click(function(){
@@ -1072,10 +1113,14 @@ function FormatOutputTable(data){
 
     var str = "<tr>";
     var keyName = "";
+    var txID="";
     for(var i = 0; i < jsonData.length; i++){
         str += "<td><b> 序号： </b>" + (i+1) + "</td>";
         for(var key in jsonData[i]){
             if(key == "Key"){
+                keyName = "交易ID";
+                txID = jsonData[i][key];
+                str += "<td><b> " + keyName + "：</b><span class=\"detailTxID\">" + jsonData[i][key] + "</span></td>";
                 continue;
             }
             if(key == "TxId"){
@@ -1086,13 +1131,115 @@ function FormatOutputTable(data){
                     switch(key2) {
                         case "ZZBH":
                             keyName = "证照编号";
-                            str += "<td><b> " + keyName + ":</b>" + jsonData[i][key][key2] + "</td>";
+                            str += "<td><b> " + keyName + "：</b>" + jsonData[i][key][key2] + "</td>";
                             keyName = "null";
                             break;
                         case "CZZT":
                             keyName = "持证主体";
-                            str += "<td><b> " + keyName + ":</b>" + jsonData[i][key][key2] + "</td>";
+                            str += "<td><b> " + keyName + "：</b>" + jsonData[i][key][key2] + "</td>";
                             keyName = "null";
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            } else {
+                str += "<td><b> " + keyName + "：</b>" + jsonData[i][key][key2] + "</td>";
+                keyName = "null";
+            }
+        }
+    str += "<td class=\"detailLink\"> 详情 </td></tr>"
+    }
+    return str;
+}
+
+function FormatOutputTableDetail(data){
+    var jsonData = JSON.parse(data);
+    // console.log(jsonData);
+
+    var str = "";
+    var keyName = "";
+    for(var i = 0; i < jsonData.length; i++){
+        str += "<tr><td><b>序号： </b>" + (i+1) + "</td></tr>";
+        for(var key in jsonData[i]){
+            if(key == "Key"){
+                continue;
+            }
+            if(key == "TxId"){
+                continue;
+            }
+            switch(key) {
+                case "TxId":
+                    keyName = "FabricTxID";
+                    break;
+                case "Timestamp":
+                    keyName = "时间戳";
+                    break;
+                case "IsDelete":
+                    keyName = "是否删除";
+                    break;
+                default:
+                    break;
+            }
+            if(key == "Value" || key == "Record"){
+                str += "<tr><td><b>交易ID:</b>" + jsonData[i][key]["recordID"] + "</td></tr>";
+                if(!jsonData[i][key].hasOwnProperty("parentRecordID")){
+                    str += "<tr><td><b>父交易ID： </b>" + jsonData[i][key]["parentTxID"]  + "</td></tr>";
+                } else {
+                    str += "<tr><td><b>父交易ID： </b>" + jsonData[i][key]["parentRecordIDID"]  + "</td></tr>";
+                }
+                for(var key2 in jsonData[i][key]){
+                    switch(key2) {
+                        case "signature":
+                            keyName = "数字签名";
+                            break;
+                        // transaction
+                        case "hash":
+                            keyName = "数据哈希";
+                            break;
+                        case "parentRecordID":
+                        case "parentTxID":
+                            keyName = "父交易ID";
+                            break;
+                        case "price":
+                            keyName = "价格";
+                            break;
+                        case "addrrec":
+                            keyName = "接收方地址";
+                            break;
+                        case "addrsend":
+                            keyName = "发送方地址";
+                            break;
+                        case "storageType":
+                            keyName = "存储类型";
+                            break;
+                        case "recordID":
+                            keyName = "交易ID";
+                            break;
+                        // estate
+                        case "ZZBH":
+                            keyName = "证照编号";
+                            break;
+                        case "KZ_BDCQZH":
+                            keyName = "不动产权证号";
+                            break;
+                        case "CZZT":
+                            keyName = "持证主体";
+                            break;
+                        case "KZ_QLRZJH":
+                            keyName = "权利人证件号";
+                            break;
+                        case "ZZBFJG":
+                            keyName = "证照颁发机构";
+                            break;
+                        case "ZZBFRQ":
+                            keyName = "证照颁发日期";
+                            break;
+                        case "KZ_ZL":
+                            keyName = "坐落";
+                            break;
+                        case "KZ_MJ":
+                            keyName = "面积";
                             break;
                         default:
                             break;
@@ -1100,14 +1247,26 @@ function FormatOutputTable(data){
                     if(keyName == "交易ID" || keyName == "父交易ID"){
                         continue;
                     }
+
+                    str += "<tr><td><b>" + keyName + ":</b>" + jsonData[i][key][key2] + "</td></tr>";
+                    keyName = "null";
                 }
             } else {
-                str += "<td><b> " + keyName + ":</b>" + jsonData[i][key][key2] + "</td>";
+                str += "<tr><td><b>" + keyName + ":</b>" + jsonData[i][key] + "</td></tr>";
                 keyName = "null";
             }
         }
-    str += "<td> <a href=\"show.html\">详情</a> </td></tr>"
+    str += "</tr>"
     }
+    return str;
+}
+
+function FormatOutputTableDetailButton(){
+    str = "";
+    str += " <p><label for=\"Prvkey_put_label\">签名密钥（本地签名，不上传）:</label><input type=\"file\" id=\"Prvkey_put_input\"></p> \
+            <p><label for=\"Pubkey_put_label\">身份证书:</label><input type=\"file\" id=\"Pubkey_put_input\"></p> \
+            <p><button type=\"button\" id=\"show_commit\">通过</button><button type=\"button\" id=\"show_reject\">驳回</button></p> \
+    ";
     return str;
 }
 
