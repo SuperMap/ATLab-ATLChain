@@ -12,6 +12,10 @@ $(document).ready(function(){
     $("#BuyerAddr_query_addr_input").val(getCookie("address"));
     $("#BuyerAddr_query_hash_addr_input").val(getCookie("address"));
 
+    $("#bar").html("<h1><center> \
+        登记部门 \
+    </h1></center>");
+
     $("#header").html("<ul> \
         <li><a href=\"\"><b> >>== 区块链系统DEMO v2.0 ==<< </b></a></li> \
         <li><a href=\"put.html\" id=\"tx_bar\">新增记录</a></li> \
@@ -371,12 +375,12 @@ $(document).ready(function(){
                             // var fileString_Image_Base64 = b.encode(fileString_Image);  
                             // console.log(fileString_Image_Base64);
 
-                            args = '{"ZZBH":"'+ ZZBH + '","KZ_BDCQZH":"' + $("#KZ_BDCQZH_op1_put_input").val() + '","CZZT":"' + $("#CZZT_op1_put_input").val() + '","KZ_QLRZJH":"' + $("#KZ_QLRZJH_op1_put_input").val() + '","ZZBFJG":"' + $("#ZZBFJG_op1_put_input").val() + '","ZZBFRQ":"' + $("#ZZBFRQ_op1_put_input").val() + '","KZ_ZL":"' + $("#KZ_ZL_op1_put_input").val() + '","KZ_MJ":"' + $("#KZ_MJ_op1_put_input").val() + '","storageType":"' + storageType + '","hash":"' + hex_sha256(fileString_Image) + '","parentRecordID":"' + parentRecordID + '"}';
+                            args = '{"ZZBH":"'+ ZZBH + '","KZ_BDCQZH":"' + $("#KZ_BDCQZH_op1_put_input").val() + '","CZZT":"' + $("#CZZT_op1_put_input").val() + '","KZ_QLRZJH":"' + $("#KZ_QLRZJH_op1_put_input").val() + '","ZZBFJG":"' + $("#ZZBFJG_op1_put_input").val() + '","ZZBFRQ":"' + $("#ZZBFRQ_op1_put_input").val() + '","KZ_ZL":"' + $("#KZ_ZL_op1_put_input").val() + '","KZ_MJ":"' + $("#KZ_MJ_op1_put_input").val() + '","storageType":"' + storageType + '","status":"已登记' + '","hash":"' + hex_sha256(fileString_Image) + '","parentRecordID":"' + parentRecordID + '"}';
 
                             signature = ECSign(Prvkey, args);
                             var argsHash = hex_sha256(args);
 
-                            args = '{"ZZBH":"'+ ZZBH + '","KZ_BDCQZH":"' + $("#KZ_BDCQZH_op1_put_input").val() + '","CZZT":"' + $("#CZZT_op1_put_input").val() + '","KZ_QLRZJH":"' + $("#KZ_QLRZJH_op1_put_input").val() + '","ZZBFJG":"' + $("#ZZBFJG_op1_put_input").val() + '","ZZBFRQ":"' + $("#ZZBFRQ_op1_put_input").val() + '","KZ_ZL":"' + $("#KZ_ZL_op1_put_input").val() + '","KZ_MJ":"' + $("#KZ_MJ_op1_put_input").val() + '","storageType":"' + storageType + '","hash":"' + hex_sha256(fileString_Image) + '","parentRecordID":"' + parentRecordID + '","recordID":"' + argsHash + '","signature":"' + signature + '"}';
+                            args = '{"ZZBH":"'+ ZZBH + '","KZ_BDCQZH":"' + $("#KZ_BDCQZH_op1_put_input").val() + '","CZZT":"' + $("#CZZT_op1_put_input").val() + '","KZ_QLRZJH":"' + $("#KZ_QLRZJH_op1_put_input").val() + '","ZZBFJG":"' + $("#ZZBFJG_op1_put_input").val() + '","ZZBFRQ":"' + $("#ZZBFRQ_op1_put_input").val() + '","KZ_ZL":"' + $("#KZ_ZL_op1_put_input").val() + '","KZ_MJ":"' + $("#KZ_MJ_op1_put_input").val() + '","storageType":"' + storageType + '","status":"已登记' + '","hash":"' + hex_sha256(fileString_Image) + '","parentRecordID":"' + parentRecordID + '","recordID":"' + argsHash + '","signature":"' + signature + '"}';
                             console.log(args);
 
                             $.ajax({
@@ -442,7 +446,6 @@ $(document).ready(function(){
         //             break;
         //     } 
     // });
-
 
     function getTractionOneKey(txid, pData){
         $.ajax({
@@ -1120,7 +1123,7 @@ function FormatOutputTable(data){
             if(key == "Key"){
                 keyName = "交易ID";
                 txID = jsonData[i][key];
-                str += "<td><b> " + keyName + "：</b><span class=\"detailTxID\">" + jsonData[i][key] + "</span></td>";
+                str += "<td hidden=\"hidden\"><b> " + keyName + "：</b><span class=\"detailTxID\">" + jsonData[i][key] + "</span></td>";
                 continue;
             }
             if(key == "TxId"){
@@ -1136,6 +1139,11 @@ function FormatOutputTable(data){
                             break;
                         case "CZZT":
                             keyName = "持证主体";
+                            str += "<td><b> " + keyName + "：</b>" + jsonData[i][key][key2] + "</td>";
+                            keyName = "null";
+                            break;
+                        case "status":
+                            keyName = "状态";
                             str += "<td><b> " + keyName + "：</b>" + jsonData[i][key][key2] + "</td>";
                             keyName = "null";
                             break;
@@ -1240,6 +1248,9 @@ function FormatOutputTableDetail(data){
                             break;
                         case "KZ_MJ":
                             keyName = "面积";
+                            break;
+                        case "status":
+                            keyName = "状态";
                             break;
                         default:
                             break;
