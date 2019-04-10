@@ -709,12 +709,12 @@ $(document).ready(function(){
         }
     });
 
-    function showDetail(txid){
+    function showDetail(){
+        txid = window.event.srcElement.id;
         var args = '{';
-        console.log("show details ......");
-        args += '"recordID":"' + $(".detailTxID").html() + '"';     
-        console.log("txID: " + args);
+        args += '"recordID":"' + txid + '"';     
         args += '}';
+        console.log("txID: " + args);
         $.ajax({
             type:'post',
             url: RESTURL + '/channels/atlchannel/chaincodes/atlchainCC/GetRecord',
@@ -733,7 +733,7 @@ $(document).ready(function(){
                 console.log(data);
                 $("#get_result_title").text("详细结果");
                 $("#result_input").html(FormatOutputTableDetail(data));
-                $("#show_result_button").html(FormatOutputTableDetailButton());
+                // $("#show_result_button").html(FormatOutputTableDetailButton());
                 if(data == "[]"){
                     alert("未查询到结果");
                 }
@@ -1090,6 +1090,9 @@ function FormatOutputUsualWithUrl(data){
                         case "KZ_MJ":
                             keyName = "面积";
                             break;
+                        case "status":
+                            keyName = "状态";
+                            break;
                         default:
                             break;
                     }
@@ -1121,9 +1124,9 @@ function FormatOutputTable(data){
         str += "<td><b> 序号： </b>" + (i+1) + "</td>";
         for(var key in jsonData[i]){
             if(key == "Key"){
-                keyName = "交易ID";
                 txID = jsonData[i][key];
-                str += "<td hidden=\"hidden\"><b> " + keyName + "：</b><span class=\"detailTxID\">" + jsonData[i][key] + "</span></td>";
+                // keyName = "交易ID";
+                // str += "<td hidden=\"hidden\"><b> " + keyName + "：</b><span class=\"detailTxID\">" + jsonData[i][key] + "</span></td>";
                 continue;
             }
             if(key == "TxId"){
@@ -1156,7 +1159,7 @@ function FormatOutputTable(data){
                 keyName = "null";
             }
         }
-    str += "<td class=\"detailLink\"> 详情 </td></tr>"
+    str += "<td class=\"detailLink\" id=\"" + txID + "\" style=\"cursor:pointer;color:blue\"> 详情 </td></tr>"
     }
     return str;
 }
@@ -1194,7 +1197,7 @@ function FormatOutputTableDetail(data){
                 if(!jsonData[i][key].hasOwnProperty("parentRecordID")){
                     str += "<tr><td><b>父交易ID： </b>" + jsonData[i][key]["parentTxID"]  + "</td></tr>";
                 } else {
-                    str += "<tr><td><b>父交易ID： </b>" + jsonData[i][key]["parentRecordIDID"]  + "</td></tr>";
+                    str += "<tr><td><b>父交易ID： </b>" + jsonData[i][key]["parentRecordID"]  + "</td></tr>";
                 }
                 for(var key2 in jsonData[i][key]){
                     switch(key2) {
