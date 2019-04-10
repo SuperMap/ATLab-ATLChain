@@ -1159,7 +1159,7 @@ function FormatOutputTable(data){
                 keyName = "null";
             }
         }
-    str += "<td class=\"detailLink\" id=\"" + txID + "\" style=\"cursor:pointer;color:blue\"> 详情 </td></tr>"
+        str += "<td class=\"detailLink\" id=\"" + txID + "\" style=\"cursor:pointer;color:blue\"> 详情 </td></tr>"
     }
     return str;
 }
@@ -1171,7 +1171,7 @@ function FormatOutputTableDetail(data){
     var str = "";
     var keyName = "";
     for(var i = 0; i < jsonData.length; i++){
-        str += "<tr><td><b>序号： </b>" + (i+1) + "</td></tr>";
+        //tr += "<tr><td><b>序号： </b>" + (i+1) + "</td></tr>";
         for(var key in jsonData[i]){
             if(key == "Key"){
                 continue;
