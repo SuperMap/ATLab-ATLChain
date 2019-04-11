@@ -465,7 +465,8 @@ $(document).ready(function(){
                 args = '{"taxType":"'+ taxType + '","taxAmount":"' + taxAmount + '","CZZT":"' + taxCZZT + '","ZZBH":"' + taxZZBH + '","status":"已完税' + '","parentRecordID":"' + parentRecordID + '"}';
 
                 signature = ECSign(Prvkey, args);
-                var argsHash = hex_sha256(args);
+                // var argsHash = hex_sha256(args);
+                var argsHash = parentRecordID;
                 args = '{"taxType":"'+ taxType + '","taxAmount":"' + taxAmount + '","CZZT":"' + taxCZZT +  '","ZZBH":"' + taxZZBH +'","status":"已完税' + '","parentRecordID":"' + parentRecordID + '","recordID":"' + argsHash + '","signature":"' + signature + '"}';
                 console.log("args:" + args);
 
