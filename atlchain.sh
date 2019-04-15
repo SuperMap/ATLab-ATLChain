@@ -20,8 +20,8 @@ export DOCKER_COMPOSE_PEER_ADDRESS=peer0.orgc.atlchain.com:7051
 export DOCKER_COMPOSE_PEER_CC_ADDRESS=peer0.orgc.atlchain.com:7052
 export DOCKER_COMPOSE_PEER_GOSSIP_BOOTSTRAP=peer0.orgc.atlchain.com:7051 
 
-export CORE_PEER_ADDRESS=peer0.orgc.atlchain.com:7061 
-export ORERER_ADDRESS=orderer0.orgc.atlchain.com:7060
+export CORE_PEER_ADDRESS=peer0.orgc.atlchain.com:7051 
+export ORERER_ADDRESS=orderer0.orgc.atlchain.com:7050
 
 function printHelp() {
     echo "Usage: "

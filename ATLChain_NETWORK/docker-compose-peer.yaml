@@ -63,7 +63,7 @@ services:
             - ./crypto-config/peerOrganizations/orgc.atlchain.com/peers/peer0.orgc.atlchain.com/tls:/etc/hyperledger/fabric/tls
             - peer0.orgc.atlchain.com:/var/hyperledger/production
         ports:
-          - 7061:7051
-          - 7062:7052
+          - 7051:7051
+          - 7052:7052
         networks:
             - atln

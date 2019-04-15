@@ -33,6 +33,6 @@ services:
             - ./crypto-config/ordererOrganizations/orgc.atlchain.com/orderers/orderer0.orgc.atlchain.com/tls:/var/hyperledger/orderer/tls
             - orderer0.orgc.atlchain.com:/var/hyperledger/production/orderer
         ports:
-          - 7060:7050
+          - 7050:7050
         networks:
             - atln

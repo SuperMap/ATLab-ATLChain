@@ -3,8 +3,8 @@
 CHANNEL_NAME=$1
 CC_SRC_PATH="github.com/chaincode/"
 
-export ORERER_ADDRESS=orderer0.orgc.atlchain.com:7060
-export PEER_ADDRESS=peer0.orgc.atlchain.com:7061 
+export ORERER_ADDRESS=orderer0.orgc.atlchain.com:7050
+export PEER_ADDRESS=peer0.orgc.atlchain.com:7051 
 export PEER_TLS_CERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/orgc.atlchain.com/peers/peer0.orgc.atlchain.com/tls/server.crt
 
 echo
