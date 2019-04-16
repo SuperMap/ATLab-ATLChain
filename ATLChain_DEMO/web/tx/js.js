@@ -902,7 +902,6 @@ $(document).ready(function(){
                 console.log(data);
                 $("#get_result_title").text("详细结果");
                 $("#result_input").html(FormatOutputTableDetail(data));
-                var jsonData = JSON.parse(data);
                 if(data == "[]"){
                     alert("未查询到结果");
                 }
