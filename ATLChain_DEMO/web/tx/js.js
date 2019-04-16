@@ -376,12 +376,12 @@ $(document).ready(function(){
                             // var fileString_Image_Base64 = b.encode(fileString_Image);  
                             // console.log(fileString_Image_Base64);
 
-                            args = '{"ZZBH":"'+ ZZBH + '","KZ_BDCQZH":"' + $("#KZ_BDCQZH_op1_put_input").val() + '","CZZT":"' + $("#CZZT_op1_put_input").val() + '","KZ_QLRZJH":"' + $("#KZ_QLRZJH_op1_put_input").val() + '","ZZBFJG":"' + $("#ZZBFJG_op1_put_input").val() + '","ZZBFRQ":"' + $("#ZZBFRQ_op1_put_input").val() + '","KZ_ZL":"' + $("#KZ_ZL_op1_put_input").val() + '","KZ_MJ":"' + $("#KZ_MJ_op1_put_input").val() + '","storageType":"' + storageType + '","status":"已登记' + '","hash":"' + hex_sha256(fileString_Image) + '","parentRecordID":"' + parentRecordID + '"}';
+                            args = '{"ZZBH":"'+ ZZBH + '","KZ_BDCQZH":"' + $("#KZ_BDCQZH_op1_put_input").val() + '","CZZT":"' + $("#CZZT_op1_put_input").val() + '","KZ_QLRZJH":"' + $("#KZ_QLRZJH_op1_put_input").val() + '","ZZBFJG":"' + $("#ZZBFJG_op1_put_input").val() + '","ZZBFRQ":"' + $("#ZZBFRQ_op1_put_input").val() + '","KZ_ZL":"' + $("#KZ_ZL_op1_put_input").val() + '","KZ_MJ":"' + $("#KZ_MJ_op1_put_input").val() + '","storageType":"' + storageType + '","status":"已交易' + '","hash":"' + hex_sha256(fileString_Image) + '","parentRecordID":"' + parentRecordID + '"}';
 
                             signature = ECSign(Prvkey, args);
                             var argsHash = hex_sha256(args);
 
-                            args = '{"ZZBH":"'+ ZZBH + '","KZ_BDCQZH":"' + $("#KZ_BDCQZH_op1_put_input").val() + '","CZZT":"' + $("#CZZT_op1_put_input").val() + '","KZ_QLRZJH":"' + $("#KZ_QLRZJH_op1_put_input").val() + '","ZZBFJG":"' + $("#ZZBFJG_op1_put_input").val() + '","ZZBFRQ":"' + $("#ZZBFRQ_op1_put_input").val() + '","KZ_ZL":"' + $("#KZ_ZL_op1_put_input").val() + '","KZ_MJ":"' + $("#KZ_MJ_op1_put_input").val() + '","storageType":"' + storageType + '","status":"已登记' + '","hash":"' + hex_sha256(fileString_Image) + '","parentRecordID":"' + parentRecordID + '","recordID":"' + argsHash + '","signature":"' + signature + '"}';
+                            args = '{"ZZBH":"'+ ZZBH + '","KZ_BDCQZH":"' + $("#KZ_BDCQZH_op1_put_input").val() + '","CZZT":"' + $("#CZZT_op1_put_input").val() + '","KZ_QLRZJH":"' + $("#KZ_QLRZJH_op1_put_input").val() + '","ZZBFJG":"' + $("#ZZBFJG_op1_put_input").val() + '","ZZBFRQ":"' + $("#ZZBFRQ_op1_put_input").val() + '","KZ_ZL":"' + $("#KZ_ZL_op1_put_input").val() + '","KZ_MJ":"' + $("#KZ_MJ_op1_put_input").val() + '","storageType":"' + storageType + '","status":"已交易' + '","hash":"' + hex_sha256(fileString_Image) + '","parentRecordID":"' + parentRecordID + '","recordID":"' + argsHash + '","signature":"' + signature + '"}';
                             console.log(args);
 
                             $.ajax({
@@ -903,9 +903,6 @@ $(document).ready(function(){
                 $("#get_result_title").text("详细结果");
                 $("#result_input").html(FormatOutputTableDetail(data));
                 var jsonData = JSON.parse(data);
-                if(jsonData[0]["Record"]["status"]=="已完税"){
-                    $("#show_result_button").html(FormatOutputTableDetailButton());
-                }
                 if(data == "[]"){
                     alert("未查询到结果");
                 }
