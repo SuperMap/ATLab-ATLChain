@@ -18,7 +18,6 @@ $(document).ready(function(){
 
     $("#header").html("<ul> \
         <li><a href=\"\"><b> >>== 区块链系统DEMO v2.0 ==<< </b></a></li> \
-        <li><a href=\"put.html\" id=\"tx_bar\">新增记录</a></li> \
         <li><a href=\"get.html\" id=\"query_bar\">查询记录</a></li> \
         <li><a href=\"trace.html\" id=\"trace_bar\">追溯记录</a></li> \
         <li><a href=\"getDataFromHBase.html\" id=\"getDataFromHBase_bar\">获取HBASE数据</a></li> \

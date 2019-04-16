@@ -198,8 +198,8 @@ app.post('/users', async function(req, res) {
         
 		logger.debug("private key file: " + filename);
         
-        fs.writeFileSync('../web/reg/msp/' + username, fdata);
-        fs.writeFileSync('../web/reg/msp/' + filename, fs.readFileSync('./fabric-client-kv-orga/' + filename));
+        fs.writeFileSync('../web/tx/msp/' + username, fdata);
+        fs.writeFileSync('../web/tx/msp/' + filename, fs.readFileSync('./fabric-client-kv-orga/' + filename));
 
 		logger.debug('Successfully registered the username %s for organization %s',username,orgName);
         response.filename = filename;
