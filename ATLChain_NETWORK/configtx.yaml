@@ -13,68 +13,38 @@ Organizations:
 
     # SampleOrg defines an MSP using the sampleconfig. It should never be used
     # in production but may be used as a template for other definitions.
-    - &OrdererA
+    - &Orderer
         # Name is the key by which this org will be referenced in channel
         # configuration transactions.
         # Name can include alphanumeric characters as well as dots and dashes.
-        Name: OrdererA
+        Name: Orderer
 
         # ID is the key by which this org's MSP definition will be referenced.
         # ID can include alphanumeric characters as well as dots and dashes.
-        ID: OrdererA
+        ID: Orderer
 
         # MSPDir is the filesystem path which contains the MSP configuration.
-        MSPDir: ./crypto-config/ordererOrganizations/orga.atlchain.com/msp
+        MSPDir: ./crypto-config/ordererOrganizations/atlchain.com/msp
 
         # Policies defines the set of policies at this level of the config tree
         # For organization policies, their canonical path is usually
         #   /Channel/<Application|Orderer>/<OrgName>/<PolicyName>
-        Policies: &OrdererAPolicies
+        Policies: &OrdererPolicies
             Readers:
                 Type: Signature
-                Rule: "OR('OrdererA.member', 'OrdererA.admin', 'OrdererA.peer', 'OrdererA.client')" 
+                Rule: "OR('Orderer.member', 'Orderer.admin', 'Orderer.peer', 'Orderer.client')" 
                 # If your MSP is configured with the new NodeOUs, you might
                 # want to use a more specific rule like the following:
                 # Rule: "OR('SampleOrg.admin', 'SampleOrg.peer', 'SampleOrg.client')"
             Writers:
                 Type: Signature
-                Rule: "OR('OrdererA.member', 'OrdererA.admin', 'OrdererA.peer', 'OrdererA.client')" 
+                Rule: "OR('Orderer.member', 'Orderer.admin', 'Orderer.peer', 'Orderer.client')" 
                 # If your MSP is configured with the new NodeOUs, you might
                 # want to use a more specific rule like the following:
                 # Rule: "OR('SampleOrg.admin', 'SampleOrg.client')"
             Admins:
                 Type: Signature
-                Rule: "OR('OrdererA.admin')"
-
-    - &OrdererB
-        Name: OrdererB
-        ID: OrdererB
-        MSPDir: ./crypto-config/ordererOrganizations/orgb.atlchain.com/msp
-        Policies: &OrdererBPolicies
-            Readers:
-                Type: Signature
-                Rule: "OR('OrdererB.member', 'OrdererB.admin', 'OrdererB.peer', 'OrdererB.client')" 
-            Writers:
-                Type: Signature
-                Rule: "OR('OrdererB.member', 'OrdererB.admin', 'OrdererB.peer', 'OrdererB.client')" 
-            Admins:
-                Type: Signature
-                Rule: "OR('OrdererB.admin')"
-
-    - &OrdererC
-        Name: OrdererC
-        ID: OrdererC
-        MSPDir: ./crypto-config/ordererOrganizations/orgc.atlchain.com/msp
-        Policies: &OrdererCPolicies
-            Readers:
-                Type: Signature
-                Rule: "OR('OrdererC.member', 'OrdererC.admin', 'OrdererC.peer', 'OrdererC.client')" 
-            Writers:
-                Type: Signature
-                Rule: "OR('OrdererC.member', 'OrdererC.admin', 'OrdererC.peer', 'OrdererC.client')" 
-            Admins:
-                Type: Signature
-                Rule: "OR('OrdererC.admin')"
+                Rule: "OR('Orderer.admin')"
 
     - &OrgA
         Name: OrgA
@@ -309,9 +279,7 @@ Orderer: &OrdererDefaults
     # participation in ordering.
     # NOTE: In the solo case, this should be a one-item list.
     Addresses:
-        - orderer0.orga.atlchain.com:7050
-        - orderer0.orgb.atlchain.com:7050
-        - orderer0.orgc.atlchain.com:7050
+        - orderer.atlchain.com:7050
 
     # Batch Timeout: The amount of time to wait before creating a batch.
     BatchTimeout: 2s
@@ -359,7 +327,7 @@ Orderer: &OrdererDefaults
         # this list to identify the brokers of the ordering service.
         # NOTE: Use IP:port notation.
         Brokers:
-            - kafka0.atlchain.com:9092
+            - kafka.atlchain.com:9092
 
     # Organizations lists the orgs participating on the orderer side of the
     # network.
@@ -442,16 +410,12 @@ Profiles:
             <<: *OrdererDefaults
             OrdererType: kafka
             Organizations:
-                - <<: *OrdererA
-                - <<: *OrdererB
-                - <<: *OrdererC
+                - <<: *Orderer
                   Policies:
-                      <<: *OrdererAPolicies
-                      <<: *OrdererBPolicies
-                      <<: *OrdererCPolicies
+                      <<: *OrdererPolicies
                       Admins:
                           Type: Signature
-                          Rule: "OR('OrdererA.admin', 'OrdererB.admin', 'OrdererC.admin')"
+                          Rule: "OR('Orderer.admin')"
                          
         Consortiums:
             SampleConsortium:

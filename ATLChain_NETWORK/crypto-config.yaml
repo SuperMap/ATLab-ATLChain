@@ -2,20 +2,10 @@
 # "OrdererOrgs" - Definition of organizations managing orderer nodes
 # ---------------------------------------------------------------------------
 OrdererOrgs:
-  - Name: OrdererA
-    Domain: orga.atlchain.com
+  - Name: Orderer
+    Domain: atlchain.com
     Specs:
-      - Hostname: orderer0
-
-  - Name: OrdererB
-    Domain: orgb.atlchain.com
-    Specs:
-      - Hostname: orderer0
-
-  - Name: OrdererC
-    Domain: orgc.atlchain.com
-    Specs:
-      - Hostname: orderer0
+      - Hostname: orderer
 
 # ---------------------------------------------------------------------------
 # "PeerOrgs" - Definition of organizations managing peer nodes

@@ -1,24 +1,24 @@
 version: '2'
 
 volumes:
-    orderer0.orgc.atlchain.com:
+    orderer.atlchain.com:
 
 networks:
   atln:
 
 services:
-    orderer0.orgc.atlchain.com:
-        container_name: orderer0.orgc.atlchain.com
+    orderer.atlchain.com:
+        container_name: orderer.atlchain.com
         image: hyperledger/fabric-orderer:1.4.0
         environment:
             - FABRIC_LOGGING_SPEC=INFO
             - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
             - ORDERER_GENERAL_GENESISMETHOD=file
             - ORDERER_GENERAL_GENESISFILE=/var/hyperledger/orderer/orderer.genesis.block
-            - ORDERER_GENERAL_LOCALMSPID=OrdererC
+            - ORDERER_GENERAL_LOCALMSPID=Orderer
             - ORDERER_GENERAL_LOCALMSPDIR=/var/hyperledger/orderer/msp
             # enabled TLS
-            - ORDERER_GENERAL_TLS_ENABLED=true
+            - ORDERER_GENERAL_TLS_ENABLED=false
             - ORDERER_GENERAL_TLS_PRIVATEKEY=/var/hyperledger/orderer/tls/server.key
             - ORDERER_GENERAL_TLS_CERTIFICATE=/var/hyperledger/orderer/tls/server.crt
             - ORDERER_GENERAL_TLS_ROOTCAS=[/var/hyperledger/orderer/tls/ca.crt]
@@ -29,9 +29,9 @@ services:
         volumes:
             - ./hosts:/etc/hosts
             - ./channel-artifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
-            - ./crypto-config/ordererOrganizations/orgc.atlchain.com/orderers/orderer0.orgc.atlchain.com/msp:/var/hyperledger/orderer/msp
-            - ./crypto-config/ordererOrganizations/orgc.atlchain.com/orderers/orderer0.orgc.atlchain.com/tls:/var/hyperledger/orderer/tls
-            - orderer0.orgc.atlchain.com:/var/hyperledger/production/orderer
+            - ./crypto-config/ordererOrganizations/atlchain.com/orderers/orderer.atlchain.com/msp:/var/hyperledger/orderer/msp
+            - ./crypto-config/ordererOrganizations/atlchain.com/orderers/orderer.atlchain.com/tls:/var/hyperledger/orderer/tls
+            - orderer.atlchain.com:/var/hyperledger/production/orderer
         ports:
           - 7050:7050
         networks:

@@ -14,5 +14,6 @@ else
 hfc.setConfigSetting('network-connection-profile-path',path.join(__dirname, 'app' ,file));
 hfc.setConfigSetting('OrgA-connection-profile-path',path.join(__dirname, 'app', 'orgA.yaml'));
 hfc.setConfigSetting('OrgB-connection-profile-path',path.join(__dirname, 'app', 'orgB.yaml'));
+hfc.setConfigSetting('OrgC-connection-profile-path',path.join(__dirname, 'app', 'orgC.yaml'));
 // some other settings the application might need to know
 hfc.addConfigFile(path.join(__dirname, 'config.json'));

@@ -3,9 +3,9 @@
 CHANNEL_NAME=$1
 CC_SRC_PATH="github.com/chaincode/"
 
-export ORERER_ADDRESS=orderer0.orgc.atlchain.com:7050
-export PEER_ADDRESS=peer0.orgc.atlchain.com:7051 
-export PEER_TLS_CERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/orgc.atlchain.com/peers/peer0.orgc.atlchain.com/tls/server.crt
+export ORERER_ADDRESS=orderer.atlchain.com:7050
+export PEER_ADDRESS=peer0.orga.atlchain.com:7051 
+export PEER_TLS_CERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/orga.atlchain.com/peers/peer0.orga.atlchain.com/tls/server.crt
 
 echo
 echo " ____    _____      _      ____    _____ "
@@ -19,7 +19,9 @@ echo
 
 # create channel
 set -x
-peer channel create -o ${ORERER_ADDRESS} -c $CHANNEL_NAME -f ./channel-artifacts/${CHANNEL_NAME}.tx --tls true --cafile $ORDERER_CA  >& log.txt 
+# peer channel create -o ${ORERER_ADDRESS} -c $CHANNEL_NAME -f ./channel-artifacts/${CHANNEL_NAME}.tx --tls true --cafile $ORDERER_CA  >& log.txt 
+
+peer channel create -o ${ORERER_ADDRESS} -c $CHANNEL_NAME -f ./channel-artifacts/${CHANNEL_NAME}.tx >& log.txt 
 res=$?
 set +x
 if [ $res -ne 0 ]; then
@@ -41,7 +43,9 @@ fi
 
 # update anchor peer
 set -x
-peer channel update -o ${ORERER_ADDRESS} -c $CHANNEL_NAME -f ./channel-artifacts/${CORE_PEER_LOCALMSPID}anchors.tx --tls true --cafile $ORDERER_CA >& log.txt 
+# peer channel update -o ${ORERER_ADDRESS} -c $CHANNEL_NAME -f ./channel-artifacts/${CORE_PEER_LOCALMSPID}anchors.tx --tls true --cafile $ORDERER_CA >& log.txt 
+
+peer channel update -o ${ORERER_ADDRESS} -c $CHANNEL_NAME -f ./channel-artifacts/${CORE_PEER_LOCALMSPID}anchors.tx >& log.txt 
 res=$?
 set +x
 if [ $res -ne 0 ]; then
@@ -63,7 +67,9 @@ fi
 
 # instantiated chaincode 
 set -x
-peer chaincode instantiate -o ${ORERER_ADDRESS} -C $CHANNEL_NAME -n atlchainCC -v 1.0 --tls true --cafile $ORDERER_CA -c '{"Args": ["init"]}' -P "AND('OrgA.peer', 'OrgB.peer', 'OrgC.peer')" >& log.txt 
+# peer chaincode instantiate -o ${ORERER_ADDRESS} -C $CHANNEL_NAME -n atlchainCC -v 1.0 --tls true --cafile $ORDERER_CA -c '{"Args": ["init"]}' -P "AND('OrgA.peer', 'OrgB.peer', 'OrgC.peer')" >& log.txt 
+
+peer chaincode instantiate -o ${ORERER_ADDRESS} -C $CHANNEL_NAME -n atlchainCC -v 1.0 -c '{"Args": ["init"]}' -P "AND('OrgA.peer', 'OrgB.peer', 'OrgC.peer')" >& log.txt 
 res=$?
 set +x
 if [ $res -ne 0 ]; then
@@ -75,9 +81,11 @@ fi
 sleep 5
 
 # invoke 
-PEER0_ORGA_CA=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/orgc.atlchain.com/peers/peer0.orgc.atlchain.com/tls/ca.crt
+PEER0_ORGA_CA=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/orga.atlchain.com/peers/peer0.orga.atlchain.com/tls/ca.crt
 set -x
-peer chaincode invoke -o ${ORERER_ADDRESS} -C $CHANNEL_NAME -n atlchainCC --peerAddresses ${PEER_ADDRESS} --tlsRootCertFiles ${PEER_TLS_CERT_FILE} -c '{"Args":["Put", "tryPutkey", "{\"tryAddrReceive\":\"trytestAddrA\", \"tryAddrSend\":\"trytestAddrB\"}", "trysignagure", "trypubKey"]}' --tls true --cafile $ORDERER_CA >& log.txt
+# peer chaincode invoke -o ${ORERER_ADDRESS} -C $CHANNEL_NAME -n atlchainCC --peerAddresses ${PEER_ADDRESS} --tlsRootCertFiles ${PEER_TLS_CERT_FILE} -c '{"Args":["Put", "tryPutkey", "{\"tryAddrReceive\":\"trytestAddrA\", \"tryAddrSend\":\"trytestAddrB\"}", "trysignagure", "trypubKey"]}' --tls true --cafile $ORDERER_CA >& log.txt
+
+peer chaincode invoke -o ${ORERER_ADDRESS} -C $CHANNEL_NAME -n atlchainCC --peerAddresses ${PEER_ADDRESS} -c '{"Args":["Put", "tryPutkey", "{\"tryAddrReceive\":\"trytestAddrA\", \"tryAddrSend\":\"trytestAddrB\"}", "trysignagure", "trypubKey"]}' >& log.txt
 res=$?
 set +x
 if [ $res -ne 0 ]; then
@@ -90,7 +98,9 @@ sleep 20
 
 # query
 set -x
-peer chaincode query -o ${ORERER_ADDRESS} -C $CHANNEL_NAME -n atlchainCC --peerAddresses ${PEER_ADDRESS} --tlsRootCertFiles ${PEER_TLS_CERT_FILE} --tls true --cafile $ORDERER_CA -c '{"Args":["Get", "{\"tryAddrSend\":\"trytestAddrB\"}"]}' >& log.txt
+# peer chaincode query -o ${ORERER_ADDRESS} -C $CHANNEL_NAME -n atlchainCC --peerAddresses ${PEER_ADDRESS} --tlsRootCertFiles ${PEER_TLS_CERT_FILE} --tls true --cafile $ORDERER_CA -c '{"Args":["Get", "{\"tryAddrSend\":\"trytestAddrB\"}"]}' >& log.txt
+
+peer chaincode query -o ${ORERER_ADDRESS} -C $CHANNEL_NAME -n atlchainCC --peerAddresses ${PEER_ADDRESS} -c '{"Args":["Get", "{\"tryAddrSend\":\"trytestAddrB\"}"]}' >& log.txt
 res=$?
 set +x
 cat log.txt   
