@@ -10,7 +10,7 @@
 *.block
 *genesisblock
 *production/
-*crypto-config/
+# *crypto-config/
 *bin/
 *IssuerPublicKey
 *IssuerRevocationPublicKey
