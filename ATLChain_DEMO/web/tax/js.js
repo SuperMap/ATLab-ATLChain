@@ -819,7 +819,7 @@ $(document).ready(function(){
                 $("#get_result_title").text("详细结果");
                 $("#result_input").html(FormatOutputTableDetail(data));
                 var jsonData = JSON.parse(data);
-                if(jsonData[0]["Record"]["status"]=="已登记"){
+                if(jsonData[0]["Record"]["status"]=="已交易"){
                     $("#show_result_button").html(FormatOutputTableDetailButton());
                 }
                 if(data == "[]"){

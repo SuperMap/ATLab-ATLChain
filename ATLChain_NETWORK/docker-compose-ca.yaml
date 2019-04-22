@@ -10,12 +10,15 @@ services:
       - FABRIC_CA_SERVER_CA_NAME=ca-orga
       - FABRIC_CA_SERVER_TLS_ENABLED=false
       - FABRIC_CA_SERVER_TLS_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.orga.atlchain.com-cert.pem
-      - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/8f805916eab34946e6b1a0e9807ffee19c0383043a9a7043919ee2eb2a920d5a_sk
+      - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/ef20a4cc2310581642fc9aa5d7a1b61668f81919af8260abeaf7d48f4623db94_sk
+    working_dir:  /etc/hyperledger/fabric-ca-server
     ports:
       - 7054:7054
-    command: sh -c 'fabric-ca-server start -b admin:adminpw -d'
-    volumes:
-      - ./crypto-config/peerOrganizations/orga.atlchain.com/ca/:/etc/hyperledger/fabric-ca-server-config
+    command: sh -c 'fabric-ca-server start --ca.certfile /etc/hyperledger/fabric-ca-server-config/ca.orga.atlchain.com-cert.pem --ca.keyfile /etc/hyperledger/fabric-ca-server-config/ef20a4cc2310581642fc9aa5d7a1b61668f81919af8260abeaf7d48f4623db94_sk -b admin:adminpw -d'
+    volumes: 
+      - ./crypto-config/peerOrganizations/orga.atlchain.com/ca/:/etc/hyperledger/fabric-ca-server-config/
+      - ./ca-config/fabric-ca-server-config.yaml:/etc/hyperledger/fabric-ca-server/fabric-ca-server-config.yaml
+
     container_name: ca.orga.atlchain.com
     networks:
       - atln

@@ -176,7 +176,7 @@ function startCA() {
 
 # Remove the files generated
 function cleanFiles() {
-    rm -rf crypto-config
+    # rm -rf crypto-config
     rm -rf channel-artifacts
     rm -rf production
 }
