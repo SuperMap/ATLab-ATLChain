@@ -1,7 +1,9 @@
 // enroll
 
-var RESTURL = "http://127.0.0.1:10002";
-var FileURL = "http://127.0.0.1:10001";
+// var RESTURL = "http://127.0.0.1:7002";
+// var FileURL = "http://127.0.0.1:7001";
+var RESTURL = "http://175.154.161.50:7002";
+var FileURL = "http://175.154.161.50:7001";
 
 $(document).ready(function(){
     // 设置预设值
@@ -16,7 +18,6 @@ $(document).ready(function(){
         交易部门 \
     </h1></center>");
 
-    // <li><a href=\"put.html\" id=\"tx_bar\">新增记录</a></li> \
     $("#header").html("<ul> \
         <li><a href=\"\"><b> >>== 区块链系统DEMO v2.0 ==<< </b></a></li> \
         <li><a href=\"put.html\" id=\"tx_bar\">新增记录</a></li> \
@@ -45,7 +46,7 @@ $(document).ready(function(){
                 let triggerDelay = 100;
                 let removeDelay = 1000;
                 //存放多个下载的url，
-                let url_arr=[FileURL + "/msp/" + username,  FileURL + "/msp/" + data.filename];
+                let url_arr=[FileURL + "/tx/msp/" + username,  FileURL + "/tx/msp/" + data.filename];
                 
                 url_arr.forEach(function(item,index){
                     _createIFrame(item, index * triggerDelay, removeDelay);
@@ -368,7 +369,7 @@ $(document).ready(function(){
                         }
                         reader_Image.onload = function(evt_Image){
                             var fileString_Image = evt_Image.target.result;
-                            var ZZBH = $("#ZZBH_op1_put_input").val();
+                            var HTH = $("#HTH_op1_put_input").val();
 
                             // console.log(fileString_Image);
                             // image base64 encode
@@ -376,12 +377,12 @@ $(document).ready(function(){
                             // var fileString_Image_Base64 = b.encode(fileString_Image);  
                             // console.log(fileString_Image_Base64);
 
-                            args = '{"ZZBH":"'+ ZZBH + '","KZ_BDCQZH":"' + $("#KZ_BDCQZH_op1_put_input").val() + '","CZZT":"' + $("#CZZT_op1_put_input").val() + '","KZ_QLRZJH":"' + $("#KZ_QLRZJH_op1_put_input").val() + '","ZZBFJG":"' + $("#ZZBFJG_op1_put_input").val() + '","ZZBFRQ":"' + $("#ZZBFRQ_op1_put_input").val() + '","KZ_ZL":"' + $("#KZ_ZL_op1_put_input").val() + '","KZ_MJ":"' + $("#KZ_MJ_op1_put_input").val() + '","storageType":"' + storageType + '","status":"已交易' + '","hash":"' + hex_sha256(fileString_Image) + '","parentRecordID":"' + parentRecordID + '"}';
+                            args = '{"HTH":"'+ HTH + '","FWSYQZH":"' + $("#FWSYQZH_op1_put_input").val() + '","QYRQ":"' + $("#QYRQ_op1_put_input").val() + '","JZMJ":"' + $("#JZMJ_op1_put_input").val() + '","DYQK":"' + $("#DYQK_op1_put_input").val() + '","CJJG":"' + $("#CJJG_op1_put_input").val() + '","FWDZ":"' + $("#FWDZ_op1_put_input").val() + '","CMR":"' + $("#CMR_op1_put_input").val() + '","MSR":"' + $("#MSR_op1_put_input").val() + '","QYJG":"' + $("#QYJG_op1_put_input").val() + '","storageType":"' + storageType + '","status":"已交易' + '","hash":"' + hex_sha256(fileString_Image) + '","parentRecordID":"' + parentRecordID + '"}';
 
                             signature = ECSign(Prvkey, args);
                             var argsHash = hex_sha256(args);
 
-                            args = '{"ZZBH":"'+ ZZBH + '","KZ_BDCQZH":"' + $("#KZ_BDCQZH_op1_put_input").val() + '","CZZT":"' + $("#CZZT_op1_put_input").val() + '","KZ_QLRZJH":"' + $("#KZ_QLRZJH_op1_put_input").val() + '","ZZBFJG":"' + $("#ZZBFJG_op1_put_input").val() + '","ZZBFRQ":"' + $("#ZZBFRQ_op1_put_input").val() + '","KZ_ZL":"' + $("#KZ_ZL_op1_put_input").val() + '","KZ_MJ":"' + $("#KZ_MJ_op1_put_input").val() + '","storageType":"' + storageType + '","status":"已交易' + '","hash":"' + hex_sha256(fileString_Image) + '","parentRecordID":"' + parentRecordID + '","recordID":"' + argsHash + '","signature":"' + signature + '"}';
+                            args = '{"HTH":"'+ HTH + '","FWSYQZH":"' + $("#FWSYQZH_op1_put_input").val() + '","QYRQ":"' + $("#QYRQ_op1_put_input").val() + '","JZMJ":"' + $("#JZMJ_op1_put_input").val() + '","DYQK":"' + $("#DYQK_op1_put_input").val() + '","CJJG":"' + $("#CJJG_op1_put_input").val() + '","FWDZ":"' + $("#FWDZ_op1_put_input").val() + '","CMR":"' + $("#CMR_op1_put_input").val() + '","MSR":"' + $("#MSR_op1_put_input").val() + '","QYJG":"' + $("#QYJG_op1_put_input").val() + '","storageType":"' + storageType + '","status":"已交易' + '","hash":"' + hex_sha256(fileString_Image) + '","parentRecordID":"' + parentRecordID + '","recordID":"' + argsHash + '","signature":"' + signature + '"}';
                             console.log(args);
 
                             $.ajax({
@@ -417,95 +418,11 @@ $(document).ready(function(){
         }
     });
 
-    function taxButtonClick(){
-        var storageTypeChecked = $("[name='storageType']").filter(":checked");
-        var storageType = storageTypeChecked.attr("value");
-        var parentRecordID = "";
-
-        var objFiles_PrvkeyPEM = document.getElementById("Prvkey_put_input");
-        var reader_PrvkeyPEM = new FileReader();
-        try{
-            reader_PrvkeyPEM.readAsText(objFiles_PrvkeyPEM.files[0], "UTF-8");
-        } catch(err) {
-            alert("请选择签名密钥");
-            return;
-        }
-        reader_PrvkeyPEM.onload = function(evt_Prvkey){
-            var fileString_PrvkeyPEM = evt_Prvkey.target.result;
-            var Prvkey = getPrvKeyFromPEM(fileString_PrvkeyPEM);
-
-            var objFiles_PubkeyPEM = document.getElementById("Pubkey_put_input");
-            var reader_PubkeyPEM = new FileReader();
-
-            try{
-                reader_PubkeyPEM.readAsText(objFiles_PubkeyPEM.files[0], "UTF-8");
-            } catch(err) {
-                alert("请选择身份证书");
-                return;
-            }
-
-            reader_PubkeyPEM.onload = function(evt_Pubkey){
-                var fileString_PubkeyPEM = evt_Pubkey.target.result;
-                try {
-                    var jsonFile = JSON.parse(fileString_PubkeyPEM);
-                } catch(err){
-                    alert("请选择正确的身份证书");
-                    return;
-                }
-                var args = "";
-                var signature = "";
-
-                console.log("click commit button!");
-
-                var parentRecordID = $("#tax_parentID")[0].innerHTML;
-                var taxType = $("#type_op1_tax_input").val();
-                var taxAmount = $("#amount_op1_tax_input").val();
-                var taxCZZT = $("#taxCZZT")[0].innerHTML;
-                var taxZZBH = $("#taxZZBH")[0].innerHTML;
-
-                args = '{"taxType":"'+ taxType + '","taxAmount":"' + taxAmount + '","CZZT":"' + taxCZZT + '","ZZBH":"' + taxZZBH + '","status":"已完税' + '","parentRecordID":"' + parentRecordID + '"}';
-
-                signature = ECSign(Prvkey, args);
-                // var argsHash = hex_sha256(args);
-                var argsHash = parentRecordID;
-                args = '{"taxType":"'+ taxType + '","taxAmount":"' + taxAmount + '","CZZT":"' + taxCZZT +  '","ZZBH":"' + taxZZBH +'","status":"已完税' + '","parentRecordID":"' + parentRecordID + '","recordID":"' + argsHash + '","signature":"' + signature + '"}';
-                console.log("args:" + args);
-
-                $.ajax({
-                    type:'post',
-                    
-                    url: RESTURL + '/channels/atlchannel/chaincodes/atlchainCC/AddRecord',
-                    data:JSON.stringify({
-                        'args':[argsHash, args, signature, fileString_PubkeyPEM],
-                        'username':getCookie("username"),
-                        'orgname':getCookie("orgname")
-                    }),
-                    headers: {
-                        "authorization": "Bearer " + getCookie("token"),
-                        "content-type": "application/json"
-                    },
-                    success:function(data){
-                        console.log(data);
-                        alert(data + ": 写入成功");
-                        $("#txID_put_input").val(data);
-                    },
-                    error:function(err){
-                        console.log(err);
-                    }
-                });
-            }
-        }
-    }
-
-    $('body').on('click' , '#tax_commit_btn' , function(){
-        taxButtonClick();
-    });
-
     function txButtonClick(){
         var storageTypeChecked = $("[name='storageType']").filter(":checked");
         var storageType = storageTypeChecked.attr("value");
         var parentRecordID = "";
-
+    
         var objFiles_PrvkeyPEM = document.getElementById("Prvkey_put_input");
         var reader_PrvkeyPEM = new FileReader();
         try{
@@ -517,17 +434,17 @@ $(document).ready(function(){
         reader_PrvkeyPEM.onload = function(evt_Prvkey){
             var fileString_PrvkeyPEM = evt_Prvkey.target.result;
             var Prvkey = getPrvKeyFromPEM(fileString_PrvkeyPEM);
-
+    
             var objFiles_PubkeyPEM = document.getElementById("Pubkey_put_input");
             var reader_PubkeyPEM = new FileReader();
-
+    
             try{
                 reader_PubkeyPEM.readAsText(objFiles_PubkeyPEM.files[0], "UTF-8");
             } catch(err) {
                 alert("请选择身份证书");
                 return;
             }
-
+    
             reader_PubkeyPEM.onload = function(evt_Pubkey){
                 var fileString_PubkeyPEM = evt_Pubkey.target.result;
                 try {
@@ -538,25 +455,25 @@ $(document).ready(function(){
                 }
                 var args = "";
                 var signature = "";
-
+    
                 console.log("click commit button!");
-
-                var parentRecordID = $("#tx_parentID")[0].innerHTML;
-                var txType = $("#type_op1_tx_input").val();
-                var txAmount = $("#amount_op1_tx_input").val();
+    
+                var parentRecordID = $("#reg_parentID")[0].innerHTML;
+                var txType = $("#type_op1_reg_input").val();
+                var txAmount = $("#amount_op1_reg_input").val();
                 var txCZZT = $("#txCZZT")[0].innerHTML;
                 var txZZBH = $("#txZZBH")[0].innerHTML;
-
-                args = '{"txType":"'+ txType + '","txAmount":"' + txAmount + '","CZZT":"' + txCZZT + '","ZZBH":"' + txZZBH + '","status":"已交易' + '","parentRecordID":"' + parentRecordID + '"}';
-
+    
+                args = '{"txType":"'+ txType + '","txAmount":"' + txAmount + '","CZZT":"' + txCZZT + '","ZZBH":"' + txZZBH + '","status":"已登记' + '","parentRecordID":"' + parentRecordID + '"}';
+    
                 signature = ECSign(Prvkey, args);
-                var argsHash = hex_sha256(args);
-                args = '{"txType":"'+ txType + '","txAmount":"' + txAmount + '","CZZT":"' + txCZZT +  '","ZZBH":"' + txZZBH +'","status":"已交易' + '","parentRecordID":"' + parentRecordID + '","recordID":"' + argsHash + '","signature":"' + signature + '"}';
+                var argsHash = parentRecordID;
+                args = '{"txType":"'+ txType + '","txAmount":"' + txAmount + '","CZZT":"' + txCZZT +  '","ZZBH":"' + txZZBH +'","status":"已登记' + '","parentRecordID":"' + parentRecordID + '","recordID":"' + argsHash + '","signature":"' + signature + '"}';
                 console.log("args:" + args);
-
+    
                 $.ajax({
                     type:'post',
-                    
+    
                     url: RESTURL + '/channels/atlchannel/chaincodes/atlchainCC/AddRecord',
                     data:JSON.stringify({
                         'args':[argsHash, args, signature, fileString_PubkeyPEM],
@@ -583,7 +500,6 @@ $(document).ready(function(){
     $('body').on('click' , '#tx_commit_btn' , function(){
         txButtonClick();
     });
-
     // put <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
     // trace >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -821,13 +737,13 @@ $(document).ready(function(){
                 var args1 = "";
                 var args2 = "";
                 var shouldAddComma = false;
-                if($("#ZZBH_op1_get_input").val() != ""){
-                    args0 = '"ZZBH":"' + $("#ZZBH_op1_get_input").val() + '"';
+                if($("#HTH_op1_get_input").val() != ""){
+                    args0 = '"HTH":"' + $("#HTH_op1_get_input").val() + '"';
                     shouldAddComma = true;
                     args += args0;
                 }
-                if($("#CZZT_op1_get_input").val() != ""){
-                    args1 = '"CZZT":"' + $("#CZZT_op1_get_input").val() + '"';     
+                if($("#CMR_op1_get_input").val() != ""){
+                    args1 = '"CMR":"' + $("#CMR_op1_get_input").val() + '"';     
                     if(shouldAddComma){
                         args += ',';
                     }
@@ -902,6 +818,10 @@ $(document).ready(function(){
                 console.log(data);
                 $("#get_result_title").text("详细结果");
                 $("#result_input").html(FormatOutputTableDetail(data));
+                var jsonData = JSON.parse(data);
+                // if(jsonData[0]["Record"]["status"]=="已完税"){
+                //     $("#show_result_button").html(FormatOutputTableDetailButton());
+                // }
                 if(data == "[]"){
                     alert("未查询到结果");
                 }
@@ -1054,7 +974,7 @@ function FormatOutputForHBaseData(data){
 }
 
 function FormatOutputHDFS(data){
-    var str = "<a href=tmp/" + data + ">" + data + "</a>";
+    var str = "<a href=../tmp/" + data + ">" + data + "</a>";
     return str;
 }
 
@@ -1126,6 +1046,72 @@ function FormatOutputUsual(data){
                             keyName = "交易ID";
                             break;
                         // estate
+                            // tx
+                        case "HTH":
+                            keyName = "合同号";
+                            break;
+                        case "FWSYQZH":
+                            keyName = "房屋所有权证号";
+                            break;
+                        case "QYRQ":
+                            keyName = "签约日期";
+                            break;
+                        case "JZMJ":
+                            keyName = "建筑面积";
+                            break;
+                        case "DYQK":
+                            keyName = "抵押情况";
+                            break;
+                        case "CJJG":
+                            keyName = "成交价格";
+                            break;
+                        case "FWDZ":
+                            keyName = "房屋地址";
+                            break;
+                        case "CMR":
+                            keyName = "出卖人";
+                            break;
+                        case "MSR":
+                            keyName = "买受人";
+                            break;
+                        case "QYJG":
+                            keyName = "签约机构";
+                            break;
+                            // tax
+                        case "GFHTH":
+                            keyName = "购房合同号";
+                            break;
+                        case "FWSYQZH":
+                            keyName = "房屋所有权证号";
+                            break;
+                        case "JZMJ":
+                            keyName = "建筑面积";
+                            break;
+                        case "CJJG":
+                            keyName = "成交价格";
+                            break;
+                        case "FWDZ":
+                            keyName = "房屋地址";
+                            break;
+                        case "CQR":
+                            keyName = "产权人";
+                            break;
+                        case "QS":
+                            keyName = "契税（万元）";
+                            break;
+                        case "TDCRJ":
+                            keyName = "土地出让金（万元）";
+                            break;
+                        case "GRSDS":
+                            keyName = "个人所得税（万元）";
+                            break;
+                        case "YHS":
+                            keyName = "印花税（万元）";
+                            break;
+                        case "GGWXJJ":
+                            keyName = "公共维修基金（万元）";
+                            break;
+                            // reg
                         case "ZZBH":
                             keyName = "证照编号";
                             break;
@@ -1152,18 +1138,6 @@ function FormatOutputUsual(data){
                             break;
                         case "status":
                             keyName = "状态";
-                            break;
-                        case "taxType":
-                            keyName = "税务类型";
-                            break;
-                        case "taxAmount":
-                            keyName = "缴税金额（万）";
-                            break;
-                        case "txType":
-                            keyName = "房屋类型";
-                            break;
-                        case "txAmount":
-                            keyName = "交易金额（万）";
                             break;
                         default:
                             break;
@@ -1249,6 +1223,72 @@ function FormatOutputUsualWithUrl(data){
                             keyName = "交易ID";
                             break;
                         // estate
+                            // tx
+                        case "HTH":
+                            keyName = "合同号";
+                            break;
+                        case "FWSYQZH":
+                            keyName = "房屋所有权证号";
+                            break;
+                        case "QYRQ":
+                            keyName = "签约日期";
+                            break;
+                        case "JZMJ":
+                            keyName = "建筑面积";
+                            break;
+                        case "DYQK":
+                            keyName = "抵押情况";
+                            break;
+                        case "CJJG":
+                            keyName = "成交价格";
+                            break;
+                        case "FWDZ":
+                            keyName = "房屋地址";
+                            break;
+                        case "CMR":
+                            keyName = "出卖人";
+                            break;
+                        case "MSR":
+                            keyName = "买受人";
+                            break;
+                        case "QYJG":
+                            keyName = "签约机构";
+                            break;
+                            // tax
+                        case "GFHTH":
+                            keyName = "购房合同号";
+                            break;
+                        case "FWSYQZH":
+                            keyName = "房屋所有权证号";
+                            break;
+                        case "JZMJ":
+                            keyName = "建筑面积";
+                            break;
+                        case "CJJG":
+                            keyName = "成交价格";
+                            break;
+                        case "FWDZ":
+                            keyName = "房屋地址";
+                            break;
+                        case "CQR":
+                            keyName = "产权人";
+                            break;
+                        case "QS":
+                            keyName = "契税（万元）";
+                            break;
+                        case "TDCRJ":
+                            keyName = "土地出让金（万元）";
+                            break;
+                        case "GRSDS":
+                            keyName = "个人所得税（万元）";
+                            break;
+                        case "YHS":
+                            keyName = "印花税（万元）";
+                            break;
+                        case "GGWXJJ":
+                            keyName = "公共维修基金（万元）";
+                            break;
+                            // reg
                         case "ZZBH":
                             keyName = "证照编号";
                             break;
@@ -1275,18 +1315,6 @@ function FormatOutputUsualWithUrl(data){
                             break;
                         case "status":
                             keyName = "状态";
-                            break;
-                        case "taxType":
-                            keyName = "税务类型";
-                            break;
-                        case "taxAmount":
-                            keyName = "缴税金额（万）";
-                            break;
-                        case "txType":
-                            keyName = "房屋类型";
-                            break;
-                        case "txAmount":
-                            keyName = "交易金额（万）";
                             break;
                         default:
                             break;
@@ -1319,9 +1347,9 @@ function FormatOutputTable(data){
         str += "<td><b> 序号： </b>" + (i+1) + "</td>";
         for(var key in jsonData[i]){
             if(key == "Key"){
-                keyName = "交易ID";
                 txID = jsonData[i][key];
-                str += "<td hidden=\"hidden\"><b> " + keyName + "：</b><span class=\"detailTxID\">" + jsonData[i][key] + "</span></td>";
+                // keyName = "交易ID";
+                // str += "<td hidden=\"hidden\"><b> " + keyName + "：</b><span class=\"detailTxID\">" + jsonData[i][key] + "</span></td>";
                 continue;
             }
             if(key == "TxId"){
@@ -1330,13 +1358,13 @@ function FormatOutputTable(data){
             if(key == "Value" || key == "Record"){
                 for(var key2 in jsonData[i][key]){
                     switch(key2) {
-                        case "ZZBH":
-                            keyName = "证照编号";
+                        case "HTH":
+                            keyName = "合同号";
                             str += "<td><b> " + keyName + "：</b>" + jsonData[i][key][key2] + "</td>";
                             keyName = "null";
                             break;
-                        case "CZZT":
-                            keyName = "持证主体";
+                        case "CMR":
+                            keyName = "出卖人";
                             str += "<td><b> " + keyName + "：</b>" + jsonData[i][key][key2] + "</td>";
                             keyName = "null";
                             break;
@@ -1362,7 +1390,7 @@ function FormatOutputTable(data){
 function FormatOutputTableDetail(data){
     var jsonData = JSON.parse(data);
     // console.log(jsonData);
-
+    
     var str = "";
     var keyName = "";
     for(var i = 0; i < jsonData.length; i++){
@@ -1388,7 +1416,7 @@ function FormatOutputTableDetail(data){
                     break;
             }
             if(key == "Value" || key == "Record"){
-                str += "<tr><td><b>交易ID：</b><span id=\"tx_parentID\">" + jsonData[i][key]["recordID"] + "</span></td></tr>";
+                str += "<tr><td><b>交易ID：</b><span id=\"reg_parentID\">" + jsonData[i][key]["recordID"] + "</span></td></tr>";
                 if(!jsonData[i][key].hasOwnProperty("parentRecordID")){
                     str += "<tr><td><b>父交易ID： </b>" + jsonData[i][key]["parentTxID"]  + "</td></tr>";
                 } else {
@@ -1423,29 +1451,35 @@ function FormatOutputTableDetail(data){
                             keyName = "交易ID";
                             break;
                         // estate
-                        case "ZZBH":
-                            keyName = "证照编号";
+                        case "HTH":
+                            keyName = "合同号";
                             break;
-                        case "KZ_BDCQZH":
-                            keyName = "不动产权证号";
+                        case "FWSYQZH":
+                            keyName = "房屋所有权证号";
                             break;
-                        case "CZZT":
-                            keyName = "持证主体";
+                        case "QYRQ":
+                            keyName = "签约日期";
                             break;
-                        case "KZ_QLRZJH":
-                            keyName = "权利人证件号";
+                        case "JZMJ":
+                            keyName = "建筑面积";
                             break;
-                        case "ZZBFJG":
-                            keyName = "证照颁发机构";
+                        case "DYQK":
+                            keyName = "抵押情况";
                             break;
-                        case "ZZBFRQ":
-                            keyName = "证照颁发日期";
+                        case "CJJG":
+                            keyName = "成交价格";
                             break;
-                        case "KZ_ZL":
-                            keyName = "坐落";
+                        case "FWDZ":
+                            keyName = "房屋地址";
                             break;
-                        case "KZ_MJ":
-                            keyName = "面积";
+                        case "CMR":
+                            keyName = "出卖人";
+                            break;
+                        case "MSR":
+                            keyName = "买受人";
+                            break;
+                        case "QYJG":
+                            keyName = "签约机构";
                             break;
                         case "status":
                             keyName = "状态";
@@ -1476,7 +1510,7 @@ function FormatOutputTableDetail(data){
                         str += "<tr><td><b>证照编号：</b><span id=\"txZZBH\">" + jsonData[i][key][key2] + "</span></td></tr>";
                         continue;
                     }
-
+    
                     str += "<tr><td><b>" + keyName + "：</b>" + jsonData[i][key][key2] + "</td></tr>";
                     keyName = "null";
                 }
@@ -1495,12 +1529,12 @@ function FormatOutputTableDetailButton(){
     str += " \
         <p><span style=\"color:#255e95;font-size:26px;font-weight:bold\">交易信息</span></p> \
         <p> \
-            <label for=\"type_op1_tx_label\">房屋类型:</label> \
-            <input type=\"text\" id=\"type_op1_tx_input\"> \
+            <label for=\"type_op1_reg_label\">房屋类型:</label> \
+            <input type=\"text\" id=\"type_op1_reg_input\"> \
         </p> \
         <p> \
-            <label for=\"amount_op1_tx_label\">交易金额（万）:</label> \
-            <input type=\"text\" id=\"amount_op1_tx_input\" value=\"10\"> \
+            <label for=\"amount_op1_reg_label\">交易金额（万）:</label> \
+            <input type=\"text\" id=\"amount_op1_reg_input\" value=\"10\"> \
         </p> \
         <p><label for=\"Prvkey_put_label\">签名密钥（本地签名，不上传）:</label><input type=\"file\" id=\"Prvkey_put_input\"></p> \
         <p><label for=\"Pubkey_put_label\">身份证书:</label><input type=\"file\" id=\"Pubkey_put_input\"></p> \
