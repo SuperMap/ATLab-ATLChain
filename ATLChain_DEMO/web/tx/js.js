@@ -1,9 +1,9 @@
 // enroll
 
-// var RESTURL = "http://127.0.0.1:7002";
-// var FileURL = "http://127.0.0.1:7001";
-var RESTURL = "http://175.154.161.50:7002";
-var FileURL = "http://175.154.161.50:7001";
+var RESTURL = "http://127.0.0.1:7002";
+var FileURL = "http://127.0.0.1:7001";
+// var RESTURL = "http://175.154.161.50:7002";
+// var FileURL = "http://175.154.161.50:7001";
 
 $(document).ready(function(){
     // 设置预设值
@@ -666,6 +666,10 @@ $(document).ready(function(){
     });
 
     $("#get_btn").click(function(){
+        if($("#RecordID_op1_get_input").val() == "" &&  $("#HTH_op1_get_input").val() == ""){
+            alert("请输入任一查询条件");
+            return;
+        }
         switch($("#get_select").val()){
             case "transaction":
                 var args = '{';
@@ -758,6 +762,13 @@ $(document).ready(function(){
                     shouldAddComma = true;
                     args += args1;
                 }
+                if(true){
+                    if(shouldAddComma){
+                        args += ',';
+                    }
+                    shouldAddComma = true;
+                    args += '"status":"已交易"';
+                }
 
                 args += '}';
 
@@ -819,12 +830,16 @@ $(document).ready(function(){
                 $("#get_result_title").text("详细结果");
                 $("#result_input").html(FormatOutputTableDetail(data));
                 var jsonData = JSON.parse(data);
-                // if(jsonData[0]["Record"]["status"]=="已完税"){
+                // if(jsonData[0]["Record"]["status"]=="已纳税"){
                 //     $("#show_result_button").html(FormatOutputTableDetailButton());
                 // }
                 if(data == "[]"){
                     alert("未查询到结果");
                 }
+                $("#show_pic").html(" \
+                    <p style=\"text-align:left\"><b>附件：</b></p> \
+                    <img width=\"900px\" height=\"600px\" src=\"../tmp/" + $("#dataHash")[0].innerHTML + "\"> \
+                ");
             },
             error:function(err){
                 console.log(err);
@@ -1063,7 +1078,7 @@ function FormatOutputUsual(data){
                             keyName = "抵押情况";
                             break;
                         case "CJJG":
-                            keyName = "成交价格";
+                            keyName = "成交价格（万元）";
                             break;
                         case "FWDZ":
                             keyName = "房屋地址";
@@ -1088,7 +1103,7 @@ function FormatOutputUsual(data){
                             keyName = "建筑面积";
                             break;
                         case "CJJG":
-                            keyName = "成交价格";
+                            keyName = "成交价格（万元）";
                             break;
                         case "FWDZ":
                             keyName = "房屋地址";
@@ -1240,7 +1255,7 @@ function FormatOutputUsualWithUrl(data){
                             keyName = "抵押情况";
                             break;
                         case "CJJG":
-                            keyName = "成交价格";
+                            keyName = "成交价格（万元）";
                             break;
                         case "FWDZ":
                             keyName = "房屋地址";
@@ -1265,7 +1280,7 @@ function FormatOutputUsualWithUrl(data){
                             keyName = "建筑面积";
                             break;
                         case "CJJG":
-                            keyName = "成交价格";
+                            keyName = "成交价格（万元）";
                             break;
                         case "FWDZ":
                             keyName = "房屋地址";
@@ -1451,6 +1466,7 @@ function FormatOutputTableDetail(data){
                             keyName = "交易ID";
                             break;
                         // estate
+                            // tx
                         case "HTH":
                             keyName = "合同号";
                             break;
@@ -1467,7 +1483,7 @@ function FormatOutputTableDetail(data){
                             keyName = "抵押情况";
                             break;
                         case "CJJG":
-                            keyName = "成交价格";
+                            keyName = "成交价格（万元）";
                             break;
                         case "FWDZ":
                             keyName = "房屋地址";
@@ -1480,6 +1496,65 @@ function FormatOutputTableDetail(data){
                             break;
                         case "QYJG":
                             keyName = "签约机构";
+                            break;
+                            // tax
+                        case "GFHTH":
+                            keyName = "购房合同号";
+                            break;
+                        case "FWSYQZH":
+                            keyName = "房屋所有权证号";
+                            break;
+                        case "JZMJ":
+                            keyName = "建筑面积";
+                            break;
+                        case "CJJG":
+                            keyName = "成交价格（万元）";
+                            break;
+                        case "FWDZ":
+                            keyName = "房屋地址";
+                            break;
+                        case "CQR":
+                            keyName = "产权人";
+                            break;
+                        case "QS":
+                            keyName = "契税（万元）";
+                            break;
+                        case "TDCRJ":
+                            keyName = "土地出让金（万元）";
+                            break;
+                        case "GRSDS":
+                            keyName = "个人所得税（万元）";
+                            break;
+                        case "YHS":
+                            keyName = "印花税（万元）";
+                            break;
+                        case "GGWXJJ":
+                            keyName = "公共维修基金（万元）";
+                            break;
+                            // reg
+                        case "ZZBH":
+                            keyName = "证照编号";
+                            break;
+                        case "KZ_BDCQZH":
+                            keyName = "不动产权证号";
+                            break;
+                        case "CZZT":
+                            keyName = "持证主体";
+                            break;
+                        case "KZ_QLRZJH":
+                            keyName = "权利人证件号";
+                            break;
+                        case "ZZBFJG":
+                            keyName = "证照颁发机构";
+                            break;
+                        case "ZZBFRQ":
+                            keyName = "证照颁发日期";
+                            break;
+                        case "KZ_ZL":
+                            keyName = "坐落";
+                            break;
+                        case "KZ_MJ":
+                            keyName = "面积";
                             break;
                         case "status":
                             keyName = "状态";
@@ -1508,6 +1583,10 @@ function FormatOutputTableDetail(data){
                     }
                     if(keyName == "证照编号"){
                         str += "<tr><td><b>证照编号：</b><span id=\"txZZBH\">" + jsonData[i][key][key2] + "</span></td></tr>";
+                        continue;
+                    }
+                    if(keyName == "数据哈希"){
+                        str += "<tr><td><b>数据哈希：</b><span id=\"dataHash\">" + jsonData[i][key][key2] + "</span></td></tr>";
                         continue;
                     }
     

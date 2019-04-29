@@ -23,7 +23,27 @@
     <div id="put_div">
         <h2 style="text-align: center">录入税务信息</h2>
         <form>
+            <fieldset>
+            <p hidden="hidden">
+                <label for="Type_get_label">选择查询类型:</label>
+                <select id="get_select" style="height:25px">
+                    <option value="estate">不动产证书</option>
+                    <option value="transaction">数据记录</option>
+                </select>
+            </p>
+            <div id="content_get_put_div">
+                <p>
+                    <label for="RecordID_op1_get_put_label">交易部门交易ID:</label>
+                    <input type="text" id="RecordID_op1_put_input">
+                </p>
+            </div>
+            <p>
+                <button type="button" id="get_put_btn">提交查询</button>
+            </p>
+            </fieldset>
+        </form>
 
+        <form>
             <fieldset>
             <p hidden="hidden">
                 <label for="Type_put_label">选择记录类型:</label>
@@ -32,90 +52,38 @@
                     <option value="transaction">数据记录</option>
                 </select>
             </p>
-            
-            <div id="content_put_div">
-                <p>
-                    <label for="GFHTH_op1_put_label">购房合同号:</label>
-                    <input type="text" id="GFHTH_op1_put_input">
-                </p>
-                <p>
-                    <label for="FWSYQZH_op1_put_label">房屋所有权证号:</label>
-                    <input type="text" id="FWSYQZH_op1_put_input" value="蒙(2016)XXXX旗不动产证明第0000118号">
-                </p>
-                <p>
-                    <label for="JZMJ_op1_put_label">建筑面积:</label>
-                    <input type="text" id="JZMJ_op1_put_input" value="90㎡">
-                </p>
-                <p>
-                    <label for="CJJG_op1_put_label">成交价格（万元）:</label>
-                    <input type="text" id="CJJG_op1_put_input" value="400">
-                </p>
-                <p>
-                    <label for="FWDZ_op1_put_label">房屋地址:</label>
-                    <input type="text" id="FWDZ_op1_put_input" value="XXX小区A12号楼1单元602室">
-                </p>
-                <p>
-                    <label for="CQR_op1_put_label">产权人:</label>
-                    <input type="text" id="CQR_op1_put_input" value="张三">
-                </p>
-                <p>
-                    <label for="QS_op1_put_label">契税（万元）:</label>
-                    <input type="text" id="QS_op1_put_input" value="1">
-                </p>
-                <p>
-                    <label for="TDCRJ_op1_put_label">土地出让金（万元）:</label>
-                    <input type="text" id="TDCRJ_op1_put_input" value="1">
-                </p>
-                <p>
-                    <label for="GRSDS_op1_put_label">个人所得税（万元）:</label>
-                    <input type="text" id="GRSDS_op1_put_input" value="0">
-                </p>
-                <p>
-                    <label for="YHS_op1_put_label">印花税（万元）:</label>
-                    <input type="text" id="YHS_op1_put_input" value="0.1">
-                </p>
-                <p>
-                    <label for="GGWXJJ_op1_put_label">公共维修基金（万元）:</label>
-                    <input type="text" id="GGWXJJ_op1_put_input" value="1">
-                </p>
-                <p>
-                    <label for="ParentID_op1_put_label">父交易ID（无父交易请空白）:</label>
-                    <textarea id="ParentID_op1_put_input" rows="3" cols="38" style="vertical-align: top;"></textarea>
-                </p>
-                <p>
-                    <label for="Image_op1_put_label">选择图片:</label>
-                    <input type="file" id="Image_op1_put_input">
-                </p>
-            </div>
-            
-            <p style="margin-right:100px">
-                <label for="Stroage_op0_put_label">存储方式:</label>
-                <input type="radio" id="hdfs_op0_put_label" name="storageType" value="hdfs" style="width:20px; height:15px" checked="checked">HDFS
-                <input type="radio" id="onchain_op0_put_label" name="storageType" value="onchain" style="width:20px; height:15px">onchain
-                <input type="radio" id="hbase_op0_put_label" name="storageType" value="hbase" style="width:20px; height:15px">HBase
-            </p>
-            <p>
-                <label for="Prvkey_put_label">签名密钥（本地签名，不上传）:</label>
-                <input type="file" id="Prvkey_put_input">
-            </p>
-            <p>
-                <label for="Pubkey_put_label">身份证书:</label>
-                <input type="file" id="Pubkey_put_input">
-            </p>
-            <p>
-                <button type="button" id="put_btn">提交</button>
-            </p>
             </fieldset>
         </form>
     </div>
 
     <hr>
 
-    <div id="result_div">
+    <div id="result_txID_div">
+        <!-- 
         <p style="text-align: center">
             <label for="txID_put_label">交易ID:</label>
             <textarea id="txID_put_input"  rows="3" cols="50" readonly="readonly" style="vertical-align: top;">交易ID</textarea>
         </p>
+        -->
     </div>
+
+    <div id="result_div">
+        <form>
+            <fieldset>
+                <table width="100%" border="0" cellspacing="0" cellpadding="0" align="center">
+                    <tr>
+                        <td align="center" class="biaoti" height="60"><span id="get_result_title">查询结果</span></td>
+                    </tr>
+                </table>
+                <table width="100%" border="0" cellspacing="1" cellpadding="4" bgcolor="#cccccc" class="tabtop13" align="left" style="text-align: left" id="result_input">
+                </table>
+                <div id="show_pic"> 
+                </div>
+                <div id="show_result_button"> 
+                </div>
+            </fieldset>
+        </form>
+    </div>
+
 </body>
 </html>
