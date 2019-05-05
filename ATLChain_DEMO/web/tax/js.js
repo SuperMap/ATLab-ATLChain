@@ -1,9 +1,9 @@
 // enroll
 
-var RESTURL = "http://127.0.0.1:7003";
-var FileURL = "http://127.0.0.1:7001";
-// var RESTURL = "http://175.154.161.50:7003";
-// var FileURL = "http://175.154.161.50:7001";
+// var RESTURL = "http://127.0.0.1:7003";
+// var FileURL = "http://127.0.0.1:7001";
+var RESTURL = "http://175.154.161.50:7003";
+var FileURL = "http://175.154.161.50:7001";
 
 $(document).ready(function(){
     // 设置预设值
@@ -903,7 +903,6 @@ $(document).ready(function(){
                 break;
         }
     });
-
 
     function showDetail(txid){
         txid = window.event.srcElement.id;
@@ -2038,7 +2037,7 @@ function FormatOutputTableTaxButton(){
             <textarea id=\"ParentID_op1_put_input\" rows=\"3\" cols=\"38\" style=\"vertical-align: top;\"></textarea> \
         </p> \
         <p> \
-            <label for=\"Image_op1_put_label\">选择图片:</label> \
+            <label for=\"Image_op1_put_label\">选择图片（选填）:</label> \
             <input type=\"file\" id=\"Image_op1_put_input\"> \
         </p> \
         <p style=\"margin-right:100px\"> \

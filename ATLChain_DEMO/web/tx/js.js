@@ -1,9 +1,9 @@
 // enroll
 
-var RESTURL = "http://127.0.0.1:7002";
-var FileURL = "http://127.0.0.1:7001";
-// var RESTURL = "http://175.154.161.50:7002";
-// var FileURL = "http://175.154.161.50:7001";
+// var RESTURL = "http://127.0.0.1:7002";
+// var FileURL = "http://127.0.0.1:7001";
+var RESTURL = "http://175.154.161.50:7002";
+var FileURL = "http://175.154.161.50:7001";
 
 $(document).ready(function(){
     // 设置预设值
@@ -791,6 +791,7 @@ $(document).ready(function(){
                         $("#get_result_title").text("查询结果");
                         $("#result_input").html(FormatOutputTable(data));
                         $("#show_result_button").html("");
+                        $("#show_pic").html("");
                         if(data == "[]"){
                             alert("未查询到结果");
                         }
