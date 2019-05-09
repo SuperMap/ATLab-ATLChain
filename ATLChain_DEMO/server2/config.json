@@ -1,6 +1,6 @@
 {
    "host":"localhost",
-   "port":"7002",
+   "port":"7003",
    "jwt_expiretime": "36000",
    "channelName":"atlchannel",
    "CC_SRC_PATH":"./app",

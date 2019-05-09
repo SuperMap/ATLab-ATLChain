@@ -33,45 +33,45 @@
 // console.log("======================== End test crypto.js =======================")
 
 
-console.log("======================== Begin test hdfs.js =======================")
-var HDFS = require('./hdfs.js');
+// console.log("======================== Begin test hdfs.js =======================")
+// var HDFS = require('./hdfs.js');
+// 
+// function callback(){
+//     console.log("Do something here");    
+// }
+// 
+// var hdfs = new HDFS('root', 'localhost', '50070');
+// console.log(hdfs);
+// hdfs.put("./orgA.yaml", "orgA.yaml", callback);
 
-function callback(){
-    console.log("Do something here");    
-}
-
-var hdfs = new HDFS('root', '172.16.15.66', '50070');
-console.log(hdfs);
-// hdfs.put("./orgA.yaml", "/test/orgA.yaml", callback);
-
-filename = "ttttt";
-hdfs.get("/test/orgA.yaml", filename, function(){console.log(filename.length)});
-
-console.log("======================== End test hdfs.js =======================")
+// filename = "ttttt";
+// hdfs.get("/test/orgA.yaml", filename, function(){console.log(filename.length)});
+// 
+// console.log("======================== End test hdfs.js =======================")
  
   
-// console.log("======================== Begin test hbase.js =======================")
-// var hbase = require('./hbase.js');
-// // var hbaseClient = new hbase('hbase.atlchain.com', '8080');
-// var hbaseClient = new hbase('hbase.atlchain.com', '4100');
-// console.log(hbaseClient);
-// hbaseClient.put('atlchain', 'rowkey2', 'cf:name', 'myname', putCallback);
-// // hbaseClient.get('atlchain', 'rowkey', 'cf:name', getCallback);
-// 
-// function getCallback(err, val){
-//     if(err != null){
-//         console.log("err: " + err);
-//         hbaseClient.createTable("atlchain","cf", getCallback);
-//         hbaseClient.put('atlchain', 'rowkey', 'cf:name', 'test data', putCallback);
-//     }
-//     console.log(val);
-// }
-// 
-// function putCallback(){
-//     console.log("finish");
-// }
-// 
-// console.log("======================== End test hbase.js =======================")
+console.log("======================== Begin test hbase.js =======================")
+var hbase = require('./hbase.js');
+// var hbaseClient = new hbase('hbase.atlchain.com', '8080');
+var hbaseClient = new hbase('localhost', '8080');
+console.log(hbaseClient);
+// hbaseClient.put('test', 'rowkey2', 'cf:name', 'myname', putCallback);
+hbaseClient.get('test', 'rowkey', 'cf:name', getCallback);
+
+function getCallback(err, val){
+    if(err != null){
+        console.log("err: " + err);
+        hbaseClient.createTable("test","cf", getCallback);
+        hbaseClient.put('test', 'rowkey', 'cf:name', 'test data', putCallback);
+    }
+    console.log(val);
+}
+
+function putCallback(){
+    console.log("finish");
+}
+
+console.log("======================== End test hbase.js =======================")
 
 
 // console.log("======================== Start test write file =======================")

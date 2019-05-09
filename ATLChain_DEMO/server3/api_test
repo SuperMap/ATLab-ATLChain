@@ -1,0 +1,361 @@
+# ATLab-ATLChain
+ATLChain
+
+1. npm install
+2. node start
+
+## Sample REST APIs Requests
+
+### Login Request
+* login by username, orgname and cert *
+```
+curl -s -X POST http://localhost:4000/login \
+-H "content-type: application/json" \
+-d '{
+  "username":"Tim",
+  "orgname":"OrgA",
+  "cert":"-----BEGIN CERTIFICATE-----\nMIICXDCCAgKgAwIBAgIUJbmJPWgMfwhga0JCaifHyHsAhoMwCgYIKoZIzj0EAwIw\ndTELMAkGA1UEBhMCVVMxEzARBgNVBAgTCkNhbGlmb3JuaWExFjAUBgNVBAcTDVNh\nbiBGcmFuY2lzY28xGjAYBgNVBAoTEW9yZ2EuYXRsY2hhaW4uY29tMR0wGwYDVQQD\nExRjYS5vcmdhLmF0bGNoYWluLmNvbTAeFw0xODExMjkwMjMwMDBaFw0xOTExMjkw\nMjM1MDBaMB8xDzANBgNVBAsTBmNsaWVudDEMMAoGA1UEAxMDSmltMFkwEwYHKoZI\nzj0CAQYIKoZIzj0DAQcDQgAErvN7eXvvyReFtT1172ElhrrE5/qCUU+czcxKjMQC\nCvLBommXlHeC1Nlp5FtzZvTx5VxDV8lWcUjQTTjm6VFKTaOBxTCBwjAOBgNVHQ8B\nAf8EBAMCB4AwDAYDVR0TAQH/BAIwADAdBgNVHQ4EFgQU7xDaa5+txo2Z3l0tJnEs\nT2ME5+4wKwYDVR0jBCQwIoAgvA1FMa9xMa1quD3Puakv47jkPAOVf1An01r0WdQo\nTmowVgYIKgMEBQYHCAEESnsiYXR0cnMiOnsiaGYuQWZmaWxpYXRpb24iOiIiLCJo\nZi5FbnJvbGxtZW50SUQiOiJKaW0iLCJoZi5UeXBlIjoiY2xpZW50In19MAoGCCqG\nSM49BAMCA0gAMEUCIQC4VPFMNOOARPIuMft4bOtPUmJvhvukEocN5SAzDFc2JwIg\nEnhmK1UFWgxyk36XL9WqGf5zhCw5qbsG+CWT8p2t+Jk=\n-----END CERTIFICATE-----\n",
+  "signature":"3045022100d4e473822634da78affc8567a57ce5cd6dead90997e05e9a4ebe1582d034b72b02206cb7cda0aa7573b3c417ef9ae203ac6d4760a70fe06593f8dc34eb2dd72bbfa0"
+}'
+```
+
+### Register Request
+* Register and enroll new users in Organization - **OrgA**:
+
+```
+curl -s -X POST http://localhost:4000/users \
+-H "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1NDgxNTgxMzUsInVzZXJuYW1lIjoiVGltIiwib3JnTmFtZSI6IlRlc3RPcmdBIiwiaWF0IjoxNTQ4MTIyMTM1fQ.LTzCDRRgONKEoE7XmuJRZzfKRMQrOnG293e80v7nvI0" \
+-H "content-type: application/json" \
+-d '{
+  "username":"Tim",
+  "orgName":"OrgA"
+}'
+
+curl -s -X POST http://localhost:4000/users \
+-H "content-type: application/json" \
+-d '{
+  "username":"Tim",
+  "orgName":"OrgA"
+}'
+```
+
+**OUTPUT:**
+
+```
+{
+  "success": true,
+  "secret": "RaxhMgevgJcm",
+  "message": "Jim enrolled Successfully",
+  "token": "<put JSON Web Token here>"
+}
+```
+
+The response contains the success/failure status, an **enrollment Secret** and a **JSON Web Token (JWT)** that is a required string in the Request Headers for subsequent requests.
+
+### Create Channel request
+
+```
+curl -s -X POST \
+  http://localhost:4000/channels \
+  -H "authorization: Bearer <put JSON Web Token here>" \
+  -H "content-type: application/json" \
+  -d '{
+	"channelName":"mychannel",
+	"channelConfigPath":"../artifacts/channel/mychannel.tx"
+}'
+```
+
+Please note that the Header **authorization** must contain the JWT returned from the `POST /users` call
+
+### Join Channel request
+
+```
+curl -s -X POST \
+  http://localhost:4000/channels/mychannel/peers \
+  -H "authorization: Bearer <put JSON Web Token here>" \
+  -H "content-type: application/json" \
+  -d '{
+	"peers": ["peer0.org1.example.com","peer1.org1.example.com"]
+}'
+```
+### Install chaincode
+
+```
+curl -s -X POST \
+  http://localhost:4000/chaincodes \
+  -H "authorization: Bearer <put JSON Web Token here>" \
+  -H "content-type: application/json" \
+  -d '{
+	"peers": ["peer0.org1.example.com","peer1.org1.example.com"],
+	"chaincodeName":"mycc",
+	"chaincodePath":"github.com/example_cc/go",
+	"chaincodeType": "golang",
+	"chaincodeVersion":"v0"
+}'
+```
+**NOTE:** *chaincodeType* must be set to **node** when node.js chaincode is used and *chaincodePath* must be set to the location of the node.js chaincode. Also put in the $PWD
+```
+ex:
+curl -s -X POST \
+  http://localhost:4000/chaincodes \
+  -H "authorization: Bearer <put JSON Web Token here>" \
+  -H "content-type: application/json" \
+  -d '{
+	"peers": ["peer0.org1.example.com","peer1.org1.example.com"],
+	"chaincodeName":"mycc",
+	"chaincodePath":"$PWD/artifacts/src/github.com/example_cc/node",
+	"chaincodeType": "node",
+	"chaincodeVersion":"v0"
+}'
+```
+
+### Instantiate chaincode
+
+This is the endorsement policy defined during instantiation.
+This policy can be fulfilled when members from both orgs sign the transaction proposal.
+
+```
+{
+	identities: [{
+			role: {
+				name: 'member',
+				mspId: 'OrgAMSP'
+			}
+		},
+		{
+			role: {
+				name: 'member',
+				mspId: 'OrgBMSP'
+			}
+		}
+	],
+	policy: {
+		'2-of': [{
+			'signed-by': 0
+		}, {
+			'signed-by': 1
+		}]
+	}
+}
+```
+
+```
+curl -s -X POST \
+  http://localhost:4000/channels/mychannel/chaincodes \
+  -H "authorization: Bearer <put JSON Web Token here>" \
+  -H "content-type: application/json" \
+  -d '{
+	"chaincodeName":"mycc",
+	"chaincodeVersion":"v0",
+	"chaincodeType": "golang",
+	"args":["a","100","b","200"]
+}'
+```
+**NOTE:** *chaincodeType* must be set to **node** when node.js chaincode is used
+
+### Invoke request
+
+This invoke request is signed by peers from both orgs, *org1* & *org2*.
+```
+curl -s -X POST \
+  http://localhost:4000/channels/mychannel/chaincodes/mycc \
+  -H "authorization: Bearer <put JSON Web Token here>" \
+  -H "content-type: application/json" \
+  -d '{
+	"peers": ["peer0.org1.example.com","peer0.org2.example.com"],
+	"fcn":"move",
+	"args":["a","b","10"]
+}'
+
+curl -s -X POST \
+  http://localhost:4000/channels/atlchannel/chaincodes/atlchainCC/AddRecord \
+  -H "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1NDkwMjI1NjgsInVzZXJuYW1lIjoiYWJiIiwib3JnbmFtZSI6Ik9yZ0EiLCJpYXQiOjE1NDg5ODY1Njh9.pXiWemEJWOvidXWQp7dxP0lWZfub5rT3pEBJ3FdURs4" \
+  -H "content-type: application/json" \
+  -d '{
+	"args":["key", "{\"AddrReceive\":\"addrAAA\", \"AddrSend\":\"addrBBB\", \"recordID\":\"123\"}", "signagureAAA", "pubKeyAAA"],
+  "username":"a00",
+  "orgname":"Org1"
+}'
+
+curl -s -X POST \
+  http://localhost:4000/channels/atlchannel/chaincodes/atlchainCC/put \
+  -H "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1NDgxNTgxMzUsInVzZXJuYW1lIjoiVGltIiwib3JnTmFtZSI6IlRlc3RPcmdBIiwiaWF0IjoxNTQ4MTIyMTM1fQ.LTzCDRRgONKEoE7XmuJRZzfKRMQrOnG293e80v7nvI0" \
+  -H "content-type: application/json" \
+  -d '{
+	"peers": ["peer0.orga.atlchain.com"],
+	"fcn":"Put",
+	"args":["{\"AddrReceive\":\"addrAAA\", \"AddrSend\":\"addrBBB\"}", "signagureAAA", "pubKeyAAA"],
+  "cert":"certfile",
+  "signature":"sign",
+  "storageType":"hbase",
+  "username":"Tim",
+  "orgname":"OrgA"
+}'
+
+curl -s -X POST \
+  http://localhost:4000/channels/mychannel/chaincodes/mycc/putTx \
+  -H "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1NTExMjQ1MzEsInVzZXJuYW1lIjoiYTAwIiwib3JnbmFtZSI6Ik9yZzEiLCJpYXQiOjE1NTEwODg1MzF9.mo3s1TloEsOmMsrcdXu9QdSR34A-C2qnF6g83MDc2Vc" \
+  -H "content-type: application/json" \
+  -d '{
+	"peers": ["peer0.org1.example.com"],
+	"fcn":"Put",
+	"args":["KEYAAA", "{\"AddrReceive\":\"addrAAA\", \"AddrSend\":\"addrBBB\"}", "signagureAAA", "pubKeyAAA"],
+  "cert":"certfile",
+  "signature":"sign",
+  "storageType":"hbase",
+  "username":"a00",
+  "orgname":"Org1"
+}'
+
+curl -s -X POST http://localhost:4000/users \
+-H "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1NDgwOTcxNjYsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Ik9yZ0EiLCJpYXQiOjE1NDgwNjExNjZ9.Msa1s3fRzKSshWA8l0O62gQ1pkSB2StU-bRL-8jomAk" \
+-H "content-type: application/json" \
+-d '{
+  "username":"Jim",
+  "orgName":"OrgA"
+}'
+```
+**NOTE:** Ensure that you save the Transaction ID from the response in order to pass this string in the subsequent query transactions.
+
+### Chaincode Query
+
+```
+curl -s -X POST \
+http://localhost:4000/channels/atlchannel/chaincodes/atlchainCC/GetRecord \
+  -H "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1NDgxNTgxMzUsInVzZXJuYW1lIjoiVGltIiwib3JnTmFtZSI6IlRlc3RPcmdBIiwiaWF0IjoxNTQ4MTIyMTM1fQ.LTzCDRRgONKEoE7XmuJRZzfKRMQrOnG293e80v7nvI0" \
+  -H "content-type: application/json" \
+  -d '{ 
+    "args":["{\"AddrSend\":\"addrBBB\", \"AddrReceive\":\"addrAAA\"}"],
+    "username":"Tim",
+    "orgname":"OrgA"
+}'
+
+curl -s -X POST \
+http://localhost:4000/channels/atlchannel/chaincodes/atlchainCC/GetRecord \
+  -H "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1NDgyNDk1NjQsInVzZXJuYW1lIjoiY2NjIiwib3JnbmFtZSI6Ik9yZ0EiLCJpYXQiOjE1NDgyMTM1NjR9.XxULwelW-yv3XSHjYOTomJDq_GDo8ksaFKbUGPzyrrU" \
+  -H "content-type: application/json" \
+  -d '{ 
+    "fcn":"Get",
+    "peer":"peer0.orga.atlchain.com", 
+    "args":["{\"AddrSend\":\"addrBBB\", \"AddrReceive\":\"addrAAA\"}"],
+    "storageType":"onchain",
+    "username":"Tim",
+    "orgname":"OrgA"
+}'
+
+curl -s -X POST \
+http://localhost:4000/channels/atlchannel/chaincodes/atlchainCC/Trace \
+  -H "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1NDgxNTgxMzUsInVzZXJuYW1lIjoiVGltIiwib3JnTmFtZSI6IlRlc3RPcmdBIiwiaWF0IjoxNTQ4MTIyMTM1fQ.LTzCDRRgONKEoE7XmuJRZzfKRMQrOnG293e80v7nvI0" \
+  -H "content-type: application/json" \
+  -d '{ 
+    "args":["{\"AddrSend\":\"addrBBB\", \"AddrReceive\":\"addrAAA\"}"],
+    "username":"Tim",
+    "orgname":"OrgA"
+}'
+```
+
+// getDataFromHBase
+```
+curl -s -X GET "http://localhost:4000/getDataFromHBase?hash=93f34d06fcf4ce30e2745ec11d856506ef9b4567f2a5f61d43cb1028e5b642c5" \
+  -H "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1NDkwMjI1NjgsInVzZXJuYW1lIjoiYWJiIiwib3JnbmFtZSI6Ik9yZ0EiLCJpYXQiOjE1NDg5ODY1Njh9.pXiWemEJWOvidXWQp7dxP0lWZfub5rT3pEBJ3FdURs4" \
+  -H "content-type: application/json"
+```
+
+// getFileFromHDFS
+```
+curl -s -X GET "http://localhost:4000/getFileFromHDFS?filename=sign" \
+  -H "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1NDgyNDk1NjQsInVzZXJuYW1lIjoiY2NjIiwib3JnbmFtZSI6Ik9yZ0EiLCJpYXQiOjE1NDgyMTM1NjR9.XxULwelW-yv3XSHjYOTomJDq_GDo8ksaFKbUGPzyrrU" \
+  -H "content-type: application/json"
+```
+
+
+### Query Block by BlockNumber
+
+```
+curl -s -X GET \
+  "http://localhost:4000/channels/mychannel/blocks/1?peer=peer0.org1.example.com" \
+  -H "authorization: Bearer <put JSON Web Token here>" \
+  -H "content-type: application/json"
+```
+
+### Query Transaction by TransactionID
+
+```
+curl -s -X GET http://148.70.109.243:4000/channels/atlchannel/transactions/e766642134d476ef44eadef272bdb32452f2980cc5c29d3869eb15a7f2740318?peer=peer0.orga.atlchain.com \
+  -H "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1NDgyNDk1NjQsInVzZXJuYW1lIjoiY2NjIiwib3JnbmFtZSI6Ik9yZ0EiLCJpYXQiOjE1NDgyMTM1NjR9.XxULwelW-yv3XSHjYOTomJDq_GDo8ksaFKbUGPzyrrU" \
+  -H "content-type: application/json"
+```
+**NOTE**: The transaction id can be from any previous invoke transaction, see results of the invoke request, will look something like `8a95b1794cb17e7772164c3f1292f8410fcfdc1943955a35c9764a21fcd1d1b3`.
+
+
+### Query ChainInfo
+
+```
+curl -s -X GET \
+  "http://localhost:4000/channels/mychannel?peer=peer0.org1.example.com" \
+  -H "authorization: Bearer <put JSON Web Token here>" \
+  -H "content-type: application/json"
+```
+
+### Query Installed chaincodes
+
+```
+curl -s -X GET \
+  "http://localhost:4000/chaincodes?peer=peer0.org1.example.com&type=installed" \
+  -H "authorization: Bearer <put JSON Web Token here>" \
+  -H "content-type: application/json"
+```
+
+### Query Instantiated chaincodes
+
+```
+curl -s -X GET \
+  "http://localhost:4000/chaincodes?peer=peer0.org1.example.com&type=instantiated" \
+  -H "authorization: Bearer <put JSON Web Token here>" \
+  -H "content-type: application/json"
+```
+
+### Query Channels
+
+```
+curl -s -X GET \
+  "http://localhost:4000/channels?peer=peer0.org1.example.com" \
+  -H "authorization: Bearer <put JSON Web Token here>" \
+  -H "content-type: application/json"
+```
+
+### Clean the network
+
+The network will still be running at this point. Before starting the network manually again, here are the commands which cleans the containers and artifacts.
+
+```
+docker rm -f $(docker ps -aq)
+docker rmi -f $(docker images | grep dev | awk '{print $3}')
+rm -rf fabric-client-kv-org[1-2]
+```
+
+### Network configuration considerations
+
+You have the ability to change configuration parameters by either directly editing the network-config.yaml file or provide an additional file for an alternative target network. The app uses an optional environment variable "TARGET_NETWORK" to control the configuration files to use. For example, if you deployed the target network on Amazon Web Services EC2, you can add a file "network-config-aws.yaml", and set the "TARGET_NETWORK" environment to 'aws'. The app will pick up the settings inside the "network-config-aws.yaml" file.
+
+#### IP Address** and PORT information
+
+If you choose to customize your docker-compose yaml file by hardcoding IP Addresses and PORT information for your peers and orderer, then you MUST also add the identical values into the network-config.yaml file. The url and eventUrl settings will need to be adjusted to match your docker-compose yaml file.
+
+```
+peer1.org1.example.com:
+  url: grpcs://x.x.x.x:7056
+  eventUrl: grpcs://x.x.x.x:7058
+
+```
+
+#### Discover IP Address
+
+To retrieve the IP Address for one of your network entities, issue the following command:
+
+```
+# this will return the IP Address for peer0
+docker inspect peer0 | grep IPAddress
+```
+
+<a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.

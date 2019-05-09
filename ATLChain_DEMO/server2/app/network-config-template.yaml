@@ -1,0 +1,301 @@
+---
+#
+# The network connection profile provides client applications the information about the target
+# blockchain network that are necessary for the applications to interact with it. These are all
+# knowledge that must be acquired from out-of-band sources. This file provides such a source.
+#
+name: "ATLChain"
+
+#
+# Any properties with an "x-" prefix will be treated as application-specific, exactly like how naming
+# in HTTP headers or swagger properties work. The SDK will simply ignore these fields and leave
+# them for the applications to process. This is a mechanism for different components of an application
+# to exchange information that are not part of the standard schema described below. In particular,
+# the "x-type" property with the "hlfv1" value example below is used by Hyperledger Composer to
+# determine the type of Fabric networks (v0.6 vs. v1.0) it needs to work with.
+#
+x-type: "hlfv1"
+
+#
+# Describe what the target network is/does.
+#
+description: "ATLChain"
+
+#
+# Schema version of the content. Used by the SDK to apply the corresponding parsing rules.
+#
+version: "1.0"
+
+#
+# The client section will be added on a per org basis see orgA.yaml and orgB.yaml
+#
+#client:
+
+#
+# [Optional]. But most apps would have this section so that channel objects can be constructed
+# based on the content below. If an app is creating channels, then it likely will not need this
+# section.
+#
+channels:
+  # name of the channel
+  atlchannel:
+    # Required. list of orderers designated by the application to use for transactions on this
+    # channel. This list can be a result of access control ("orga" can only access "ordererA"), or
+    # operational decisions to share loads from applications among the orderers.  The values must
+    # be "names" of orgs defined under "organizations/peers"
+    orderers:
+      - orderer0.orga.atlchain.com
+
+    # Required. list of peers from participating orgs
+    peers:
+      peer0.orga.atlchain.com:
+        # [Optional]. will this peer be sent transaction proposals for endorsement? The peer must
+        # have the chaincode installed. The app can also use this property to decide which peers
+        # to send the chaincode install request. Default: true
+        endorsingPeer: true
+
+        # [Optional]. will this peer be sent query proposals? The peer must have the chaincode
+        # installed. The app can also use this property to decide which peers to send the
+        # chaincode install request. Default: true
+        chaincodeQuery: true
+
+        # [Optional]. will this peer be sent query proposals that do not require chaincodes, like
+        # queryBlock(), queryTransaction(), etc. Default: true
+        ledgerQuery: true
+
+        # [Optional]. will this peer be the target of the SDK's listener registration? All peers can
+        # produce events but the app typically only needs to connect to one to listen to events.
+        # Default: true
+        eventSource: true
+
+      peer1.orga.atlchain.com:
+        endorsingPeer: false
+        chaincodeQuery: true
+        ledgerQuery: true
+        eventSource: false
+
+      peer0.orgb.atlchain.com:
+        endorsingPeer: true
+        chaincodeQuery: true
+        ledgerQuery: true
+        eventSource: true
+
+      peer1.orgb.atlchain.com:
+        endorsingPeer: false
+        chaincodeQuery: true
+        ledgerQuery: true
+        eventSource: false
+
+      peer0.orgc.atlchain.com:
+        endorsingPeer: true
+        chaincodeQuery: true
+        ledgerQuery: true
+        eventSource: true
+
+      peer1.orgc.atlchain.com:
+        endorsingPeer: false
+        chaincodeQuery: true
+        ledgerQuery: true
+        eventSource: false
+
+    # [Optional]. what chaincodes are expected to exist on this channel? The application can use
+    # this information to validate that the target peers are in the expected state by comparing
+    # this list with the query results of getInstalledChaincodes() and getInstantiatedChaincodes()
+    chaincodes:
+      # the format follows the "cannonical name" of chaincodes by fabric code
+      - atlchainCC:v1
+
+#
+# list of participating organizations in this network
+#
+organizations:
+  OrgA:
+    mspid: OrgA
+
+    peers:
+      - peer0.orga.atlchain.com
+      - peer1.orga.atlchain.com
+
+    # [Optional]. Certificate Authorities issue certificates for identification purposes in a Fabric based
+    # network. Typically certificates provisioning is done in a separate process outside of the
+    # runtime network. Fabric-CA is a special certificate authority that provides a REST APIs for
+    # dynamic certificate management (enroll, revoke, re-enroll). The following section is only for
+    # Fabric-CA servers.
+    certificateAuthorities:
+      - ca.orga.atlchain.com
+
+    # [Optional]. If the application is going to make requests that are reserved to organization
+    # administrators, including creating/updating channels, installing/instantiating chaincodes, it
+    # must have access to the admin identity represented by the private key and signing certificate.
+    # Both properties can be the PEM string or local path to the PEM file. Note that this is mainly for
+    # convenience in development mode, production systems should not expose sensitive information
+    # this way. The SDK should allow applications to set the org admin identity via APIs, and only use
+    # this route as an alternative when it exists.
+    adminPrivateKey:
+      path: ../../crypto/peerOrganizations/orga.atlchain.com/users/Admin@orga.atlchain.com/msp/keystore/ADMIN_ORGA_PRIVATE_KEY
+    signedCert:
+      path: ../../crypto/peerOrganizations/orga.atlchain.com/users/Admin@orga.atlchain.com/msp/signcerts/Admin@orga.atlchain.com-cert.pem
+
+  # the profile will contain public information about organizations other than the one it belongs to.
+  # These are necessary information to make transaction lifecycles work, including MSP IDs and
+  # peers with a public URL to send transaction proposals. The file will not contain private
+  # information reserved for members of the organization, such as admin key and certificate,
+  # fabric-ca registrar enroll ID and secret, etc.
+  OrgB:
+    mspid: OrgB
+    peers:
+      - peer0.orgb.atlchain.com
+      - peer1.orgb.atlchain.com
+    certificateAuthorities:
+      - ca.orgb.atlchain.com
+    adminPrivateKey:
+      path: ../../crypto/peerOrganizations/orgb.atlchain.com/users/Admin@orgb.atlchain.com/msp/keystore/ADMIN_ORGB_PRIVATE_KEY
+    signedCert:
+      path: ../../crypto/peerOrganizations/orgb.atlchain.com/users/Admin@orgb.atlchain.com/msp/signcerts/Admin@orgb.atlchain.com-cert.pem
+
+  OrgC:
+    mspid: OrgC
+    peers:
+      - peer0.orgc.atlchain.com
+      - peer1.orgc.atlchain.com
+    certificateAuthorities:
+      - ca.orgc.atlchain.com
+    adminPrivateKey:
+      path: ../../crypto/peerOrganizations/orgc.atlchain.com/users/Admin@orgc.atlchain.com/msp/keystore/ADMIN_ORGC_PRIVATE_KEY
+    signedCert:
+      path: ../../crypto/peerOrganizations/orgc.atlchain.com/users/Admin@orgc.atlchain.com/msp/signcerts/Admin@orgc.atlchain.com-cert.pem
+#
+# List of orderers to send transaction and channel create/update requests to. For the time
+# being only one orderer is needed. If more than one is defined, which one get used by the
+# SDK is implementation specific. Consult each SDK's documentation for its handling of orderers.
+#
+orderers:
+  orderer0.orga.atlchain.com:
+    url: grpc://orderer0.orga.atlchain.com:7060
+
+    # these are standard properties defined by the gRPC library
+    # they will be passed in as-is to gRPC client constructor
+    grpcOptions:
+      ssl-target-name-override: orderer0.orga.atlchain.com
+
+    tlsCACerts:
+      path:
+
+  orderer0.orgb.atlchain.com:
+    url: grpc://orderer0.orgb.atlchain.com:7060
+
+    # these are standard properties defined by the gRPC library
+    # they will be passed in as-is to gRPC client constructor
+    grpcOptions:
+      ssl-target-name-override: orderer0.orgb.atlchain.com
+
+    tlsCACerts:
+      path: 
+
+  orderer0.orgc.atlchain.com:
+    url: grpc://orderer0.orgc.atlchain.com:7060
+
+    # these are standard properties defined by the gRPC library
+    # they will be passed in as-is to gRPC client constructor
+    grpcOptions:
+      ssl-target-name-override: orderer0.orgc.atlchain.com
+
+    tlsCACerts:
+      path: 
+
+#
+# List of peers to send various requests to, including endorsement, query
+# and event listener registration.
+#
+peers:
+  peer0.orga.atlchain.com:
+    # this URL is used to send endorsement and query requests
+    url: grpc://peer0.orga.atlchain.com:7061
+    grpcOptions:
+      ssl-target-name-override: peer0.orga.atlchain.com
+    tlsCACerts:
+      path: 
+
+  peer1.orga.atlchain.com:
+    url: grpc://peer1.orga.atlchain.com:7061
+    grpcOptions:
+      ssl-target-name-override: peer1.orga.atlchain.com
+    tlsCACerts:
+      path: 
+
+  peer0.orgb.atlchain.com:
+    url: grpc://peer0.orgb.atlchain.com:7061
+    grpcOptions:
+      ssl-target-name-override: peer0.orgb.atlchain.com
+    tlsCACerts:
+      path: 
+
+  peer1.orgb.atlchain.com:
+    url: grpc://peer1.orgb.atlchain.com:7061
+    eventUrl: grpc://peer1.orgb.atlchain.com:7063
+    grpcOptions:
+      ssl-target-name-override: peer1.orgb.atlchain.com
+    tlsCACerts:
+      path: 
+
+  peer0.orgc.atlchain.com:
+    url: grpc://peer0.orgc.atlchain.com:7061
+    grpcOptions:
+      ssl-target-name-override: peer0.orgc.atlchain.com
+    tlsCACerts:
+      path: 
+
+  peer1.orgc.atlchain.com:
+    url: grpc://peer1.orgc.atlchain.com:7061
+    eventUrl: grpc://peer1.orgc.atlchain.com:7063
+    grpcOptions:
+      ssl-target-name-override: peer1.orgc.atlchain.com
+    tlsCACerts:
+      path: 
+
+#
+# Fabric-CA is a special kind of Certificate Authority provided by Hyperledger Fabric which allows
+# certificate management to be done via REST APIs. Application may choose to use a standard
+# Certificate Authority instead of Fabric-CA, in which case this section would not be specified.
+#
+certificateAuthorities:
+  ca.orga.atlchain.com:
+    url: http://ca.orga.atlchain.com:7054
+    # the properties specified under this object are passed to the 'http' client verbatim when
+    # making the request to the Fabric-CA server
+    httpOptions:
+      verify: false
+    tlsCACerts:
+      path: 
+
+    # Fabric-CA supports dynamic user enrollment via REST APIs. A "root" user, a.k.a registrar, is
+    # needed to enroll and invoke new users.
+    registrar:
+      - enrollId: admin
+        enrollSecret: adminpw
+    # [Optional] The optional name of the CA.
+    caName: ca-orga
+
+  ca.orgb.atlchain.com:
+    url: https://ca.orgb.atlchain.com:7054
+    httpOptions:
+      verify: false
+    tlsCACerts:
+      path: 
+    registrar:
+      - enrollId: admin
+        enrollSecret: adminpw
+    # [Optional] The optional name of the CA.
+    caName: ca-orgb
+
+  ca.orgc.atlchain.com:
+    url: https://ca.orgc.atlchain.com:7054
+    httpOptions:
+      verify: false
+    tlsCACerts:
+      path: 
+    registrar:
+      - enrollId: admin
+        enrollSecret: adminpw
+    # [Optional] The optional name of the CA.
+    caName: ca-orgc

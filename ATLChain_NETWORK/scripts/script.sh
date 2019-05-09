@@ -66,6 +66,7 @@ function installCC(){
         echo " ERROR !!! FAILED to install chaincode"
         exit 1
     fi
+    sleep 3
 }
  
 # instantiated chaincode 
@@ -80,7 +81,8 @@ function initCC(){
         echo "===========$res============="
         echo " ERROR !!! FAILED to instantiate chaincode"
         exit 1
-    fi
+    fi 
+    sleep 3
 }
 
 # invoke chaincode
@@ -97,6 +99,7 @@ function invokeCC(){
         echo " ERROR !!! FAILED to invoke chaincode"
         # exit 1
     fi
+    sleep 3
 }
 
 # query chaincode
@@ -113,6 +116,7 @@ function queryCC(){
         echo " ERROR !!! FAILED to query chaincode"
         exit 1
     fi
+    sleep 3
 }
 
 # change org for different peers
@@ -139,6 +143,19 @@ function changeOrg(){
     fi
 }
 
+function startServer(){
+    cd demo/server
+    npm install
+    nohup node http.js > http.log 2>&1 &	
+    nohup node app.js > http.log 2>&1 &
+    
+    cd ../server2
+    nohup node app.js > app.log 2>&1 &
+    
+    cd ../server3
+    nohup node app.js > app.log 2>&1 &
+}
+
 # The first peer create channel
 createChannel;
 
@@ -150,17 +167,15 @@ do
     installCC
 done
 
-changeOrg orga
-initCC
-
-changeOrg orgb
-queryCC
-
-changeOrg orgc
-queryCC
-
-changeOrg orga
-invokeCC
+for org in "orga" "orgb" "orgc"
+do
+    if [ $org == "orga" ]
+    then
+        initCC
+    else
+        queryCC
+    fi
+done
 
 echo
 echo "========= All GOOD, network built successfully=========== "

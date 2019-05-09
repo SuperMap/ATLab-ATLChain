@@ -149,7 +149,7 @@ app.post('/login', async function(req, res) {
 
     var jsonObj = JSON.parse(cert);
     var filename = jsonObj.enrollment.signingIdentity + "-pub";
-    var address = account.getAddress('./fabric-client-kv-orga/' + filename);
+    var address = account.getAddress('./fabric-client-kv-orgb/' + filename);
 
     console.log("address:" + address);
 
@@ -191,19 +191,19 @@ app.post('/users', async function(req, res) {
 	logger.debug('-- returned from registering the username %s for organization %s',username,orgName);
 	if (response && typeof response !== 'string') {
 
-        var fdata = fs.readFileSync('./fabric-client-kv-orga/' + username);
+        var fdata = fs.readFileSync('./fabric-client-kv-orgb/' + username);
         var jsonObj = JSON.parse(fdata);
         var filename = jsonObj.enrollment.signingIdentity + "-priv";
         var pubkeyFile = jsonObj.enrollment.signingIdentity + "-pub";
         
 		logger.debug("private key file: " + filename);
         
-        fs.writeFileSync('../web/tx/msp/' + username, fdata);
-        fs.writeFileSync('../web/tx/msp/' + filename, fs.readFileSync('./fabric-client-kv-orga/' + filename));
+        fs.writeFileSync('../web/tax/msp/' + username, fdata);
+        fs.writeFileSync('../web/tax/msp/' + filename, fs.readFileSync('./fabric-client-kv-orgb/' + filename));
 
 		logger.debug('Successfully registered the username %s for organization %s',username,orgName);
         response.filename = filename;
-		response.address = account.getAddress('./fabric-client-kv-orga/' + pubkeyFile);
+		response.address = account.getAddress('./fabric-client-kv-orgb/' + pubkeyFile);
         console.log("username:" + username);
 		logger.debug("address: " + response.address);
 		res.json(response);
@@ -224,7 +224,7 @@ app.post('/channels/:channelName/chaincodes/:chaincodeName/GetRecord', async fun
     let orgname = req.body.orgname;
 
 	var fcn = "Get";
-	let peer = 'peer0.orga.atlchain.com';
+	let peer = 'peer0.orgb.atlchain.com';
 
 	if (!chaincodeName) {
 		res.json(getErrorMessage('\'chaincodeName\''));
@@ -254,7 +254,7 @@ app.post('/channels/:channelName/chaincodes/:chaincodeName/TraceRecord', async f
 	var chaincodeName = req.params.chaincodeName;
     let username = req.body.username;
     let orgname = req.body.orgname;
-	let peer = 'peer0.orga.atlchain.com';
+	let peer = 'peer0.orgb.atlchain.com';
     let args = req.body.args; 
     let fcn = "getHistoryByKey";
 
@@ -278,7 +278,7 @@ app.post('/channels/:channelName/chaincodes/:chaincodeName/putTx', async functio
     var username = req.body.username;
     var orgname = req.body.orgname;
 
-	var peers = ['peer0.orga.atlchain.com'] ;
+	var peers = ['peer0.orgb.atlchain.com'] ;
     var fcn = "Put";
 
 	if (!args) {
@@ -358,7 +358,7 @@ app.post('/channels/:channelName/chaincodes/:chaincodeName/AddRecord', async fun
     console.log(args)
     console.log("+++++++++++++++++++++++");
 
-	var peers = ['peer0.orga.atlchain.com'] ;
+	var peers = ['peer0.orgb.atlchain.com'] ;
     var fcn = "Put";
 
 	if (!args) {
@@ -431,7 +431,7 @@ app.get('/GetFileFromHDFS', async function(req, res) {
 	// 	return;
 	// }
     // res.json(filename);
-
+    
     hdfsClient.get(hdfsDir + filename, "../web/tmp/" + filename, function(){
         res.json(filename);
         logger.info("Got file from HDFS");
