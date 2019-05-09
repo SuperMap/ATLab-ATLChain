@@ -8,18 +8,18 @@ ff02::1 ip6-allnodes
 ff02::2 ip6-allrouters
 
 # server1
-172.16.15.66    kafka.atlchain.com
-172.16.15.66    zookeeper.atlchain.com
-172.16.15.66    orderer.atlchain.com
-172.16.15.66    hbase.atlchain.com
-172.16.15.66    hdfs.atlchain.com
-172.16.15.66    peer0.orga.atlchain.com
-172.16.15.66    ca.orga.atlchain.com
+host1IP    kafka.atlchain.com
+host1IP    zookeeper.atlchain.com
+host1IP    orderer.atlchain.com
+host1IP    hbase.atlchain.com
+host1IP    hdfs.atlchain.com
+host1IP    peer0.orga.atlchain.com
+host1IP    ca.orga.atlchain.com
 
 # server2
-172.16.18.8     peer0.orgb.atlchain.com
-172.16.18.8     ca.orgb.atlchain.com
+host2IP     peer0.orgb.atlchain.com
+host2IP     ca.orgb.atlchain.com
 
 # server3
-172.16.18.9     peer0.orgc.atlchain.com
-172.16.18.9     ca.orgc.atlchain.com
+host2IP     peer0.orgc.atlchain.com
+host2IP     ca.orgc.atlchain.com

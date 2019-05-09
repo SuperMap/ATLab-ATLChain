@@ -140,12 +140,11 @@ function changeOrg(){
 }
 
 # The first peer create channel
-# createChannel;
+createChannel;
 
 for org in "orga" "orgb" "orgc"
 do
     changeOrg $org
-    queryCC
     joinChannel
     updateAnchor
     installCC
