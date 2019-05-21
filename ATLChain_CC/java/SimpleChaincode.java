@@ -30,14 +30,24 @@ public class SimpleChaincode extends ChaincodeBase {
             _logger.info("Invoke java simple chaincode");
             String func = stub.getFunction();
             List<String> params = stub.getParameters();
+            List<byte[]> paramsByte = stub.getArgs();
             if (func.equals("Put")) {
                 return Put(stub, params);
+            }
+            if (func.equals("Get")) {
+                return Get(stub, params);
             }
             if (func.equals("PutBin")) {
                 return PutBin(stub, params);
             }
-            if (func.equals("Get")) {
-                return Get(stub, params);
+            if (func.equals("GetBin")) {
+                return GetBin(stub, params);
+            }
+            if (func.equals("PutByteArray")) {
+                return PutByteArray(stub, paramsByte);
+            }
+            if (func.equals("GetByteArray")) {
+                return GetByteArray(stub, params);
             }
             if (func.equals("GetHistoryByKey")) {
                 return GetHistoryByKey(stub, params);
@@ -62,6 +72,7 @@ public class SimpleChaincode extends ChaincodeBase {
         return "Hash String";
     }
 
+    // API:Put records
     private Response Put(ChaincodeStub stub, List<String> args){
         int argsNeeded = 4;
         if (args.size() != 4){
@@ -80,6 +91,38 @@ public class SimpleChaincode extends ChaincodeBase {
         _logger.info("Transfer complete");
         return newSuccessResponse("invoke finished successfully");
     }
+    
+    // Put byte array data to ledger
+    private Response PutByteArray(ChaincodeStub stub, List<byte[]> args){
+        int argsNeeded = 4;
+        if (args.size() != 4){
+            return newErrorResponse("Incorrect number of arguments. Expecting " + argsNeeded);
+        }
+        String putKey = args.get(0).toString();
+        _logger.info("putKey:" + putKey);
+        String binary = "PutByteArray";
+
+        byte[] byteArray = args.get(1);
+        _logger.info("byteArray:" + byteArray.toString());
+
+        stub.putState(putKey, byteArray);
+        _logger.info("Transfer complete");
+        return newSuccessResponse("invoke finished successfully");
+    }
+    
+    // Get byte array data from ledger
+    private Response GetByteArray(ChaincodeStub stub, List<String> args) {
+        if (args.size() != 1) {
+            return newErrorResponse("Incorrect number of arguments. Expecting name of the person to query");
+        }
+        String key = args.get(0);
+        byte[] byteArray = stub.getState(key);
+
+
+        _logger.info("total result: " + byteArray.toString());
+        return newSuccessResponse(byteArray);
+    }
+
     
     // Put binary string data on chain
     private Response PutBin(ChaincodeStub stub, List<String> args){
@@ -103,7 +146,8 @@ public class SimpleChaincode extends ChaincodeBase {
         _logger.info("Transfer complete");
         return newSuccessResponse("invoke finished successfully");
     }
-    // query callback representing the query of a chaincode
+
+    // Query callback representing the query of a chaincode
     private Response Get(ChaincodeStub stub, List<String> args) {
         if (args.size() != 1) {
             return newErrorResponse("Incorrect number of arguments. Expecting name of the person to query");
@@ -131,6 +175,22 @@ public class SimpleChaincode extends ChaincodeBase {
         return newSuccessResponse(ByteString.copyFrom(strBuilder.toString(), UTF_8).toByteArray());
     }
 
+    // Query record by key, and change the binary string to string
+    private Response GetBin(ChaincodeStub stub, List<String> args) {
+        if (args.size() != 1) {
+            return newErrorResponse("Incorrect number of arguments. Expecting name of the person to query");
+        }
+        String key = args.get(0);
+        String val = stub.getStringState(key);
+        String binVal = StrToBinstr(val);
+        if (val == null) {
+            return newErrorResponse(String.format("Error: state for %s is null", key));
+        }
+        _logger.info(String.format("Query Response:\nName: %s, Amount: %s\n", key, binVal));
+        return newSuccessResponse(binVal, ByteString.copyFrom(binVal, UTF_8).toByteArray());
+    }
+
+    // API:Get the history of a key
     private Response GetHistoryByKey(ChaincodeStub stub, List<String> args) {
         if (args.size() != 1) {
             return newErrorResponse("Incorrect number of arguments. Expecting 1");
@@ -158,6 +218,7 @@ public class SimpleChaincode extends ChaincodeBase {
         return newSuccessResponse(ByteString.copyFrom(strBuilder.toString(), UTF_8).toByteArray());
     }
 
+    // API:Get record by key
     private Response GetRecordByKey(ChaincodeStub stub, List<String> args) {
         if (args.size() != 1) {
             return newErrorResponse("Incorrect number of arguments. Expecting name of the person to query");
@@ -171,7 +232,7 @@ public class SimpleChaincode extends ChaincodeBase {
         return newSuccessResponse(val, ByteString.copyFrom(val, UTF_8).toByteArray());
     }
 
-    // 二进制转换为字符串
+    // Binary String to string
     private static String BinToString(String binary) { 
         String[] tempStr = binary.split(" "); 
         char[] tempChar = new char[tempStr.length]; 
@@ -181,7 +242,7 @@ public class SimpleChaincode extends ChaincodeBase {
         return String.valueOf(tempChar); 
     }
 
-    //将二进制字符串转换成int数组   
+    // Binary String to int array
     private static int[] BinstrToIntArray(String binStr) { 
         char[] temp = binStr.toCharArray(); 
         int[] result = new int[temp.length];  
@@ -191,7 +252,7 @@ public class SimpleChaincode extends ChaincodeBase {
         return result; 
     }
     
-    //将二进制转换成字符 
+    // Binary to char
     private static char BinstrToChar(String binStr){ 
         int[] temp = BinstrToIntArray(binStr); 
         int sum = 0; 
@@ -201,6 +262,15 @@ public class SimpleChaincode extends ChaincodeBase {
         return (char)sum; 
     }
 
+    // String to Binary String, splited by space
+	private static String StrToBinstr(String str) {
+		char[] strChar = str.toCharArray();
+		String result = "";
+		for (int i = 0; i < strChar.length; i++) {
+			result += Integer.toBinaryString(strChar[i]) + " ";
+		}
+		return result;
+	}
 
     public static void main(String[] args) {
         System.out.println("OpenSSL avaliable: " + OpenSsl.isAvailable());
