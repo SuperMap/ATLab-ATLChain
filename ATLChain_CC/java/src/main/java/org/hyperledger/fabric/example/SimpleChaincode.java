@@ -135,7 +135,7 @@ public class SimpleChaincode extends ChaincodeBase {
     // API:Put records
     private Response Put(ChaincodeStub stub, List<String> args, List<byte[]> argsByte){
         int argsNeeded = 5;
-        if (args.size() != 4){
+        if (args.size() != 5){
             return newErrorResponse("Incorrect number of arguments. Expecting " + argsNeeded);
         }
         String putKey = args.get(0);
@@ -152,6 +152,7 @@ public class SimpleChaincode extends ChaincodeBase {
 
         stub.putStringState(putKey, jsonStr);
         _logger.info("Transfer complete");
+        _logger.info("+++++++++++++++++++FilePath: " + filePath);
         return newSuccessResponse("invoke finished successfully. FilePath: " + filePath);
     }
     
@@ -342,7 +343,9 @@ public class SimpleChaincode extends ChaincodeBase {
         StorageServer storageServer = null;
         TrackerServer trackerServer = null;
 		try {
-			ClientGlobal.init(confURL.toURI().toString());
+            _logger.info("confURL.toString(): ");
+			// ClientGlobal.init(confURL.toURI().toString());
+			ClientGlobal.init("/fdfs_client.conf");
 			TrackerClient tracker = new TrackerClient();
 			trackerServer = tracker.getConnection();
 			StorageClient storageClient = new StorageClient(trackerServer, storageServer);

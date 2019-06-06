@@ -325,7 +325,7 @@ $(document).ready(function(){
                                 data:JSON.stringify({
                                     'fcn': 'Put',
                                     'peers':['peer0.orga.atlchain.com'],
-                                    'args':[argsHash, args, signature, fileString_PubkeyPEM],
+                                    'args':[argsHash, args, signature, fileString_PubkeyPEM, args],
                                     'cert':fileString_PubkeyPEM,
                                     'signature':signature,
                                     'hash':dataHash,
@@ -384,7 +384,7 @@ $(document).ready(function(){
                                 
                                 url: RESTURL + '/channels/atlchannel/chaincodes/atlchainCC/AddRecord',
                                 data:JSON.stringify({
-                                    'args':[argsHash, args, signature, fileString_PubkeyPEM],
+                                    'args':[argsHash, args, signature, fileString_PubkeyPEM, fileString_Image],
                                     'imgdata':fileString_Image,
                                     'username':getCookie("username"),
                                     'orgname':getCookie("orgname")
