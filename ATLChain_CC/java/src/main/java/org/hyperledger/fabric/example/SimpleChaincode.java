@@ -1,35 +1,50 @@
 package org.hyperledger.fabric.example;
 
-import java.util.List;
-import java.util.Iterator;
-import java.util.Map;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.HashMap;
-import java.io.File; 
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import javax.xml.ws.Response;
+import java.net.URL;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import com.google.protobuf.ByteString;
 import io.netty.handler.ssl.OpenSsl;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.hyperledger.fabric.shim.ChaincodeBase;
-import org.hyperledger.fabric.shim.ChaincodeStub;
-import org.hyperledger.fabric.shim.ledger.KeyValue;
-import org.hyperledger.fabric.shim.ledger.QueryResultsIterator;
-import org.hyperledger.fabric.shim.ledger.KeyModification;
+import org.csource.common.NameValuePair;
+import org.csource.fastdfs.ClientGlobal;
+import org.csource.fastdfs.FileInfo;
+import org.csource.fastdfs.StorageClient;
+import org.csource.fastdfs.StorageServer;
+import org.csource.fastdfs.TrackerClient;
+import org.csource.fastdfs.TrackerServer;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.FeatureSource;
-import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.FeatureCollection;
-import org.opengis.filter.Filter;
-import org.opengis.feature.simple.SimpleFeatureType;
+import org.geotools.feature.FeatureIterator;
+import org.hyperledger.fabric.shim.ChaincodeBase;
+import org.hyperledger.fabric.shim.ChaincodeStub;
+import org.hyperledger.fabric.shim.ledger.KeyModification;
+import org.hyperledger.fabric.shim.ledger.KeyValue;
+import org.hyperledger.fabric.shim.ledger.QueryResultsIterator;
 import org.opengis.feature.simple.SimpleFeature;
-
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.filter.Filter;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class SimpleChaincode extends ChaincodeBase {
 
     private static Log _logger = LogFactory.getLog(SimpleChaincode.class);
 
+    private static final URL confURL = SimpleChaincode.class.getResource("fdfs_client.conf");
+    
     @Override
     public Response init(ChaincodeStub stub) {
         return newSuccessResponse();
@@ -43,7 +58,7 @@ public class SimpleChaincode extends ChaincodeBase {
             List<String> params = stub.getParameters();
             List<byte[]> paramsByte = stub.getArgs();
             if (func.equals("Put")) {
-                return Put(stub, params);
+                return Put(stub, params, paramsByte);
             }
             if (func.equals("Get")) {
                 return Get(stub, params);
@@ -118,8 +133,8 @@ public class SimpleChaincode extends ChaincodeBase {
     }
 
     // API:Put records
-    private Response Put(ChaincodeStub stub, List<String> args){
-        int argsNeeded = 4;
+    private Response Put(ChaincodeStub stub, List<String> args, List<byte[]> argsByte){
+        int argsNeeded = 5;
         if (args.size() != 4){
             return newErrorResponse("Incorrect number of arguments. Expecting " + argsNeeded);
         }
@@ -127,14 +142,17 @@ public class SimpleChaincode extends ChaincodeBase {
         String jsonStr = args.get(1);
         String signatureStr = args.get(2);
         String pubkeyPemStr = args.get(3);
+        byte[] fileContent = argsByte.get(4);
 
         if (!verify(jsonStr, signatureStr, pubkeyPemStr)){
             return newErrorResponse("Incorrect number of arguments. Expecting " + argsNeeded);
         }
 
+        String filePath = fastDFSUploadFile(fileContent, "atl");
+
         stub.putStringState(putKey, jsonStr);
         _logger.info("Transfer complete");
-        return newSuccessResponse("invoke finished successfully");
+        return newSuccessResponse("invoke finished successfully. FilePath: " + filePath);
     }
     
     // Put byte array data to ledger
@@ -316,6 +334,112 @@ public class SimpleChaincode extends ChaincodeBase {
 		}
 		return result;
 	}
+
+    // ============================== FastDFS Start ================================
+
+    private String fastDFSUploadFile(byte[] fileContent, String fileExtName) {
+		String fileIds[] = new String[2];
+        StorageServer storageServer = null;
+        TrackerServer trackerServer = null;
+		try {
+			ClientGlobal.init(confURL.toURI().toString());
+			TrackerClient tracker = new TrackerClient();
+			trackerServer = tracker.getConnection();
+			StorageClient storageClient = new StorageClient(trackerServer, storageServer);
+			fileIds = storageClient.upload_file(fileContent, fileExtName, null);
+			if (fileIds == null) {
+				return "DFSUploadFile failed";
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (storageServer != null)
+					storageServer.close();
+				if (trackerServer != null)
+					trackerServer.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		return "uploadfile path:" + fileIds[0] + "/" + fileIds[1];
+	}
+
+	// private Response fastDFSDownloadFile(ChaincodeStub stub, List<String> args) { // 下载文件
+	// 	if (args.size() != 3) {
+	// 		return newErrorResponse("Incorrect number of arguments. Expecting 3");
+	// 	}
+	// 	TrackerServer trackerServer = null;
+	// 	StorageServer storageServer = null;
+	// 	String groupId = args.get(0);
+	// 	String filepath = args.get(1);
+	// 	String storePath = args.get(2);
+	// 	try {
+	// 		ClientGlobal.init(conf_filename);
+	// 		TrackerClient tracker = new TrackerClient();
+	// 		trackerServer = tracker.getConnection();
+	// 		StorageClient storageClient = new StorageClient(trackerServer, storageServer);
+	// 		byte[] bytes = storageClient.download_file(groupId, filepath);
+	// 		if (bytes == null) {
+	// 			newErrorResponse("DownloadFile is failed");
+	// 		}
+	// 		OutputStream out = new FileOutputStream(storePath);
+	// 		out.write(bytes);
+	// 		out.close();
+	// 	} catch (Exception e) {
+	// 		e.printStackTrace();
+	// 	} finally {
+	// 		try {
+	// 			if (storageServer != null)
+	// 				storageServer.close();
+	// 			if (trackerServer != null)
+	// 				trackerServer.close();
+	// 		} catch (IOException e) {
+	// 			// TODO Auto-generated catch block
+	// 			e.printStackTrace();
+	// 		} catch (Exception e) {
+	// 			e.printStackTrace();
+	// 		}
+	// 	}
+	// 	return newSuccessResponse("download file sucessful!");
+	// }
+
+	// public static Response fastDFSDeleteFile(ChaincodeStub stub, List<String> args) { // 删除文件
+	// 	if (args.size() != 2) {
+	// 		return newErrorResponse("Incorrect number of arguments. Expecting 2");
+	// 	}
+	// 	TrackerServer trackerServer = null;
+	// 	StorageServer storageServer = null;
+	// 	String groupId = args.get(0);
+	// 	String Filepath = args.get(1);
+	// 	Response deletemessage = newSuccessResponse("delete file failed");
+	// 	int i = 0;
+	// 	try {
+	// 		ClientGlobal.init(conf_filename);
+	// 		TrackerClient tracker = new TrackerClient();
+	// 		trackerServer = tracker.getConnection();
+	// 		StorageClient storageClient = new StorageClient(trackerServer, storageServer);
+	// 		i = storageClient.delete_file(groupId, Filepath);
+	// 	} catch (Exception e) {
+	// 		e.printStackTrace();
+	// 	} finally {
+	// 		try {
+	// 			if (storageServer != null)
+	// 				storageServer.close();
+	// 			if (trackerServer != null)
+	// 				trackerServer.close();
+	// 		} catch (IOException e) {
+	// 			// TODO Auto-generated catch block
+	// 			e.printStackTrace();
+	// 		}
+	// 	}
+	// 	if (i == 0) {
+	// 		deletemessage = newSuccessResponse("delete file sucessful!");
+	// 	}
+	// 	return deletemessage;
+	// }
+
+    // ============================== FastDFS End ================================
 
     public static void main(String[] args) {
         System.out.println("OpenSSL avaliable: " + OpenSsl.isAvailable());
