@@ -7,7 +7,7 @@ $ export CORE_PEER_LOCALMSPID=OrgA
 
 2. 设置环境变量，peer账号
 ```
-$ export CORE_PEER_MSPCONFIGPATH=$PWD/crypto-config/peerOrganizations/orga.atlchain.com/users/Admin@orga.atlchain.com/msp/
+$ export CORE_PEER_MSPCONFIGPATH=$PWD/crypto-config/peerOrganizations/orga.example.com/users/Admin@orga.example.com/msp/
 ```
 
 3. 安装链码
