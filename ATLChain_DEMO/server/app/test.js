@@ -52,7 +52,7 @@
   
 console.log("======================== Begin test hbase.js =======================")
 var hbase = require('./hbase.js');
-// var hbaseClient = new hbase('hbase.atlchain.com', '8080');
+// var hbaseClient = new hbase('hbase.example.com', '8080');
 var hbaseClient = new hbase('localhost', '8080');
 console.log(hbaseClient);
 // hbaseClient.put('test', 'rowkey2', 'cf:name', 'myname', putCallback);

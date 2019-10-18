@@ -1,6 +1,6 @@
 ## ATLChain
 
-This is an experimental system  for "BLOCKCHAIN + GIS"
+This is an experimental system  for "BLOCKCHAIN + Electronic Certification" based on fabric 1.4.3
 
 **0. Project struct**
 

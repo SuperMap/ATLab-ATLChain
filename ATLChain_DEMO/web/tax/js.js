@@ -330,7 +330,7 @@ $(document).ready(function(){
                                 url: RESTURL + '/channels/atlchannel/chaincodes/atlchainCC/putTx',
                                 data:JSON.stringify({
                                     'fcn': 'Put',
-                                    'peers':['peer0.orgb.atlchain.com'],
+                                    'peers':['peer0.orgb.example.com'],
                                     'args':[argsHash, args, signature, fileString_PubkeyPEM],
                                     'cert':fileString_PubkeyPEM,
                                     'signature':signature,
@@ -550,7 +550,7 @@ $(document).ready(function(){
             url: RESTURL + '/channels/atlchannel/chaincodes/atlchainCC/TraceRecord',
             data:JSON.stringify({
                 // 'fcn': 'getHistoryByKey',
-                // 'peer': 'peer0.orgb.atlchain.com',
+                // 'peer': 'peer0.orgb.example.com',
                 'args':[txid],
                 'username':getCookie("username"),
                 'orgname':getCookie("orgname")
@@ -592,7 +592,7 @@ $(document).ready(function(){
             url: RESTURL + '/channels/atlchannel/chaincodes/atlchainCC/TraceRecord',
             data:JSON.stringify({
                 // 'fcn': 'getHistoryByKey',
-                // 'peer': 'peer0.orgb.atlchain.com',
+                // 'peer': 'peer0.orgb.example.com',
                 'args':[txid],
                 'username':getCookie("username"),
                 'orgname':getCookie("orgname")
@@ -726,7 +726,7 @@ $(document).ready(function(){
                     url: RESTURL + '/channels/atlchannel/chaincodes/atlchainCC/GetRecord',
                     data:JSON.stringify({
                         'fcn': 'Get',
-                        'peer': 'peer0.orgb.atlchain.com',
+                        'peer': 'peer0.orgb.example.com',
                         'args':[args],
                         'username':getCookie("username"),
                         'orgname':getCookie("orgname")
@@ -789,7 +789,7 @@ $(document).ready(function(){
                     url: RESTURL + '/channels/atlchannel/chaincodes/atlchainCC/GetRecord',
                     data:JSON.stringify({
                         'fcn': 'Get',
-                        'peer': 'peer0.orgb.atlchain.com',
+                        'peer': 'peer0.orgb.example.com',
                         'args':[args],
                         'username':getCookie("username"),
                         'orgname':getCookie("orgname")
@@ -831,7 +831,7 @@ $(document).ready(function(){
                     url: RESTURL + '/channels/atlchannel/chaincodes/atlchainCC/GetRecord',
                     data:JSON.stringify({
                         'fcn': 'Get',
-                        'peer': 'peer0.orgb.atlchain.com',
+                        'peer': 'peer0.orgb.example.com',
                         'args':[args],
                         'username':getCookie("username"),
                         'orgname':getCookie("orgname")
@@ -856,7 +856,7 @@ $(document).ready(function(){
                             url: RESTURL + '/channels/atlchannel/chaincodes/atlchainCC/GetRecord',
                             data:JSON.stringify({
                                 'fcn': 'Get',
-                                'peer': 'peer0.orgb.atlchain.com',
+                                'peer': 'peer0.orgb.example.com',
                                 'args':[args],
                                 'username':getCookie("username"),
                                 'orgname':getCookie("orgname")
@@ -915,7 +915,7 @@ $(document).ready(function(){
             url: RESTURL + '/channels/atlchannel/chaincodes/atlchainCC/GetRecord',
             data:JSON.stringify({
                 'fcn': 'Get',
-                'peer': 'peer0.orgb.atlchain.com',
+                'peer': 'peer0.orgb.example.com',
                 'args':[args],
                 'username':getCookie("username"),
                 'orgname':getCookie("orgname")

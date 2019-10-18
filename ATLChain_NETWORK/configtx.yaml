@@ -24,7 +24,7 @@ Organizations:
         ID: Orderer
 
         # MSPDir is the filesystem path which contains the MSP configuration.
-        MSPDir: ./crypto-config/ordererOrganizations/atlchain.com/msp
+        MSPDir: ./crypto-config/ordererOrganizations/example.com/msp
 
         # Policies defines the set of policies at this level of the config tree
         # For organization policies, their canonical path is usually
@@ -49,7 +49,7 @@ Organizations:
     - &OrgA
         Name: OrgA
         ID: OrgA
-        MSPDir: ./crypto-config/peerOrganizations/orga.atlchain.com/msp
+        MSPDir: ./crypto-config/peerOrganizations/orga.example.com/msp
         Policies: &OrgAPolicies
             Readers:
                 Type: Signature
@@ -61,13 +61,13 @@ Organizations:
                 Type: Signature
                 Rule: "OR('OrgA.admin')"
         AnchorPeers:
-            - Host: peer0.orga.atlchain.com
+            - Host: peer0.orga.example.com
               Port: 7051
     
     - &OrgB
         Name: OrgB
         ID: OrgB
-        MSPDir: ./crypto-config/peerOrganizations/orgb.atlchain.com/msp
+        MSPDir: ./crypto-config/peerOrganizations/orgb.example.com/msp
         Policies: &OrgBPolicies
             Readers:
                 Type: Signature
@@ -79,13 +79,13 @@ Organizations:
                 Type: Signature
                 Rule: "OR('OrgB.admin')"
         AnchorPeers:
-            - Host: peer0.orgb.atlchain.com
+            - Host: peer0.orgb.example.com
               Port: 7051
     
     - &OrgC
         Name: OrgC
         ID: OrgC
-        MSPDir: ./crypto-config/peerOrganizations/orgc.atlchain.com/msp
+        MSPDir: ./crypto-config/peerOrganizations/orgc.example.com/msp
         Policies: &OrgCPolicies
             Readers:
                 Type: Signature
@@ -97,7 +97,7 @@ Organizations:
                 Type: Signature
                 Rule: "OR('OrgC.admin')"
         AnchorPeers:
-            - Host: peer0.orgc.atlchain.com
+            - Host: peer0.orgc.example.com
               Port: 7051
  
 ################################################################################
@@ -279,7 +279,7 @@ Orderer: &OrdererDefaults
     # participation in ordering.
     # NOTE: In the solo case, this should be a one-item list.
     Addresses:
-        - orderer.atlchain.com:7050
+        - orderer.example.com:7050
 
     # Batch Timeout: The amount of time to wait before creating a batch.
     BatchTimeout: 2s
@@ -327,7 +327,7 @@ Orderer: &OrdererDefaults
         # this list to identify the brokers of the ordering service.
         # NOTE: Use IP:port notation.
         Brokers:
-            - kafka.atlchain.com:9092
+            - kafka.example.com:9092
 
     # Organizations lists the orgs participating on the orderer side of the
     # network.

@@ -31,11 +31,11 @@ General:
     TLS:
         Enabled: false
         # PrivateKey governs the file location of the private key of the TLS certificate.
-        PrivateKey: ./crypto-config/ordererOrganizations/orga.atlchain.com/orderers/orderer.orga.atlchain.com/tls/server.key
+        PrivateKey: ./crypto-config/ordererOrganizations/orga.example.com/orderers/orderer.orga.example.com/tls/server.key
         # Certificate governs the file location of the server TLS certificate.
-        Certificate: ./crypto-config/ordererOrganizations/orga.atlchain.com/orderers/orderer.orga.atlchain.com/tls/server.crt
+        Certificate: ./crypto-config/ordererOrganizations/orga.example.com/orderers/orderer.orga.example.com/tls/server.crt
         RootCAs:
-          - ./crypto-config/ordererOrganizations/orga.atlchain.com/orderers/orderer.orga.atlchain.com/tls/ca.crt
+          - ./crypto-config/ordererOrganizations/orga.example.com/orderers/orderer.orga.example.com/tls/ca.crt
         ClientAuthRequired: false
         ClientRootCAs:
     # Keepalive settings for the GRPC server.
@@ -100,7 +100,7 @@ General:
     # LocalMSPDir is where to find the private crypto material needed by the
     # orderer. It is set relative here as a default for dev environments but
     # should be changed to the real location in production.
-    LocalMSPDir: ./crypto-config/ordererOrganizations/orga.atlchain.com/orderers/orderer.orga.atlchain.com/msp
+    LocalMSPDir: ./crypto-config/ordererOrganizations/orga.example.com/orderers/orderer.orga.example.com/msp
 
     # LocalMSPID is the identity to register the local MSP material with the MSP
     # manager. IMPORTANT: The local MSP ID of an orderer needs to match the MSP

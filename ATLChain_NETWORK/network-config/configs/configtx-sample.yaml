@@ -27,7 +27,7 @@ Organizations:
         ID: OrdererOrgA
 
         # MSPDir is the filesystem path which contains the MSP configuration.
-        MSPDir: ./crypto-config/ordererOrganizations/orga.atlchain.com/msp
+        MSPDir: ./crypto-config/ordererOrganizations/orga.example.com/msp
 
         # Policies defines the set of policies at this level of the config tree
         # For organization policies, their canonical path is usually
@@ -61,7 +61,7 @@ Organizations:
     
         ID: OrdererOrgB
     
-        MSPDir: ./crypto-config/ordererOrganizations/orgb.atlchain.com/msp
+        MSPDir: ./crypto-config/ordererOrganizations/orgb.example.com/msp
     
         Policies: &OrdererOrgBPolicies
             Readers:
@@ -81,7 +81,7 @@ Organizations:
     
         ID: OrgA
     
-        MSPDir: ./crypto-config/peerOrganizations/orga.atlchain.com/msp
+        MSPDir: ./crypto-config/peerOrganizations/orga.example.com/msp
     
         Policies: &OrgAPolicies
             Readers:
@@ -105,7 +105,7 @@ Organizations:
 
         ID: OrgB
 
-        MSPDir: ./crypto-config/peerOrganizations/orgb.atlchain.com/msp
+        MSPDir: ./crypto-config/peerOrganizations/orgb.example.com/msp
 
         Policies: &OrgBPolicies
             Readers:

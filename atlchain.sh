@@ -4,10 +4,9 @@ export PATH=${PWD}/ATLChain_NETWORK/bin:$PATH
 export FABRIC_CFG_PATH=${PWD}/ATLChain_NETWORK
 
 CHANNEL_NAME="atlchannel"
-ORG_DOMAIN_NAME="orga.atlchain.com"
+ORG_DOMAIN_NAME="orga.example.com"
 
 #compose files
-DOCKER_COMPOSE_FILE_KAFKA="docker-compose-kafka.yaml"
 DOCKER_COMPOSE_FILE_ORDERER="docker-compose-orderer.yaml"
 DOCKER_COMPOSE_FILE_PEER="docker-compose-peer.yaml"
 DOCKER_COMPOSE_FILE_CA="docker-compose-ca.yaml"
@@ -16,12 +15,12 @@ DOCKER_COMPOSE_FILE_CLI="docker-compose-cli.yaml"
 # default compose project name
 export COMPOSE_PROJECT_NAME=atlproj
 
-export DOCKER_COMPOSE_PEER_ADDRESS=peer0.orga.atlchain.com:7051
-export DOCKER_COMPOSE_PEER_CC_ADDRESS=peer0.orga.atlchain.com:7052
-export DOCKER_COMPOSE_PEER_GOSSIP_BOOTSTRAP=peer0.orga.atlchain.com:7051 
+export DOCKER_COMPOSE_PEER_ADDRESS=peer0.orga.example.com:7051
+export DOCKER_COMPOSE_PEER_CC_ADDRESS=peer0.orga.example.com:7052
+export DOCKER_COMPOSE_PEER_GOSSIP_BOOTSTRAP=peer0.orga.example.com:7051 
 
-export CORE_PEER_ADDRESS=peer0.orga.atlchain.com:7051 
-export ORERER_ADDRESS=orderer.atlchain.com:7050
+export CORE_PEER_ADDRESS=peer0.orga.example.com:7051 
+export ORERER_ADDRESS=orderer.example.com:7050
 
 function printHelp() {
     echo "Usage: "
@@ -124,14 +123,6 @@ function genChannelArtifacts() {
     echo 
 }
 
-function startKafka() {
-    docker-compose -f ${DOCKER_COMPOSE_FILE_KAFKA} up -d 2>&1
-    if [ $? -ne 0 ]; then
-        echo "ERROR !!!! Unable to start kafka"
-        exit 1
-    fi
-}
-
 function startOrderer() {
     docker-compose -f ${DOCKER_COMPOSE_FILE_ORDERER} up -d 2>&1
     if [ $? -ne 0 ]; then
@@ -176,9 +167,15 @@ function startCA() {
 
 # Remove the files generated
 function cleanFiles() {
-    # rm -rf crypto-config
-    rm -rf channel-artifacts
-    rm -rf production
+    if [ -d "./crypto-config" ]; then
+        rm -r crypto-config
+    fi
+    if [ -d "./channel-artifacts" ]; then
+        rm -r channel-artifacts
+    fi
+    if [ -d "./production" ]; then
+        rm -r production
+    fi
 }
 
 function stopOrderer() {
@@ -209,23 +206,8 @@ function stopCA() {
     fi
 }
 
-function startAll() {
-    startOrderer
-    startPeer
-    startCA
-    startCLI
-}
-
-function stopAll() {
-    stopOrderer
-    stopPeer
-    stopCA
-    stopCLI
-}
-
 function addOrg() {
     cryptogen generate --config=./orgc-crypto.yaml
-
     configtxgen -printOrg OrgC > ./channel-artifacts/orgc.json
 }
 
@@ -244,62 +226,20 @@ fi
 
 MODE=$1
 shift
-NODE=$1
-shift
 # Determine whether starting or stopping
 if [ "$MODE" == "up" ]; then
-    if [ "$NODE" == "kafka" ]; then
-        export COMPOSE_PROJECT_NAME=atlprojk
-        startKafka
-    elif [ "$NODE" == "orderer" ]; then
-        export COMPOSE_PROJECT_NAME=atlprojo
-        startOrderer
-    elif [ "$NODE" == "peer" ]; then
-        export COMPOSE_PROJECT_NAME=atlprojp
-        startPeer
-    elif [ "$NODE" == "ca" ]; then
-        export COMPOSE_PROJECT_NAME=atlprojc
-        startCA
-    elif [ "$NODE" == "cli" ]; then
-        export COMPOSE_PROJECT_NAME=atlprojcl
-        startCLI
-    elif [ "$NODE" == "all" ]; then
-        startAll
-    else 
-        printHelp
-        exit 1
-    fi
+        genCerts
+        # genChannelArtifacts
+        # startOrderer
+        # startPeer
+        # startCA
+        # startCLI
 elif [ "$MODE" == "down" ]; then
-    if [ "$NODE" == "kafka" ]; then
-        export COMPOSE_PROJECT_NAME=atlprojk
-        stopKafka
-    elif [ "$NODE" == "orderer" ]; then
-        export COMPOSE_PROJECT_NAME=atlprojo
-        stopOrderer
-    elif [ "$NODE" == "peer" ]; then
-        export COMPOSE_PROJECT_NAME=atlprojp
-        stopPeer
-    elif [ "$NODE" == "ca" ]; then
-        export COMPOSE_PROJECT_NAME=atlprojc
-        stopCA
-    elif [ "$NODE" == "cli" ]; then
-        export COMPOSE_PROJECT_NAME=atlprojcl
-        stopCLI
-    elif [ "$NODE" == "all" ]; then
-        stopAll
-    else 
-        printHelp
-        exit 1
-    fi
-elif [ "$MODE" == "genCerts" ]; then
-    genCerts
-elif [ "$MODE" == "genArti" ]; then
-    genChannelArtifacts
-elif [ "$MODE" == "generate" ]; then
-    genCerts
-    genChannelArtifacts
-elif [ "$MODE" == "clean" ]; then
-    cleanFiles
+        # stopCLI
+        # stopCA
+        # stopPeer
+        # stopOrderer
+        cleanFiles    
 elif [ "$MODE" == "addorg" ]; then
     addOrg
 else

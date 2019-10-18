@@ -32,10 +32,10 @@ var crypto = require('./app/crypto.js');
 
 var port = process.env.PORT || hfc.getConfigSetting('port');
 var host = process.env.HOST || hfc.getConfigSetting('host');
-var hbaseClient = new hbase('hbase.atlchain.com', '8080');
+var hbaseClient = new hbase('hbase.example.com', '8080');
 var hbaseTable = 'atlchain';
 var hbaseCF = 'data:data';
-var hdfsClient = new hdfs('root', 'hadoop.atlchain.com', '50070');
+var hdfsClient = new hdfs('root', 'hadoop.example.com', '50070');
 var hdfsDir = '/user/root';
 
 hbaseClient.get(hbaseTable, 'rowkey', hbaseCF, getCallback);
@@ -224,7 +224,7 @@ app.post('/channels/:channelName/chaincodes/:chaincodeName/GetRecord', async fun
     let orgname = req.body.orgname;
 
 	var fcn = "Get";
-	let peer = 'peer0.orga.atlchain.com';
+	let peer = 'peer0.orga.example.com';
 
 	if (!chaincodeName) {
 		res.json(getErrorMessage('\'chaincodeName\''));
@@ -254,7 +254,7 @@ app.post('/channels/:channelName/chaincodes/:chaincodeName/TraceRecord', async f
 	var chaincodeName = req.params.chaincodeName;
     let username = req.body.username;
     let orgname = req.body.orgname;
-	let peer = 'peer0.orga.atlchain.com';
+	let peer = 'peer0.orga.example.com';
     let args = req.body.args; 
     let fcn = "getHistoryByKey";
 
@@ -278,7 +278,7 @@ app.post('/channels/:channelName/chaincodes/:chaincodeName/putTx', async functio
     var username = req.body.username;
     var orgname = req.body.orgname;
 
-	var peers = ['peer0.orga.atlchain.com'] ;
+	var peers = ['peer0.orga.example.com'] ;
     var fcn = "Put";
 
 	if (!args) {
@@ -358,7 +358,7 @@ app.post('/channels/:channelName/chaincodes/:chaincodeName/AddRecord', async fun
     console.log(args)
     console.log("+++++++++++++++++++++++");
 
-	var peers = ['peer0.orga.atlchain.com'] ;
+	var peers = ['peer0.orga.example.com'] ;
     var fcn = "Put";
 
 	if (!args) {

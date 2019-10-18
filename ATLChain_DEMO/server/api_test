@@ -182,7 +182,7 @@ curl -s -X POST \
   -H "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1NDgxNTgxMzUsInVzZXJuYW1lIjoiVGltIiwib3JnTmFtZSI6IlRlc3RPcmdBIiwiaWF0IjoxNTQ4MTIyMTM1fQ.LTzCDRRgONKEoE7XmuJRZzfKRMQrOnG293e80v7nvI0" \
   -H "content-type: application/json" \
   -d '{
-	"peers": ["peer0.orga.atlchain.com"],
+	"peers": ["peer0.orga.example.com"],
 	"fcn":"Put",
 	"args":["{\"AddrReceive\":\"addrAAA\", \"AddrSend\":\"addrBBB\"}", "signagureAAA", "pubKeyAAA"],
   "cert":"certfile",
@@ -236,7 +236,7 @@ http://localhost:4000/channels/atlchannel/chaincodes/atlchainCC/GetRecord \
   -H "content-type: application/json" \
   -d '{ 
     "fcn":"Get",
-    "peer":"peer0.orga.atlchain.com", 
+    "peer":"peer0.orga.example.com", 
     "args":["{\"AddrSend\":\"addrBBB\", \"AddrReceive\":\"addrAAA\"}"],
     "storageType":"onchain",
     "username":"Tim",
@@ -281,7 +281,7 @@ curl -s -X GET \
 ### Query Transaction by TransactionID
 
 ```
-curl -s -X GET http://148.70.109.243:4000/channels/atlchannel/transactions/e766642134d476ef44eadef272bdb32452f2980cc5c29d3869eb15a7f2740318?peer=peer0.orga.atlchain.com \
+curl -s -X GET http://148.70.109.243:4000/channels/atlchannel/transactions/e766642134d476ef44eadef272bdb32452f2980cc5c29d3869eb15a7f2740318?peer=peer0.orga.example.com \
   -H "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1NDgyNDk1NjQsInVzZXJuYW1lIjoiY2NjIiwib3JnbmFtZSI6Ik9yZ0EiLCJpYXQiOjE1NDgyMTM1NjR9.XxULwelW-yv3XSHjYOTomJDq_GDo8ksaFKbUGPzyrrU" \
   -H "content-type: application/json"
 ```

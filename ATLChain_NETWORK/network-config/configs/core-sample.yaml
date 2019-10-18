@@ -209,18 +209,18 @@ peer:
         clientAuthRequired: false
         # X.509 certificate used for TLS server
         cert:
-            file: crypto-config/peerOrganizations/orga.atlchain.com/peers/peer0.orga.atlchain.com/tls/server.crt
+            file: crypto-config/peerOrganizations/orga.example.com/peers/peer0.orga.example.com/tls/server.crt
         # Private key used for TLS server (and client if clientAuthEnabled
         # is set to true
         key:
-            file: crypto-config/peerOrganizations/orga.atlchain.com/peers/peer0.orga.atlchain.com/tls/server.key
+            file: crypto-config/peerOrganizations/orga.example.com/peers/peer0.orga.example.com/tls/server.key
         # Trusted root certificate chain for tls.cert
         rootcert:
-            file: crypto-config/peerOrganizations/orga.atlchain.com/peers/peer0.orga.atlchain.com/tls/ca.crt
+            file: crypto-config/peerOrganizations/orga.example.com/peers/peer0.orga.example.com/tls/ca.crt
         # Set of root certificate authorities used to verify client certificates
         clientRootCAs:
             files:
-              - crypto-config/peerOrganizations/orga.atlchain.com/peers/peer0.orga.atlchain.com/tls/ca.crt
+              - crypto-config/peerOrganizations/orga.example.com/peers/peer0.orga.example.com/tls/ca.crt
         # Private key used for TLS when making client connections.  If
         # not set, peer.tls.key.file will be used instead
         clientKey:
@@ -271,7 +271,7 @@ peer:
                 KeyStore:
 
     # Path on the file system where peer will find MSP local configurations
-    mspConfigPath: ./crypto-config/peerOrganizations/orga.atlchain.com/peers/peer0.orga.atlchain.com/msp
+    mspConfigPath: ./crypto-config/peerOrganizations/orga.example.com/peers/peer0.orga.example.com/msp
 
     # Identifier of the local MSP
     # ----!!!!IMPORTANT!!!-!!!IMPORTANT!!!-!!!IMPORTANT!!!!----

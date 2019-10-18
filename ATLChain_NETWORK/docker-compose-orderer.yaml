@@ -1,14 +1,14 @@
 version: '2'
 
 volumes:
-    orderer.atlchain.com:
+    orderer.example.com:
 
 networks:
   atln:
 
 services:
-    orderer.atlchain.com:
-        container_name: orderer.atlchain.com
+    orderer.example.com:
+        container_name: orderer.example.com
         image: hyperledger/fabric-orderer:1.4.0
         environment:
             - FABRIC_LOGGING_SPEC=DEBUG
@@ -29,9 +29,9 @@ services:
         volumes:
             - ./hosts:/etc/hosts
             - ./channel-artifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
-            - ./crypto-config/ordererOrganizations/atlchain.com/orderers/orderer.atlchain.com/msp:/var/hyperledger/orderer/msp
-            - ./crypto-config/ordererOrganizations/atlchain.com/orderers/orderer.atlchain.com/tls:/var/hyperledger/orderer/tls
-            - orderer.atlchain.com:/var/hyperledger/production/orderer
+            - ./crypto-config/ordererOrganizations/example.com/orderers/orderer.example.com/msp:/var/hyperledger/orderer/msp
+            - ./crypto-config/ordererOrganizations/example.com/orderers/orderer.example.com/tls:/var/hyperledger/orderer/tls
+            - orderer.example.com:/var/hyperledger/production/orderer
         ports:
           - 7050:7050
         networks:

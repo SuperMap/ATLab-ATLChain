@@ -27,7 +27,7 @@ Organizations:
         ID: OrdererOrgA
 
         # MSPDir is the filesystem path which contains the MSP configuration.
-        MSPDir: ./crypto-config/ordererOrganizations/orga.atlchain.com/msp
+        MSPDir: ./crypto-config/ordererOrganizations/orga.example.com/msp
 
         # Policies defines the set of policies at this level of the config tree
         # For organization policies, their canonical path is usually
@@ -61,7 +61,7 @@ Organizations:
     
         ID: OrdererOrgB
     
-        MSPDir: ./crypto-config/ordererOrganizations/orgb.atlchain.com/msp
+        MSPDir: ./crypto-config/ordererOrganizations/orgb.example.com/msp
     
         Policies: &OrdererOrgBPolicies
             Readers:
@@ -81,7 +81,7 @@ Organizations:
     
         ID: OrgA
     
-        MSPDir: ./crypto-config/peerOrganizations/orga.atlchain.com/msp
+        MSPDir: ./crypto-config/peerOrganizations/orga.example.com/msp
     
         Policies: &OrgAPolicies
             Readers:
@@ -97,7 +97,7 @@ Organizations:
                 Rule: "OR('OrgA.admin')"
     
         AnchorPeers:
-            - Host: peer0.orga.atlchain.com
+            - Host: peer0.orga.example.com
               Port: 7051
     
     - &OrgB
@@ -105,7 +105,7 @@ Organizations:
 
         ID: OrgB
 
-        MSPDir: ./crypto-config/peerOrganizations/orgb.atlchain.com/msp
+        MSPDir: ./crypto-config/peerOrganizations/orgb.example.com/msp
 
         Policies: &OrgBPolicies
             Readers:
@@ -119,7 +119,7 @@ Organizations:
                 Rule: "OR('OrgB.admin')"
 
         AnchorPeers:
-            - Host: peer0.orgb.atlchain.com
+            - Host: peer0.orgb.example.com
               Port: 7051
 
 
@@ -303,8 +303,8 @@ Orderer: &OrdererDefaults
     # participation in ordering.
     # NOTE: In the solo case, this should be a one-item list.
     Addresses:
-        - orderer.orga.atlchain.com:7050
-        - orderer.orgb.atlchain.com:7050
+        - orderer.orga.example.com:7050
+        - orderer.orgb.example.com:7050
 
     # Batch Timeout: The amount of time to wait before creating a batch.
     BatchTimeout: 2s

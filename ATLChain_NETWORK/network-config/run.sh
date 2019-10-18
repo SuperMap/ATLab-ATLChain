@@ -1,7 +1,7 @@
 #!/bin/sh
 
-ORDERER_ADDRESS=orderer.orga.atlchain.com:7050
-ORDERER_CA=./crypto-config/ordererOrganizations/orga.atlchain.com/orderers/orderer.orga.atlchain.com/tls/ca.crt
+ORDERER_ADDRESS=orderer.orga.example.com:7050
+ORDERER_CA=./crypto-config/ordererOrganizations/orga.example.com/orderers/orderer.orga.example.com/tls/ca.crt
 
 if [ $1 = clean ]
 then
@@ -32,8 +32,8 @@ then
     echo "### export CORE_PEER_LOCALMSPID=OrgA ###"
     export CORE_PEER_LOCALMSPID=OrgA
      
-    echo "### export CORE_PEER_MSPCONFIGPATH=$PWD/crypto-config/peerOrganizations/orga.atlchain.com/users/Admin@orga.atlchain.com/msp ###"
-    export CORE_PEER_MSPCONFIGPATH=$PWD/crypto-config/peerOrganizations/orga.atlchain.com/users/Admin@orga.atlchain.com/msp
+    echo "### export CORE_PEER_MSPCONFIGPATH=$PWD/crypto-config/peerOrganizations/orga.example.com/users/Admin@orga.example.com/msp ###"
+    export CORE_PEER_MSPCONFIGPATH=$PWD/crypto-config/peerOrganizations/orga.example.com/users/Admin@orga.example.com/msp
 
     echo "### peer channel create -o ${ORDERER_ADDRESS} -c atlchannel -f atlchannel.tx ###"
     peer channel create -o ${ORDERER_ADDRESS} -c atlchannel -f atlchannel.tx 

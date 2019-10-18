@@ -1,14 +1,14 @@
 version: '2'
 
 volumes:
-    peer0.orga.atlchain.com:
+    peer0.orga.example.com:
 
 networks:
     atln:
 
 services:
-    couchdb.orga.atlchain.com:
-        container_name: couchdb.orga.atlchain.com
+    couchdb.orga.example.com:
+        container_name: couchdb.orga.example.com
         image: hyperledger/fabric-couchdb:0.4.14
         # Populate the COUCHDB_USER and COUCHDB_PASSWORD to set an admin user and password
         # for CouchDB.  This will prevent CouchDB from operating in an "Admin Party" mode.
@@ -22,14 +22,14 @@ services:
         networks:
             - atln
 
-    peer0.orga.atlchain.com:
-        container_name: peer0.orga.atlchain.com
+    peer0.orga.example.com:
+        container_name: peer0.orga.example.com
         image: hyperledger/fabric-peer:1.4.0
         depends_on:
-            - couchdb.orga.atlchain.com
+            - couchdb.orga.example.com
         environment:
             # peer env
-            - CORE_PEER_ID=peer0.orga.atlchain.com
+            - CORE_PEER_ID=peer0.orga.example.com
             - CORE_PEER_ADDRESS=${DOCKER_COMPOSE_PEER_ADDRESS}
             - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
             - CORE_PEER_CHAINCODEADDRESS=${DOCKER_COMPOSE_PEER_CC_ADDRESS}
@@ -39,7 +39,7 @@ services:
             - CORE_PEER_LOCALMSPID=OrgA
             # state database
             - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
-            - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb.orga.atlchain.com:5984
+            - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb.orga.example.com:5984
             - CORE_LEDGER_STATE_COUCHDBCONFIG_USERNAME=
             - CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD=
             # basic env
@@ -59,9 +59,9 @@ services:
         volumes:
             - /var/run/:/host/var/run/
             - ./hosts:/etc/hosts
-            - ./crypto-config/peerOrganizations/orga.atlchain.com/peers/peer0.orga.atlchain.com/msp:/etc/hyperledger/fabric/msp
-            - ./crypto-config/peerOrganizations/orga.atlchain.com/peers/peer0.orga.atlchain.com/tls:/etc/hyperledger/fabric/tls
-            - peer0.orga.atlchain.com:/var/hyperledger/production
+            - ./crypto-config/peerOrganizations/orga.example.com/peers/peer0.orga.example.com/msp:/etc/hyperledger/fabric/msp
+            - ./crypto-config/peerOrganizations/orga.example.com/peers/peer0.orga.example.com/tls:/etc/hyperledger/fabric/tls
+            - peer0.orga.example.com:/var/hyperledger/production
         ports:
           - 7051:7051
           - 7052:7052
