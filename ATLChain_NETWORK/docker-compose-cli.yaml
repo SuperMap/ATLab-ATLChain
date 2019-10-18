@@ -1,19 +1,18 @@
-version: '2'
+version: "2"
 
 networks:
-  atln:
+    atln:
 
 services:
     cli:
         container_name: cli
-        image: hyperledger/fabric-tools:1.4.0
+        image: hyperledger/fabric-tools:1.4.3
         tty: true
         stdin_open: true
         environment:
             - GOPATH=/opt/gopath
             - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
-            - FABRIC_LOGGING_SPEC=DEBUG
-              # - FABRIC_LOGGING_SPEC=INFO
+            - FABRIC_LOGGING_SPEC=INFO
             - CORE_PEER_ID=cli
             - CORE_PEER_ADDRESS=${CORE_PEER_ADDRESS}
             - CORE_PEER_LOCALMSPID=OrgA

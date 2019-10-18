@@ -16,11 +16,10 @@ DOCKER_COMPOSE_FILE_CLI="docker-compose-cli.yaml"
 export COMPOSE_PROJECT_NAME=atlproj
 
 export DOCKER_COMPOSE_PEER_ADDRESS=peer0.orga.example.com:7051
-export DOCKER_COMPOSE_PEER_CC_ADDRESS=peer0.orga.example.com:7052
 export DOCKER_COMPOSE_PEER_GOSSIP_BOOTSTRAP=peer0.orga.example.com:7051 
 
 export CORE_PEER_ADDRESS=peer0.orga.example.com:7051 
-export ORERER_ADDRESS=orderer.example.com:7050
+export ORERER_ADDRESS=orderer1.example.com:7050
 
 function printHelp() {
     echo "Usage: "
@@ -94,11 +93,11 @@ function genChannelArtifacts() {
     fi
 
     echo
-    echo "#################################################################"
-    echo "### Generating channel configuration transaction 'atlchannel.tx' ###"
-    echo "#################################################################"
+    echo "#########################################################################"
+    echo "### Generating channel configuration transaction '${CHANNEL_NAME}.tx' ###"
+    echo "#########################################################################"
     set -x
-    configtxgen -profile TxChannel -outputCreateChannelTx ./channel-artifacts/atlchannel.tx -channelID $CHANNEL_NAME
+    configtxgen -profile TxChannel -outputCreateChannelTx ./channel-artifacts/${CHANNEL_NAME}.tx -channelID $CHANNEL_NAME
     res=$?
     set +x
     if [ $res -ne 0 ]; then
@@ -168,22 +167,18 @@ function startCA() {
 # Remove the files generated
 function cleanFiles() {
     if [ -d "./crypto-config" ]; then
-        rm -r crypto-config
+        rm -rf crypto-config
     fi
     if [ -d "./channel-artifacts" ]; then
-        rm -r channel-artifacts
+        rm -rf channel-artifacts
     fi
     if [ -d "./production" ]; then
-        rm -r production
+        rm -rf production
     fi
 }
 
 function stopOrderer() {
     docker-compose -f ${DOCKER_COMPOSE_FILE_ORDERER} down 2>&1
-}
-
-function stopKafka() {
-    docker-compose -f ${DOCKER_COMPOSE_FILE_KAFKA} down 2>&1
 }
 
 function stopPeer() {
@@ -229,16 +224,16 @@ shift
 # Determine whether starting or stopping
 if [ "$MODE" == "up" ]; then
         genCerts
-        # genChannelArtifacts
-        # startOrderer
-        # startPeer
+        genChannelArtifacts
+        startOrderer
+        startPeer
         # startCA
         # startCLI
 elif [ "$MODE" == "down" ]; then
         # stopCLI
         # stopCA
-        # stopPeer
-        # stopOrderer
+        stopPeer
+        stopOrderer
         cleanFiles    
 elif [ "$MODE" == "addorg" ]; then
     addOrg
