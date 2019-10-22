@@ -5,6 +5,8 @@ export FABRIC_CFG_PATH=${PWD}/ATLChain_NETWORK
 
 CHANNEL_NAME="atlchannel"
 ORG_DOMAIN_NAME="orga.example.com"
+IMAGE_TAG1="amd64-1.4.3"
+IMAGE_TAG2="amd64-0.4.15"
 
 #compose files
 DOCKER_COMPOSE_FILE_ORDERER="docker-compose-orderer.yaml"
@@ -21,29 +23,23 @@ export DOCKER_COMPOSE_PEER_GOSSIP_BOOTSTRAP=peer0.orga.example.com:7051
 export CORE_PEER_ADDRESS=peer0.orga.example.com:7051 
 export ORERER_ADDRESS=orderer1.example.com:7050
 
-function printHelp() {
+function help() {
     echo "Usage: "
-    echo "  atlchain.sh <mode> [<node>]"
-    echo "      <mode> - one of 'up', 'down', 'genCerts', 'genArti', 'clean'"
+    echo "  atlchain.sh <mode>"
+    echo "      <mode> - one of 'up', 'down', 'clean'"
     echo "        - 'up' - bring up the network with docker-compose up"
     echo "        - 'down' - clear the network with docker-compose down"
-    echo "        - 'genCerts' - generate crypto material"
-    echo "        - 'genArti' - generate channel artifacts"
     echo "        - 'clean' - clean files built during network running"
-    echo "      <node> - one of 'orderer', 'peer', 'ca', 'cli'"
-    echo "        - 'orderer' - orderer node"
-    echo "        - 'peer' - peer node"
-    echo "        - 'ca' - ca node"
-    echo "        - 'cli' - tool node, you can run commands in cli container"
     echo "e.g."
-    echo "  atlchain.sh genCerts"
-    echo "  atlchain.sh genArti"
-    echo "  atlchain.sh up orderer"
-    echo "  atlchain.sh down peer"
+    echo "  atlchain.sh up"
+    echo "  atlchain.sh down"
 }
 
 # Generates Org certs using cryptogen tool
 function genCerts() {
+    # generate crypto-config.yaml
+    genCryptoConfig
+
     which cryptogen
     if [ "$?" -ne 0 ]; then
         echo "cryptogen tool not found."
@@ -106,9 +102,9 @@ function genChannelArtifacts() {
     fi
     
     echo
-    echo "#################################################################"
+    echo "#############################################################"
     echo "#######    Generating anchor peer update for Org   ##########"
-    echo "#################################################################"
+    echo "#############################################################"
     set -x
     configtxgen -profile TxChannel -outputAnchorPeersUpdate ./channel-artifacts/OrgAanchors.tx -channelID $CHANNEL_NAME -asOrg OrgA
     configtxgen -profile TxChannel -outputAnchorPeersUpdate ./channel-artifacts/OrgBanchors.tx -channelID $CHANNEL_NAME -asOrg OrgB
@@ -206,39 +202,118 @@ function addOrg() {
     configtxgen -printOrg OrgC > ./channel-artifacts/orgc.json
 }
 
-# Network config files in ATLChain_NETWORK directory
+function downloadImages() {
+    docker pull hyperledger/fabric-tools:amd64-1.4.3
+    docker pull hyperledger/fabric-ccenv:amd64-1.4.3
+    docker pull hyperledger/fabric-javaenv:amd64-1.4.3
+    docker pull hyperledger/fabric-orderer:amd64-1.4.3
+    docker pull hyperledger/fabric-peer:amd64-1.4.3
+    docker pull hyperledger/fabric-ca:amd64-1.4.3
+    docker pull hyperledger/fabric-couchdb：amd64-0.4.15
+    docker pull hyperledger/fabric-baseos：amd64-0.4.15
+}
+
+function addOrgOrdererCryptoConfig() {
+    echo "  - Name: $1
+    Domain: $2
+    EnableNodeOUs: true
+    Specs:
+      - Hostname: orderer1
+      - Hostname: orderer2
+      - Hostname: orderer3
+      - Hostname: orderer4
+      - Hostname: orderer5" >> crypto-config.yaml
+    
+    echo "" >> crypto-config.yaml
+}
+
+function addOrgPeerCryptoConfig() {
+    echo "  - Name: $1
+    Domain: $2
+    EnableNodeOUs: true
+    Template:
+      Count: 2
+    Users:
+      Count: 2" >> crypto-config.yaml
+
+    echo "" >> crypto-config.yaml
+}
+
+function genCryptoConfig() {
+    if [ ! -d "crypto-config.yaml" ]
+    then
+        touch crypto-config.yaml
+    else
+        rm crypto-config.yaml
+    fi
+    echo "OrdererOrgs:" > crypto-config.yaml
+    varSwitch="orderer"
+    while read line
+    do
+        if [ "$line" == "" ]
+        then
+            if [ "$varSwitch" == "orderer" ]
+            then
+                varSwitch="peer"
+                echo "PeerOrgs:" >> crypto-config.yaml
+            fi
+            continue
+        fi
+        
+        if [ "$varSwitch" == "orderer" ]
+        then
+            addOrgOrdererCryptoConfig $(echo $line | awk '{print $1}') $(echo $line | awk '{print $2}')
+        elif [ "$varSwitch" == "peer" ]
+        then
+            addOrgPeerCryptoConfig $(echo $line | awk '{print $1}') $(echo $line | awk '{print $2}')
+        fi
+    done < conf/crypto-config.conf
+}
+
+# Network config files are in ATLChain_NETWORK directory
 cd ATLChain_NETWORK
-# untar bin package
-if [ ! -d "bin" ] 
-then
-    echo "extract binary files..."
-    tar xvf bin.tar.xz
-fi
+genCerts
+# # Download docker images
+# echo "Downloading docker images......"
+# downloadImages
+# if [ $? -ne 0 ]; then
+#     echo "ERROR !!!! Unable to download docker images"
+#     exit 1
+# fi
 
-if [ ! -d "production" ];then
-    mkdir production
-fi
+# # Untar bin package
+# if [ ! -d "bin" ] 
+# then
+#     echo "extract binary files..."
+#     tar xvf bin.tar.xz
+# fi
 
-MODE=$1
-shift
-# Determine whether starting or stopping
-if [ "$MODE" == "up" ]; then
-        genCerts
-        genChannelArtifacts
-        startOrderer
-        startPeer
-        # startCA
-        # startCLI
-elif [ "$MODE" == "down" ]; then
-        # stopCLI
-        # stopCA
-        stopPeer
-        stopOrderer
-        cleanFiles    
-elif [ "$MODE" == "addorg" ]; then
-    addOrg
-else
-    printHelp
-    exit 1 
-fi
+# if [ ! -d "production" ];then
+#     mkdir production
+# fi
+
+# MODE=$1
+# shift
+# # Determine whether starting or stopping
+# if [ "$MODE" == "up" ]; then
+#         genCerts
+#         genChannelArtifacts
+#         startOrderer
+#         startPeer
+#         # startCA
+#         # startCLI
+# elif [ "$MODE" == "down" ]; then
+#         # stopCLI
+#         # stopCA
+#         stopPeer
+#         stopOrderer
+#         cleanFiles    
+# elif [ "$MODE" == "addorg" ]; then
+#     addOrg
+# else
+#     help
+#     exit 1 
+# fi
+
+# Back to working dir
 cd ..

@@ -9,7 +9,7 @@ networks:
 services:
     couchdb.orga.example.com:
         container_name: couchdb.orga.example.com
-        image: hyperledger/fabric-couchdb:0.4.15
+        image: hyperledger/fabric-couchdb:${IMAGE_TAG2}
         # Populate the COUCHDB_USER and COUCHDB_PASSWORD to set an admin user and password
         # for CouchDB.  This will prevent CouchDB from operating in an "Admin Party" mode.
         environment:
@@ -22,7 +22,7 @@ services:
 
     peer0.orga.example.com:
         container_name: peer0.orga.example.com
-        image: hyperledger/fabric-peer:1.4.3
+        image: hyperledger/fabric-peer:${IMAGE_TAG1}
         depends_on:
             - couchdb.orga.example.com
         environment:

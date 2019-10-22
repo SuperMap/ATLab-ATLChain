@@ -77,7 +77,7 @@ Organizations:
                 Rule: "OR('OrgB.admin')"
 
         OrdererEndpoints:
-            - "orderer2.example.com:8050"
+            - "orderer2.example.com:7050"
 
         AnchorPeers:
             - Host: peer0.orgb.example.com
@@ -99,7 +99,7 @@ Organizations:
                 Rule: "OR('OrgC.admin')"
 
         OrdererEndpoints:
-            - "orderer3.example.com:9050"
+            - "orderer3.example.com:7050"
 
         AnchorPeers:
             - Host: peer0.orgc.example.com
@@ -314,8 +314,8 @@ Orderer: &OrdererDefaults
     Addresses:
         # - 127.0.0.1:7050
         - orderer1.example.com:7050
-        - orderer2.example.com:8050
-        - orderer3.example.com:9050
+        - orderer2.example.com:7050
+        - orderer3.example.com:7050
 
     # Batch Timeout: The amount of time to wait before creating a batch.
     BatchTimeout: 2s
@@ -380,11 +380,11 @@ Orderer: &OrdererDefaults
               ClientTLSCert: crypto-config/ordererOrganizations/example.com/orderers/orderer1.example.com/tls/server.crt
               ServerTLSCert: crypto-config/ordererOrganizations/example.com/orderers/orderer1.example.com/tls/server.crt
             - Host: orderer2.example.com
-              Port: 8050
+              Port: 7050
               ClientTLSCert: crypto-config/ordererOrganizations/example.com/orderers/orderer2.example.com/tls/server.crt
               ServerTLSCert: crypto-config/ordererOrganizations/example.com/orderers/orderer2.example.com/tls/server.crt
             - Host: orderer3.example.com
-              Port: 9050
+              Port: 7050
               ClientTLSCert: crypto-config/ordererOrganizations/example.com/orderers/orderer3.example.com/tls/server.crt
               ServerTLSCert: crypto-config/ordererOrganizations/example.com/orderers/orderer3.example.com/tls/server.crt
 

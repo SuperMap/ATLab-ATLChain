@@ -11,7 +11,7 @@ networks:
 services:
     orderer1.example.com:
         container_name: orderer1.example.com
-        image: hyperledger/fabric-orderer:1.4.3
+        image: hyperledger/fabric-orderer:${IMAGE_TAG1}
         environment:
             # base env
             - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
@@ -46,7 +46,7 @@ services:
     
     orderer2.example.com:
         container_name: orderer2.example.com
-        image: hyperledger/fabric-orderer:1.4.3
+        image: hyperledger/fabric-orderer:${IMAGE_TAG1}
         environment:
             - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
             - ORDERER_GENERAL_LOCALMSPID=OrgOrderer
@@ -74,13 +74,13 @@ services:
             - ./crypto-config/ordererOrganizations/example.com/orderers/orderer2.example.com/tls:/var/hyperledger/orderer/tls
             - ./production/orderer2.example.com:/var/hyperledger/production/orderer
         ports:
-          - 8050:7050
+          - 7050:7050
         networks:
             - atln
 
     orderer3.example.com:
         container_name: orderer3.example.com
-        image: hyperledger/fabric-orderer:1.4.3
+        image: hyperledger/fabric-orderer:${IMAGE_TAG1}
         environment:
             - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
             - ORDERER_GENERAL_LOCALMSPID=OrgOrderer
@@ -108,7 +108,7 @@ services:
             - ./crypto-config/ordererOrganizations/example.com/orderers/orderer3.example.com/tls:/var/hyperledger/orderer/tls
             - ./production/orderer3.example.com:/var/hyperledger/production/orderer
         ports:
-          - 9050:7050
+          - 7050:7050
         networks:
             - atln
 

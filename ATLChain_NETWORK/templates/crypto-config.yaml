@@ -1,0 +1,15 @@
+OrdererOrgs:
+  - Name: ORDERER_ORG_NAME
+    Domain: ORDERER_ORG_DOMAIN
+    EnableNodeOUs: true
+    Specs:
+      - Hostname: ORDERER_HOSTNAME
+
+PeerOrgs:
+  - Name: PEER_ORG_NAME
+    Domain: PEER_ORG_DOMAIN
+    EnableNodeOUs: true
+    Template:
+      Count: 2
+    Users:
+      Count: 2

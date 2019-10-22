@@ -6,7 +6,7 @@ networks:
 services:
     cli:
         container_name: cli
-        image: hyperledger/fabric-tools:1.4.3
+        image: hyperledger/fabric-tools:${IMAGE_TAG1}
         tty: true
         stdin_open: true
         environment:
