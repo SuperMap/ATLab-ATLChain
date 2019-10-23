@@ -1,7 +1,7 @@
 #!/bin/bash
 
-export PATH=${PWD}/ATLChain_NETWORK/bin:$PATH
-export FABRIC_CFG_PATH=${PWD}/ATLChain_NETWORK
+export PATH=./bin:$PATH
+export FABRIC_CFG_PATH=${PWD}
 
 CHANNEL_NAME="atlchannel"
 ORG_DOMAIN_NAME="orga.example.com"
@@ -37,7 +37,6 @@ function help() {
 
 # Generates Org certs using cryptogen tool
 function genCerts() {
-    # generate crypto-config.yaml
     genCryptoConfig
 
     which cryptogen
@@ -66,6 +65,8 @@ function genCerts() {
 
 # Generate Channel Artifacts used in the network
 function genChannelArtifacts() {
+    genConfigtx
+
     which configtxgen
     if [ "$?" -ne 0 ]; then
         echo "configtxgen tool not found. exiting"
@@ -119,7 +120,7 @@ function genChannelArtifacts() {
 }
 
 function startOrderer() {
-    docker-compose -f ${DOCKER_COMPOSE_FILE_ORDERER} up -d 2>&1
+    IMAGETAG1=$IMAGE_TAG1 docker-compose -f ${DOCKER_COMPOSE_FILE_ORDERER} up -d 2>&1
     if [ $? -ne 0 ]; then
         echo "ERROR !!!! Unable to start orderer node"
         exit 1
@@ -127,7 +128,7 @@ function startOrderer() {
 }
 
 function startPeer() {
-    docker-compose -f ${DOCKER_COMPOSE_FILE_PEER} up -d 2>&1
+    IMAGETAG1=$IMAGE_TAG1 IMAGETAG2=$IMAGE_TAG2 docker-compose -f ${DOCKER_COMPOSE_FILE_PEER} up -d 2>&1
     if [ $? -ne 0 ]; then
         echo "ERROR !!!! Unable to start peer node"
         exit 1
@@ -144,7 +145,7 @@ function startCA() {
 
 # Start a CLI peer container for operation
 function startCLI() {
-    docker-compose -f ${DOCKER_COMPOSE_FILE_CLI} up -d 2>&1
+    IMAGETAG1=$IMAGE_TAG1 docker-compose -f ${DOCKER_COMPOSE_FILE_CLI} up -d 2>&1
     if [ $? -ne 0 ]; then
         echo "ERROR !!!! Unable to start CLI node"
         exit 1
@@ -153,7 +154,7 @@ function startCLI() {
 
 # Start a CA container
 function startCA() {
-    docker-compose -f ${DOCKER_COMPOSE_FILE_CA} up -d 2>&1
+    IMAGETAG1=$IMAGE_TAG1 docker-compose -f ${DOCKER_COMPOSE_FILE_CA} up -d 2>&1
     if [ $? -ne 0 ]; then
         echo "ERROR !!!! Unable to start CA node"
         exit 1
@@ -174,27 +175,19 @@ function cleanFiles() {
 }
 
 function stopOrderer() {
-    docker-compose -f ${DOCKER_COMPOSE_FILE_ORDERER} down 2>&1
+    IMAGETAG1=$IMAGE_TAG1 docker-compose -f ${DOCKER_COMPOSE_FILE_ORDERER} down 2>&1
 }
 
 function stopPeer() {
-    docker-compose -f ${DOCKER_COMPOSE_FILE_PEER} down 2>&1
-}
-
-function stopCA() {
-    docker-compose -f ${DOCKER_COMPOSE_FILE_CA} down 2>&1
+    IMAGETAG1=$IMAGE_TAG1 IMAGETAG2=$IMAGE_TAG2 docker-compose -f ${DOCKER_COMPOSE_FILE_PEER} down 2>&1
 }
 
 function stopCLI() {
-    docker-compose -f ${DOCKER_COMPOSE_FILE_CLI} down 2>&1
+    IMAGETAG1=$IMAGE_TAG1 docker-compose -f ${DOCKER_COMPOSE_FILE_CLI} down 2>&1
 }
 
 function stopCA() {
-    docker-compose -f ${DOCKER_COMPOSE_FILE_CA} down 2>&1
-    if [ $? -ne 0 ]; then
-        echo "ERROR !!!! Unable to stop CA node"
-        exit 1
-    fi
+    IMAGETAG1=$IMAGE_TAG1 docker-compose -f ${DOCKER_COMPOSE_FILE_CA} down 2>&1
 }
 
 function addOrg() {
@@ -203,14 +196,45 @@ function addOrg() {
 }
 
 function downloadImages() {
-    docker pull hyperledger/fabric-tools:amd64-1.4.3
-    docker pull hyperledger/fabric-ccenv:amd64-1.4.3
-    docker pull hyperledger/fabric-javaenv:amd64-1.4.3
-    docker pull hyperledger/fabric-orderer:amd64-1.4.3
-    docker pull hyperledger/fabric-peer:amd64-1.4.3
-    docker pull hyperledger/fabric-ca:amd64-1.4.3
-    docker pull hyperledger/fabric-couchdb：amd64-0.4.15
-    docker pull hyperledger/fabric-baseos：amd64-0.4.15
+    if [ !"$(docker images hyperledger/fabric-tools:amd64-1.4.3 -q)" == "18ed4db0cd57" ]
+    then
+        docker pull hyperledger/fabric-tools:amd64-1.4.3
+    fi
+    
+    if [ !"$(docker images hyperledger/fabric-ccenv:amd64-1.4.3 -q)" == "18ed4db0cd57" ]
+    then
+        docker pull hyperledger/fabric-ccenv:amd64-1.4.3
+    fi
+
+    if [ !"$(docker images hyperledger/fabric-javaenv:amd64-1.4.3 -q)" == "18ed4db0cd57" ]
+    then
+        docker pull hyperledger/fabric-javaenv:amd64-1.4.3
+    fi
+
+    if [ !"$(docker images hyperledger/fabric-orderer:amd64-1.4.3 -q)" == "18ed4db0cd57" ]
+    then
+        docker pull hyperledger/fabric-orderer:amd64-1.4.3
+    fi
+
+    if [ !"$(docker images hyperledger/fabric-peer:amd64-1.4.3 -q)" == "18ed4db0cd57" ]
+    then
+        docker pull hyperledger/fabric-peer:amd64-1.4.3
+    fi
+
+    if [ !"$(docker images hyperledger/fabric-ca:amd64-1.4.3 -q)" == "18ed4db0cd57" ]
+    then
+        docker pull hyperledger/fabric-ca:amd64-1.4.3
+    fi
+
+    if [ !"$(docker images hyperledger/fabric-couchdb：amd64-0.4.15 -q)" == "18ed4db0cd57" ]
+    then
+        docker pull hyperledger/fabric-couchdb：amd64-0.4.15
+    fi
+
+    if [ !"$(docker images hyperledger/fabric-baseos：amd64-0.4.15 -q)" == "18ed4db0cd57" ]
+    then
+        docker pull hyperledger/fabric-baseos：amd64-0.4.15
+    fi
 }
 
 # generate crypto-config.yaml
@@ -269,7 +293,7 @@ function genConfigtx() {
         
         if [ "$varSwitch" == "orderer" ]
         then
-            addPart1Configtx $(echo $line | awk '{print $1}')
+            addPart1Configtx $(echo $line | awk '{print $1}') $(echo $line | awk '{print $2}')
         elif [ "$varSwitch" == "peer" ]
         then
             addPart2Configtx $(echo $line | awk '{print $1}') $(echo $line | awk '{print $2}') $(echo $line | awk '{print $3}')
@@ -277,8 +301,12 @@ function genConfigtx() {
     done < ./conf/crypto-config.conf
 
     addPart3Configtx
-    addPart4Configtx
 
+    while read line
+    do
+        addPart4Configtx $line
+    done < ./conf/raft.conf
+    
     varSwitch="orderer"
     while read line
     do
@@ -331,7 +359,7 @@ function addPart1Configtx() {
     echo "    - &$1
         Name: $1
         ID: $1
-        MSPDir: crypto-config/ordererOrganizations/example.com/msp
+        MSPDir: crypto-config/ordererOrganizations/$2/msp
         Policies: &$1Policies
             Readers:
                 Type: Signature
@@ -350,7 +378,7 @@ function addPart2Configtx() {
     echo "    - &$1
         Name: $1
         ID: $1
-        MSPDir: crypto-config/peerOrganizations/orgc.example.com/msp
+        MSPDir: crypto-config/peerOrganizations/$2/msp
         Policies: &$1Policies
             Readers:
                 Type: Signature
@@ -451,18 +479,18 @@ function addPart4Configtx() {
 
     EtcdRaft:
         Consenters:
-            - Host: $1
+            - Host: $2.$1
               Port: 7050
-              ClientTLSCert: crypto-config/ordererOrganizations/example.com/orderers/orderer1.example.com/tls/server.crt
-              ServerTLSCert: crypto-config/ordererOrganizations/example.com/orderers/orderer1.example.com/tls/server.crt
-            - Host: $2
+              ClientTLSCert: crypto-config/ordererOrganizations/$1/orderers/$2.$1/tls/server.crt
+              ServerTLSCert: crypto-config/ordererOrganizations/$1/orderers/$2.$1/tls/server.crt
+            - Host: $3.$1
               Port: 7050
-              ClientTLSCert: crypto-config/ordererOrganizations/example.com/orderers/orderer2.example.com/tls/server.crt
-              ServerTLSCert: crypto-config/ordererOrganizations/example.com/orderers/orderer2.example.com/tls/server.crt
-            - Host: $3
+              ClientTLSCert: crypto-config/ordererOrganizations/$1/orderers/$3.$1/tls/server.crt
+              ServerTLSCert: crypto-config/ordererOrganizations/$1/orderers/$3.$1/tls/server.crt
+            - Host: $4.$1
               Port: 7050
-              ClientTLSCert: crypto-config/ordererOrganizations/example.com/orderers/orderer3.example.com/tls/server.crt
-              ServerTLSCert: crypto-config/ordererOrganizations/example.com/orderers/orderer3.example.com/tls/server.crt
+              ClientTLSCert: crypto-config/ordererOrganizations/$1/orderers/$4.$1/tls/server.crt
+              ServerTLSCert: crypto-config/ordererOrganizations/$1/orderers/$4.$1/tls/server.crt
 
         Options:
             TickInterval: 500ms
@@ -546,48 +574,48 @@ function addPart6Configtx() {
     echo "" >> configtx.yaml
 }
 
-genCerts
-genConfigtx
+function prepareForStart() {
+    # Download docker images
+    echo "Downloading docker images......"
+    downloadImages
+    if [ $? -ne 0 ]; then
+        echo "ERROR !!!! Unable to download docker images"
+        exit 1
+    fi
 
-# # Download docker images
-# echo "Downloading docker images......"
-# downloadImages
-# if [ $? -ne 0 ]; then
-#     echo "ERROR !!!! Unable to download docker images"
-#     exit 1
-# fi
+    # Untar bin package
+    if [ ! -d "bin" ] 
+    then
+        echo "extract binary files..."
+        tar xvf bin.tar.xz
+    fi
 
-# # Untar bin package
-# if [ ! -d "bin" ] 
-# then
-#     echo "extract binary files..."
-#     tar xvf bin.tar.xz
-# fi
+    if [ ! -d "production" ];then
+        mkdir production
+    fi
+}
 
-# if [ ! -d "production" ];then
-#     mkdir production
-# fi
+MODE=$1
+shift
+# Determine whether starting or stopping
+if [ "$MODE" == "up" ]; then
+    prepareForStart
 
-# MODE=$1
-# shift
-# # Determine whether starting or stopping
-# if [ "$MODE" == "up" ]; then
-#         genCerts
-#         genChannelArtifacts
-#         startOrderer
-#         startPeer
-#         # startCA
-#         # startCLI
-# elif [ "$MODE" == "down" ]; then
-#         # stopCLI
-#         # stopCA
-#         stopPeer
-#         stopOrderer
-#         cleanFiles    
-# elif [ "$MODE" == "addorg" ]; then
-#     addOrg
-# else
-#     help
-#     exit 1 
-# fi
-
+    genCerts
+    genChannelArtifacts
+    startOrderer
+    startPeer
+    startCA
+    startCLI
+elif [ "$MODE" == "down" ]; then
+    stopCLI
+    stopCA
+    stopPeer
+    stopOrderer
+    cleanFiles    
+elif [ "$MODE" == "addorg" ]; then
+    addOrg
+else
+    help
+    exit 1 
+fi

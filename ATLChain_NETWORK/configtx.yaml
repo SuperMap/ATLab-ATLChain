@@ -1,0 +1,240 @@
+Organizations:
+    - &OrgOrderer
+        Name: OrgOrderer
+        ID: OrgOrderer
+        MSPDir: crypto-config/ordererOrganizations/example.com/msp
+        Policies: &OrgOrdererPolicies
+            Readers:
+                Type: Signature
+                Rule: "OR('OrgOrderer.member')"
+            Writers:
+                Type: Signature
+                Rule: "OR('OrgOrderer.member')"
+            Admins:
+                Type: Signature
+                Rule: "OR('OrgOrderer.admin')"
+
+    - &OrgA
+        Name: OrgA
+        ID: OrgA
+        MSPDir: crypto-config/peerOrganizations/orga.example.com/msp
+        Policies: &OrgAPolicies
+            Readers:
+                Type: Signature
+                Rule: "OR('OrgA.member')"
+            Writers:
+                Type: Signature
+                Rule: "OR('OrgA.member')"
+            Admins:
+                Type: Signature
+                Rule: "OR('OrgA.admin')"
+
+        OrdererEndpoints:
+            - orderer1.example.com:7050
+
+        AnchorPeers:
+            - Host: orga.example.com
+              Port: 7051
+
+    - &OrgB
+        Name: OrgB
+        ID: OrgB
+        MSPDir: crypto-config/peerOrganizations/orgb.example.com/msp
+        Policies: &OrgBPolicies
+            Readers:
+                Type: Signature
+                Rule: "OR('OrgB.member')"
+            Writers:
+                Type: Signature
+                Rule: "OR('OrgB.member')"
+            Admins:
+                Type: Signature
+                Rule: "OR('OrgB.admin')"
+
+        OrdererEndpoints:
+            - orderer2.example.com:7050
+
+        AnchorPeers:
+            - Host: orgb.example.com
+              Port: 7051
+
+    - &OrgC
+        Name: OrgC
+        ID: OrgC
+        MSPDir: crypto-config/peerOrganizations/orgc.example.com/msp
+        Policies: &OrgCPolicies
+            Readers:
+                Type: Signature
+                Rule: "OR('OrgC.member')"
+            Writers:
+                Type: Signature
+                Rule: "OR('OrgC.member')"
+            Admins:
+                Type: Signature
+                Rule: "OR('OrgC.admin')"
+
+        OrdererEndpoints:
+            - orderer3.example.com:7050
+
+        AnchorPeers:
+            - Host: orgc.example.com
+              Port: 7051
+
+Capabilities:
+    Channel: &ChannelCapabilities
+        V1_4_3: true
+        V1_3: false
+        V1_1: false
+
+    Orderer: &OrdererCapabilities
+        V1_4_2: true
+        V1_1: false
+
+    Application: &ApplicationCapabilities
+        V1_4_2: true
+        V1_3: false
+        V1_2: false
+        V1_1: false
+
+Application: &ApplicationDefaults
+    ACLs: &ACLsDefault
+        lscc/ChaincodeExists: /Channel/Application/Readers
+        lscc/GetDeploymentSpec: /Channel/Application/Readers
+        lscc/GetChaincodeData: /Channel/Application/Readers
+        lscc/GetInstantiatedChaincodes: /Channel/Application/Readers
+        qscc/GetChainInfo: /Channel/Application/Readers
+        qscc/GetBlockByNumber: /Channel/Application/Readers
+        qscc/GetBlockByHash: /Channel/Application/Readers
+        qscc/GetTransactionByID: /Channel/Application/Readers
+        qscc/GetBlockByTxID: /Channel/Application/Readers
+        cscc/GetConfigBlock: /Channel/Application/Readers
+        cscc/GetConfigTree: /Channel/Application/Readers
+        cscc/SimulateConfigTreeUpdate: /Channel/Application/Readers
+        peer/Propose: /Channel/Application/Writers
+        peer/ChaincodeToChaincode: /Channel/Application/Readers
+        event/Block: /Channel/Application/Readers
+        event/FilteredBlock: /Channel/Application/Readers
+
+    Organizations:
+
+    Policies: &ApplicationDefaultPolicies
+        Readers:
+            Type: ImplicitMeta
+            Rule: "ANY Readers"
+        Writers:
+            Type: ImplicitMeta
+            Rule: "ANY Writers"
+        Admins:
+            Type: ImplicitMeta
+            Rule: "MAJORITY Admins"
+
+    Capabilities:
+        <<: *ApplicationCapabilities
+
+Orderer: &OrdererDefaults
+    OrdererType: etcdraft
+    Addresses:
+        - example.com:7050
+        - orderer1:7050
+        - orderer2:7050
+
+    BatchTimeout: 2s
+
+    BatchSize:
+        MaxMessageCount: 2000
+        AbsoluteMaxBytes: 100 MB
+        PreferredMaxBytes: 50 MB
+
+    MaxChannels: 0
+    Kafka:
+        Brokers:
+            - kafka0:9092
+            - kafka1:9092
+            - kafka2:9092
+
+    EtcdRaft:
+        Consenters:
+            - Host: orderer1.example.com
+              Port: 7050
+              ClientTLSCert: crypto-config/ordererOrganizations/example.com/orderers/orderer1.example.com/tls/server.crt
+              ServerTLSCert: crypto-config/ordererOrganizations/example.com/orderers/orderer1.example.com/tls/server.crt
+            - Host: orderer2.example.com
+              Port: 7050
+              ClientTLSCert: crypto-config/ordererOrganizations/example.com/orderers/orderer2.example.com/tls/server.crt
+              ServerTLSCert: crypto-config/ordererOrganizations/example.com/orderers/orderer2.example.com/tls/server.crt
+            - Host: orderer3.example.com
+              Port: 7050
+              ClientTLSCert: crypto-config/ordererOrganizations/example.com/orderers/orderer3.example.com/tls/server.crt
+              ServerTLSCert: crypto-config/ordererOrganizations/example.com/orderers/orderer3.example.com/tls/server.crt
+
+        Options:
+            TickInterval: 500ms
+            ElectionTick: 10
+            HeartbeatTick: 1
+            MaxInflightBlocks: 5
+            SnapshotIntervalSize: 200 MB
+
+    Organizations:
+
+    Policies:
+        Readers:
+            Type: ImplicitMeta
+            Rule: "ANY Readers"
+        Writers:
+            Type: ImplicitMeta
+            Rule: "ANY Writers"
+        Admins:
+            Type: ImplicitMeta
+            Rule: "MAJORITY Admins"
+        BlockValidation:
+            Type: ImplicitMeta
+            Rule: "ANY Writers"
+
+    Capabilities:
+        <<: *OrdererCapabilities
+
+Channel: &ChannelDefaults
+    Policies:
+        Readers:
+            Type: ImplicitMeta
+            Rule: "ANY Readers"
+        Writers:
+            Type: ImplicitMeta
+            Rule: "ANY Writers"
+        Admins:
+            Type: ImplicitMeta
+            Rule: "MAJORITY Admins"
+
+    Capabilities:
+        <<: *ChannelCapabilities
+
+Profiles:
+    OrdererChannel:
+        <<: *ChannelDefaults
+        Capabilities:
+            <<: *ChannelCapabilities
+        Orderer:
+            <<: *OrdererDefaults
+            Organizations:
+                - <<: *OrgOrderer
+            Capabilities:
+                <<: *OrdererCapabilities
+        Consortiums:
+            SampleConsortium:
+                Organizations:
+                    - <<: *OrgA
+                    - <<: *OrgB
+                    - <<: *OrgC
+
+    TxChannel:
+        Consortium: SampleConsortium
+        <<: *ChannelDefaults
+        Application:
+            <<: *ApplicationDefaults
+            Organizations:
+                - *OrgA
+                - *OrgB
+                - *OrgC
+            Capabilities:
+                <<: *ApplicationCapabilities
+
