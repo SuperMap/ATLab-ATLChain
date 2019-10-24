@@ -30,7 +30,7 @@ Organizations:
                 Rule: "OR('OrgA.admin')"
 
         OrdererEndpoints:
-            - orderer1.example.com:7050
+            - :7050
 
         AnchorPeers:
             - Host: orga.example.com
@@ -52,7 +52,7 @@ Organizations:
                 Rule: "OR('OrgB.admin')"
 
         OrdererEndpoints:
-            - orderer2.example.com:7050
+            - :7050
 
         AnchorPeers:
             - Host: orgb.example.com
@@ -74,7 +74,7 @@ Organizations:
                 Rule: "OR('OrgC.admin')"
 
         OrdererEndpoints:
-            - orderer3.example.com:7050
+            - :7050
 
         AnchorPeers:
             - Host: orgc.example.com

@@ -3,36 +3,15 @@
 export PATH=./bin:$PATH
 export FABRIC_CFG_PATH=${PWD}
 
-CHANNEL_NAME="atlchannel"
-ORG_DOMAIN_NAME="orga.example.com"
-IMAGE_TAG1="amd64-1.4.3"
-IMAGE_TAG2="amd64-0.4.15"
-
-#compose files
-DOCKER_COMPOSE_FILE_ORDERER="docker-compose-orderer.yaml"
-DOCKER_COMPOSE_FILE_PEER="docker-compose-peer.yaml"
-DOCKER_COMPOSE_FILE_CA="docker-compose-ca.yaml"
-DOCKER_COMPOSE_FILE_CLI="docker-compose-cli.yaml"
-
-# default compose project name
-export COMPOSE_PROJECT_NAME=atlproj
-
-export DOCKER_COMPOSE_PEER_ADDRESS=peer0.orga.example.com:7051
-export DOCKER_COMPOSE_PEER_GOSSIP_BOOTSTRAP=peer0.orga.example.com:7051 
-
-export CORE_PEER_ADDRESS=peer0.orga.example.com:7051 
-export ORERER_ADDRESS=orderer1.example.com:7050
+. ./nodes.sh
 
 function help() {
     echo "Usage: "
-    echo "  atlchain.sh <mode>"
-    echo "      <mode> - one of 'up', 'down', 'clean'"
-    echo "        - 'up' - bring up the network with docker-compose up"
-    echo "        - 'down' - clear the network with docker-compose down"
-    echo "        - 'clean' - clean files built during network running"
-    echo "e.g."
-    echo "  atlchain.sh up"
-    echo "  atlchain.sh down"
+    echo "  command <mode>"
+    echo "    <mode> - one of 'up', 'down', 'clean'"
+    echo "      - 'up' - start up the network"
+    echo "      - 'down' - shutdown the network"
+    echo "      - 'clean' - clean all the files using by the networks"
 }
 
 # Generates Org certs using cryptogen tool
@@ -119,44 +98,11 @@ function genChannelArtifacts() {
     echo 
 }
 
-function startOrderer() {
-    IMAGETAG1=$IMAGE_TAG1 docker-compose -f ${DOCKER_COMPOSE_FILE_ORDERER} up -d 2>&1
-    if [ $? -ne 0 ]; then
-        echo "ERROR !!!! Unable to start orderer node"
-        exit 1
-    fi
-}
-
-function startPeer() {
-    IMAGETAG1=$IMAGE_TAG1 IMAGETAG2=$IMAGE_TAG2 docker-compose -f ${DOCKER_COMPOSE_FILE_PEER} up -d 2>&1
-    if [ $? -ne 0 ]; then
-        echo "ERROR !!!! Unable to start peer node"
-        exit 1
-    fi
-}
-
-function startCA() {
-    docker-compose -f ${DOCKER_COMPOSE_FILE_CA} up -d 2>&1
-    if [ $? -ne 0 ]; then
-        echo "ERROR !!!! Unable to start CA node "
-        exit 1
-    fi
-}
-
 # Start a CLI peer container for operation
 function startCLI() {
     IMAGETAG1=$IMAGE_TAG1 docker-compose -f ${DOCKER_COMPOSE_FILE_CLI} up -d 2>&1
     if [ $? -ne 0 ]; then
         echo "ERROR !!!! Unable to start CLI node"
-        exit 1
-    fi
-}
-
-# Start a CA container
-function startCA() {
-    IMAGETAG1=$IMAGE_TAG1 docker-compose -f ${DOCKER_COMPOSE_FILE_CA} up -d 2>&1
-    if [ $? -ne 0 ]; then
-        echo "ERROR !!!! Unable to start CA node"
         exit 1
     fi
 }
@@ -174,20 +120,8 @@ function cleanFiles() {
     fi
 }
 
-function stopOrderer() {
-    IMAGETAG1=$IMAGE_TAG1 docker-compose -f ${DOCKER_COMPOSE_FILE_ORDERER} down 2>&1
-}
-
-function stopPeer() {
-    IMAGETAG1=$IMAGE_TAG1 IMAGETAG2=$IMAGE_TAG2 docker-compose -f ${DOCKER_COMPOSE_FILE_PEER} down 2>&1
-}
-
 function stopCLI() {
     IMAGETAG1=$IMAGE_TAG1 docker-compose -f ${DOCKER_COMPOSE_FILE_CLI} down 2>&1
-}
-
-function stopCA() {
-    IMAGETAG1=$IMAGE_TAG1 docker-compose -f ${DOCKER_COMPOSE_FILE_CA} down 2>&1
 }
 
 function addOrg() {
@@ -266,7 +200,7 @@ function genCryptoConfig() {
         then
             addOrgPeerCryptoConfig $(echo $line | awk '{print $1}') $(echo $line | awk '{print $2}')
         fi
-    done < ./conf/crypto-config.conf
+    done < ./conf/orgs.conf
 }
 
 # generate configtx.yaml
@@ -298,7 +232,7 @@ function genConfigtx() {
         then
             addPart2Configtx $(echo $line | awk '{print $1}') $(echo $line | awk '{print $2}') $(echo $line | awk '{print $3}')
         fi
-    done < ./conf/crypto-config.conf
+    done < ./conf/orgs.conf
 
     addPart3Configtx
 
@@ -330,6 +264,7 @@ function genConfigtx() {
 }
 
 function addOrgOrdererCryptoConfig() {
+    ## TODO 子节点数量需要可配置
     echo "  - Name: $1
     Domain: $2
     EnableNodeOUs: true
@@ -391,7 +326,7 @@ function addPart2Configtx() {
                 Rule: \"OR('$1.admin')\"
 
         OrdererEndpoints:
-            - $3:7050
+            - $4:7050
 
         AnchorPeers:
             - Host: $2
@@ -595,24 +530,53 @@ function prepareForStart() {
     fi
 }
 
+function distributeCerts() {
+    ## TODO 删除其他组织的的私钥
+    echo "Distributing certs to orgs..."
+
+    index=0
+    hostArray=()
+    while read line
+    do
+        host=$(echo $line | awk '{print $3}')
+        if [ ! $host == "" ]
+        then
+            hostArray[$index]=$host
+        else
+            continue
+        fi
+        index=`expr $index + 1`
+    done < ./conf/orgs.conf
+
+    length=${#hostArray[@]}
+    while(( $length>0 ))
+    do
+        ssh root@${hostArray[`expr $length - 1`]} " [ -d /var/local/hyperledger/fabric/msp ] || mkdir -p /var/local/hyperledger/fabric/msp "
+        scp -r ./crypto-config root@${hostArray[`expr $length - 1`]}:/var/local/hyperledger/fabric/msp/
+        scp ./$DOCKER_COMPOSE_FILE_CA ./$DOCKER_COMPOSE_FILE_PEER ./$DOCKER_COMPOSE_FILE_ORDERER root@${hostArray[`expr $length - 1`]}:/var/local/hyperledger/fabric/
+        length=`expr $length - 1`
+    done
+}
+
 MODE=$1
 shift
 # Determine whether starting or stopping
 if [ "$MODE" == "up" ]; then
     prepareForStart
-
     genCerts
+    distributeCerts
     genChannelArtifacts
     startOrderer
     startPeer
-    startCA
-    startCLI
+    # startCA
+    # startCLI
 elif [ "$MODE" == "down" ]; then
     stopCLI
     stopCA
     stopPeer
     stopOrderer
-    cleanFiles    
+elif [ "$MODE" == "clean" ]; then
+    cleanFiles   
 elif [ "$MODE" == "addorg" ]; then
     addOrg
 else
