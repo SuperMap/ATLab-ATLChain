@@ -45,7 +45,8 @@ function genCerts() {
 
 # Generate Channel Artifacts used in the network
 function genChannelArtifacts() {
-    genConfigtx
+    # generate configtx.yaml
+    # ./configtx.sh
 
     which configtxgen
     if [ "$?" -ne 0 ]; then
@@ -58,21 +59,39 @@ function genChannelArtifacts() {
     fi
 
     echo "##########################################################"
-    echo "#########  Generating Orderer Genesis block ##############"
+    echo "#################  生成系统通道创世区块  ####################"
     echo "##########################################################"
-    set -x
-    configtxgen -profile OrdererChannel -channelID ordererchannel -outputBlock ./channel-artifacts/genesis.block
-    res=$?
-    set +x
-    if [ $res -ne 0 ]; then
-        echo "Failed to generate orderer genesis block..."
-        exit 1
-    fi
+
+    # 获取设置的系统通道名
+    while read line; do
+        value=$(echo $line | awk '{print $1}')
+        if [ $value == "SystemChannel:" ]; then
+            varSwitch="system"
+            continue
+        elif [ $value == "ApplicationChannel:" ]; then
+            varSwitch="app"
+            continue
+        fi
+
+        if [ $varSwitch == "system" ]; then
+            channelid=$(echo $value | tr '[A-Z]' '[a-z]')
+            set -x
+            configtxgen -profile $value -channelID $channelid -outputBlock ./channel-artifacts/genesis.block
+            res=$?
+            set +x
+            if [ $res -ne 0 ]; then
+                echo "Failed to generate orderer genesis block..."
+                exit 1
+            fi
+        else
+            break
+        fi
+    done < ./conf/channel.conf
 
     echo
-    echo "#########################################################################"
-    echo "### Generating channel configuration transaction '${CHANNEL_NAME}.tx' ###"
-    echo "#########################################################################"
+    echo "##########################################################"
+    echo "##################    生成通道配置交易    ##################"
+    echo "##########################################################"
     set -x
     configtxgen -profile TxChannel -outputCreateChannelTx ./channel-artifacts/${CHANNEL_NAME}.tx -channelID $CHANNEL_NAME
     res=$?
@@ -83,9 +102,9 @@ function genChannelArtifacts() {
     fi
 
     echo
-    echo "#############################################################"
-    echo "#######    Generating anchor peer update for Org   ##########"
-    echo "#############################################################"
+    echo "##########################################################"
+    echo "##################    生成更新锚节点交易    #################"
+    echo "##########################################################"
     set -x
     configtxgen -profile TxChannel -outputAnchorPeersUpdate ./channel-artifacts/OrgAanchors.tx -channelID $CHANNEL_NAME -asOrg OrgA
     configtxgen -profile TxChannel -outputAnchorPeersUpdate ./channel-artifacts/OrgBanchors.tx -channelID $CHANNEL_NAME -asOrg OrgB
@@ -164,274 +183,6 @@ function downloadImages() {
     fi
 }
 
-# generate configtx.yaml
-function genConfigtx() {
-    if [ ! -d "configtx.yaml" ]; then
-        touch configtx.yaml
-    else
-        rm configtx.yaml
-    fi
-    echo "Organizations:" >configtx.yaml
-    varSwitch="orderer"
-    while read line; do
-        if [ "$line" == "" ]; then
-            if [ "$varSwitch" == "orderer" ]; then
-                varSwitch="peer"
-                echo "PeerOrgs:" >>crypto-config.yaml
-            fi
-            continue
-        fi
-
-        if [ "$varSwitch" == "orderer" ]; then
-            addPart1Configtx $(echo $line | awk '{print $1}') $(echo $line | awk '{print $2}')
-        elif [ "$varSwitch" == "peer" ]; then
-            addPart2Configtx $(echo $line | awk '{print $1}') $(echo $line | awk '{print $2}') $(echo $line | awk '{print $3}')
-        fi
-    done <./conf/orgs.conf
-
-    addPart3Configtx
-
-    while read line; do
-        addPart4Configtx $line
-    done <./conf/raft.conf
-
-    varSwitch="orderer"
-    while read line; do
-        if [ "$line" == "" ]; then
-            if [ "$varSwitch" == "orderer" ]; then
-                varSwitch="peer"
-            fi
-            continue
-        fi
-
-        if [ "$varSwitch" == "orderer" ]; then
-            addPart5Configtx $(echo $line | awk '{print $1}') $(echo $line | awk '{print $2}') $(echo $line | awk '{print $3}') $(echo $line | awk '{print $4}') $(echo $line | awk '{print $5}')
-        elif [ "$varSwitch" == "peer" ]; then
-            addPart6Configtx $(echo $line | awk '{print $1}') $(echo $line | awk '{print $2}') $(echo $line | awk '{print $3}') $(echo $line | awk '{print $4}')
-        fi
-    done <./conf/channel.conf
-}
-
-
-function addPart1Configtx() {
-    echo "    - &$1
-        Name: $1
-        ID: $1
-        MSPDir: crypto-config/ordererOrganizations/$2/msp
-        Policies: &$1Policies
-            Readers:
-                Type: Signature
-                Rule: \"OR('$1.member')\"
-            Writers:
-                Type: Signature
-                Rule: \"OR('$1.member')\"
-            Admins:
-                Type: Signature
-                Rule: \"OR('$1.admin')\"" >>configtx.yaml
-
-    echo "" >>configtx.yaml
-}
-
-function addPart2Configtx() {
-    echo "    - &$1
-        Name: $1
-        ID: $1
-        MSPDir: crypto-config/peerOrganizations/$2/msp
-        Policies: &$1Policies
-            Readers:
-                Type: Signature
-                Rule: \"OR('$1.member')\"
-            Writers:
-                Type: Signature
-                Rule: \"OR('$1.member')\"
-            Admins:
-                Type: Signature
-                Rule: \"OR('$1.admin')\"
-
-        OrdererEndpoints:
-            - $4:7050
-
-        AnchorPeers:
-            - Host: $2
-              Port: 7051" >>configtx.yaml
-
-    echo "" >>configtx.yaml
-}
-
-function addPart3Configtx() {
-    echo "Capabilities:
-    Channel: &ChannelCapabilities
-        V1_4_3: true
-        V1_3: false
-        V1_1: false
-
-    Orderer: &OrdererCapabilities
-        V1_4_2: true
-        V1_1: false
-
-    Application: &ApplicationCapabilities
-        V1_4_2: true
-        V1_3: false
-        V1_2: false
-        V1_1: false
-
-Application: &ApplicationDefaults
-    ACLs: &ACLsDefault
-        lscc/ChaincodeExists: /Channel/Application/Readers
-        lscc/GetDeploymentSpec: /Channel/Application/Readers
-        lscc/GetChaincodeData: /Channel/Application/Readers
-        lscc/GetInstantiatedChaincodes: /Channel/Application/Readers
-        qscc/GetChainInfo: /Channel/Application/Readers
-        qscc/GetBlockByNumber: /Channel/Application/Readers
-        qscc/GetBlockByHash: /Channel/Application/Readers
-        qscc/GetTransactionByID: /Channel/Application/Readers
-        qscc/GetBlockByTxID: /Channel/Application/Readers
-        cscc/GetConfigBlock: /Channel/Application/Readers
-        cscc/GetConfigTree: /Channel/Application/Readers
-        cscc/SimulateConfigTreeUpdate: /Channel/Application/Readers
-        peer/Propose: /Channel/Application/Writers
-        peer/ChaincodeToChaincode: /Channel/Application/Readers
-        event/Block: /Channel/Application/Readers
-        event/FilteredBlock: /Channel/Application/Readers
-
-    Organizations:
-
-    Policies: &ApplicationDefaultPolicies
-        Readers:
-            Type: ImplicitMeta
-            Rule: \"ANY Readers\"
-        Writers:
-            Type: ImplicitMeta
-            Rule: \"ANY Writers\"
-        Admins:
-            Type: ImplicitMeta
-            Rule: \"MAJORITY Admins\"
-
-    Capabilities:
-        <<: *ApplicationCapabilities" >>configtx.yaml
-
-    echo "" >>configtx.yaml
-}
-
-function addPart4Configtx() {
-    echo "Orderer: &OrdererDefaults
-    OrdererType: etcdraft
-    Addresses:
-        - $1:7050
-        - $2:7050
-        - $3:7050
-
-    BatchTimeout: 2s
-
-    BatchSize:
-        MaxMessageCount: 2000
-        AbsoluteMaxBytes: 100 MB
-        PreferredMaxBytes: 50 MB
-
-    MaxChannels: 0
-    Kafka:
-        Brokers:
-            - kafka0:9092
-            - kafka1:9092
-            - kafka2:9092
-
-    EtcdRaft:
-        Consenters:
-            - Host: $2.$1
-              Port: 7050
-              ClientTLSCert: crypto-config/ordererOrganizations/$1/orderers/$2.$1/tls/server.crt
-              ServerTLSCert: crypto-config/ordererOrganizations/$1/orderers/$2.$1/tls/server.crt
-            - Host: $3.$1
-              Port: 7050
-              ClientTLSCert: crypto-config/ordererOrganizations/$1/orderers/$3.$1/tls/server.crt
-              ServerTLSCert: crypto-config/ordererOrganizations/$1/orderers/$3.$1/tls/server.crt
-            - Host: $4.$1
-              Port: 7050
-              ClientTLSCert: crypto-config/ordererOrganizations/$1/orderers/$4.$1/tls/server.crt
-              ServerTLSCert: crypto-config/ordererOrganizations/$1/orderers/$4.$1/tls/server.crt
-
-        Options:
-            TickInterval: 500ms
-            ElectionTick: 10
-            HeartbeatTick: 1
-            MaxInflightBlocks: 5
-            SnapshotIntervalSize: 200 MB
-
-    Organizations:
-
-    Policies:
-        Readers:
-            Type: ImplicitMeta
-            Rule: \"ANY Readers\"
-        Writers:
-            Type: ImplicitMeta
-            Rule: \"ANY Writers\"
-        Admins:
-            Type: ImplicitMeta
-            Rule: \"MAJORITY Admins\"
-        BlockValidation:
-            Type: ImplicitMeta
-            Rule: \"ANY Writers\"
-
-    Capabilities:
-        <<: *OrdererCapabilities
-
-Channel: &ChannelDefaults
-    Policies:
-        Readers:
-            Type: ImplicitMeta
-            Rule: \"ANY Readers\"
-        Writers:
-            Type: ImplicitMeta
-            Rule: \"ANY Writers\"
-        Admins:
-            Type: ImplicitMeta
-            Rule: \"MAJORITY Admins\"
-
-    Capabilities:
-        <<: *ChannelCapabilities" >>configtx.yaml
-
-    echo "" >>configtx.yaml
-}
-
-function addPart5Configtx() {
-    echo "Profiles:
-    $1:
-        <<: *ChannelDefaults
-        Capabilities:
-            <<: *ChannelCapabilities
-        Orderer:
-            <<: *OrdererDefaults
-            Organizations:
-                - <<: *$2
-            Capabilities:
-                <<: *OrdererCapabilities
-        Consortiums:
-            SampleConsortium:
-                Organizations:
-                    - <<: *$3
-                    - <<: *$4
-                    - <<: *$5" >>configtx.yaml
-
-    echo "" >>configtx.yaml
-}
-
-function addPart6Configtx() {
-    echo "    $1:
-        Consortium: SampleConsortium
-        <<: *ChannelDefaults
-        Application:
-            <<: *ApplicationDefaults
-            Organizations:
-                - *$2
-                - *$3
-                - *$4
-            Capabilities:
-                <<: *ApplicationCapabilities" >>configtx.yaml
-
-    echo "" >>configtx.yaml
-}
-
 function prepareForStart() {
     # Download docker images
     echo "Downloading docker images......"
@@ -482,9 +233,9 @@ shift
 # Determine whether starting or stopping
 if [ "$MODE" == "up" ]; then
     # prepareForStart
-    genCerts
+    # genCerts
     # distributeCerts
-    # genChannelArtifacts
+    genChannelArtifacts
     # startOrderer
     # startPeer
     # startCA
