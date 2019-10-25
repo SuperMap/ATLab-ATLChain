@@ -16,7 +16,8 @@ function help() {
 
 # Generates Org certs using cryptogen tool
 function genCerts() {
-    genCryptoConfig
+    # generate crypto-config.yaml
+    ./crypto-config.sh
 
     which cryptogen
     if [ "$?" -ne 0 ]; then
@@ -80,7 +81,7 @@ function genChannelArtifacts() {
         echo "Failed to generate channel configuration transaction..."
         exit 1
     fi
-    
+
     echo
     echo "#############################################################"
     echo "#######    Generating anchor peer update for Org   ##########"
@@ -95,7 +96,7 @@ function genChannelArtifacts() {
         echo "Failed to generate anchor peer update for Org..."
         exit 1
     fi
-    echo 
+    echo
 }
 
 # Start a CLI peer container for operation
@@ -126,169 +127,91 @@ function stopCLI() {
 
 function addOrg() {
     cryptogen generate --config=./orgc-crypto.yaml
-    configtxgen -printOrg OrgC > ./channel-artifacts/orgc.json
+    configtxgen -printOrg OrgC >./channel-artifacts/orgc.json
 }
 
 function downloadImages() {
-    if [ !"$(docker images hyperledger/fabric-tools:amd64-1.4.3 -q)" == "18ed4db0cd57" ]
-    then
+    if [ !"$(docker images hyperledger/fabric-tools:amd64-1.4.3 -q)" == "18ed4db0cd57" ]; then
         docker pull hyperledger/fabric-tools:amd64-1.4.3
     fi
-    
-    if [ !"$(docker images hyperledger/fabric-ccenv:amd64-1.4.3 -q)" == "18ed4db0cd57" ]
-    then
+
+    if [ !"$(docker images hyperledger/fabric-ccenv:amd64-1.4.3 -q)" == "18ed4db0cd57" ]; then
         docker pull hyperledger/fabric-ccenv:amd64-1.4.3
     fi
 
-    if [ !"$(docker images hyperledger/fabric-javaenv:amd64-1.4.3 -q)" == "18ed4db0cd57" ]
-    then
+    if [ !"$(docker images hyperledger/fabric-javaenv:amd64-1.4.3 -q)" == "18ed4db0cd57" ]; then
         docker pull hyperledger/fabric-javaenv:amd64-1.4.3
     fi
 
-    if [ !"$(docker images hyperledger/fabric-orderer:amd64-1.4.3 -q)" == "18ed4db0cd57" ]
-    then
+    if [ !"$(docker images hyperledger/fabric-orderer:amd64-1.4.3 -q)" == "18ed4db0cd57" ]; then
         docker pull hyperledger/fabric-orderer:amd64-1.4.3
     fi
 
-    if [ !"$(docker images hyperledger/fabric-peer:amd64-1.4.3 -q)" == "18ed4db0cd57" ]
-    then
+    if [ !"$(docker images hyperledger/fabric-peer:amd64-1.4.3 -q)" == "18ed4db0cd57" ]; then
         docker pull hyperledger/fabric-peer:amd64-1.4.3
     fi
 
-    if [ !"$(docker images hyperledger/fabric-ca:amd64-1.4.3 -q)" == "18ed4db0cd57" ]
-    then
+    if [ !"$(docker images hyperledger/fabric-ca:amd64-1.4.3 -q)" == "18ed4db0cd57" ]; then
         docker pull hyperledger/fabric-ca:amd64-1.4.3
     fi
 
-    if [ !"$(docker images hyperledger/fabric-couchdb：amd64-0.4.15 -q)" == "18ed4db0cd57" ]
-    then
+    if [ !"$(docker images hyperledger/fabric-couchdb：amd64-0.4.15 -q)" == "18ed4db0cd57" ]; then
         docker pull hyperledger/fabric-couchdb：amd64-0.4.15
     fi
 
-    if [ !"$(docker images hyperledger/fabric-baseos：amd64-0.4.15 -q)" == "18ed4db0cd57" ]
-    then
+    if [ !"$(docker images hyperledger/fabric-baseos：amd64-0.4.15 -q)" == "18ed4db0cd57" ]; then
         docker pull hyperledger/fabric-baseos：amd64-0.4.15
     fi
 }
 
-# generate crypto-config.yaml
-function genCryptoConfig() {
-    if [ ! -d "crypto-config.yaml" ]
-    then
-        touch crypto-config.yaml
-    else
-        rm crypto-config.yaml
-    fi
-    echo "OrdererOrgs:" > crypto-config.yaml
-    varSwitch="orderer"
-    while read line
-    do
-        if [ "$line" == "" ]
-        then
-            if [ "$varSwitch" == "orderer" ]
-            then
-                varSwitch="peer"
-                echo "PeerOrgs:" >> crypto-config.yaml
-            fi
-            continue
-        fi
-        
-        if [ "$varSwitch" == "orderer" ]
-        then
-            addOrgOrdererCryptoConfig $(echo $line | awk '{print $1}') $(echo $line | awk '{print $2}')
-        elif [ "$varSwitch" == "peer" ]
-        then
-            addOrgPeerCryptoConfig $(echo $line | awk '{print $1}') $(echo $line | awk '{print $2}')
-        fi
-    done < ./conf/orgs.conf
-}
-
 # generate configtx.yaml
 function genConfigtx() {
-    if [ ! -d "configtx.yaml" ]
-    then
+    if [ ! -d "configtx.yaml" ]; then
         touch configtx.yaml
     else
         rm configtx.yaml
     fi
-    echo "Organizations:" > configtx.yaml
+    echo "Organizations:" >configtx.yaml
     varSwitch="orderer"
-    while read line
-    do
-        if [ "$line" == "" ]
-        then
-            if [ "$varSwitch" == "orderer" ]
-            then
+    while read line; do
+        if [ "$line" == "" ]; then
+            if [ "$varSwitch" == "orderer" ]; then
                 varSwitch="peer"
-                echo "PeerOrgs:" >> crypto-config.yaml
+                echo "PeerOrgs:" >>crypto-config.yaml
             fi
             continue
         fi
-        
-        if [ "$varSwitch" == "orderer" ]
-        then
+
+        if [ "$varSwitch" == "orderer" ]; then
             addPart1Configtx $(echo $line | awk '{print $1}') $(echo $line | awk '{print $2}')
-        elif [ "$varSwitch" == "peer" ]
-        then
+        elif [ "$varSwitch" == "peer" ]; then
             addPart2Configtx $(echo $line | awk '{print $1}') $(echo $line | awk '{print $2}') $(echo $line | awk '{print $3}')
         fi
-    done < ./conf/orgs.conf
+    done <./conf/orgs.conf
 
     addPart3Configtx
 
-    while read line
-    do
+    while read line; do
         addPart4Configtx $line
-    done < ./conf/raft.conf
-    
+    done <./conf/raft.conf
+
     varSwitch="orderer"
-    while read line
-    do
-        if [ "$line" == "" ]
-        then
-            if [ "$varSwitch" == "orderer" ]
-            then
+    while read line; do
+        if [ "$line" == "" ]; then
+            if [ "$varSwitch" == "orderer" ]; then
                 varSwitch="peer"
             fi
             continue
         fi
-        
-        if [ "$varSwitch" == "orderer" ]
-        then
+
+        if [ "$varSwitch" == "orderer" ]; then
             addPart5Configtx $(echo $line | awk '{print $1}') $(echo $line | awk '{print $2}') $(echo $line | awk '{print $3}') $(echo $line | awk '{print $4}') $(echo $line | awk '{print $5}')
-        elif [ "$varSwitch" == "peer" ]
-        then
+        elif [ "$varSwitch" == "peer" ]; then
             addPart6Configtx $(echo $line | awk '{print $1}') $(echo $line | awk '{print $2}') $(echo $line | awk '{print $3}') $(echo $line | awk '{print $4}')
         fi
-    done < ./conf/channel.conf
+    done <./conf/channel.conf
 }
 
-function addOrgOrdererCryptoConfig() {
-    ## TODO 子节点数量需要可配置
-    echo "  - Name: $1
-    Domain: $2
-    EnableNodeOUs: true
-    Specs:
-      - Hostname: orderer1
-      - Hostname: orderer2
-      - Hostname: orderer3
-      - Hostname: orderer4
-      - Hostname: orderer5" >> crypto-config.yaml
-    
-    echo "" >> crypto-config.yaml
-}
-
-function addOrgPeerCryptoConfig() {
-    echo "  - Name: $1
-    Domain: $2
-    EnableNodeOUs: true
-    Template:
-      Count: 2
-    Users:
-      Count: 2" >> crypto-config.yaml
-
-    echo "" >> crypto-config.yaml
-}
 
 function addPart1Configtx() {
     echo "    - &$1
@@ -304,9 +227,9 @@ function addPart1Configtx() {
                 Rule: \"OR('$1.member')\"
             Admins:
                 Type: Signature
-                Rule: \"OR('$1.admin')\"" >> configtx.yaml
+                Rule: \"OR('$1.admin')\"" >>configtx.yaml
 
-    echo "" >> configtx.yaml
+    echo "" >>configtx.yaml
 }
 
 function addPart2Configtx() {
@@ -330,9 +253,9 @@ function addPart2Configtx() {
 
         AnchorPeers:
             - Host: $2
-              Port: 7051" >> configtx.yaml
+              Port: 7051" >>configtx.yaml
 
-    echo "" >> configtx.yaml
+    echo "" >>configtx.yaml
 }
 
 function addPart3Configtx() {
@@ -385,9 +308,9 @@ Application: &ApplicationDefaults
             Rule: \"MAJORITY Admins\"
 
     Capabilities:
-        <<: *ApplicationCapabilities" >> configtx.yaml
+        <<: *ApplicationCapabilities" >>configtx.yaml
 
-    echo "" >> configtx.yaml
+    echo "" >>configtx.yaml
 }
 
 function addPart4Configtx() {
@@ -466,9 +389,9 @@ Channel: &ChannelDefaults
             Rule: \"MAJORITY Admins\"
 
     Capabilities:
-        <<: *ChannelCapabilities" >> configtx.yaml
+        <<: *ChannelCapabilities" >>configtx.yaml
 
-    echo "" >> configtx.yaml
+    echo "" >>configtx.yaml
 }
 
 function addPart5Configtx() {
@@ -488,9 +411,9 @@ function addPart5Configtx() {
                 Organizations:
                     - <<: *$3
                     - <<: *$4
-                    - <<: *$5" >> configtx.yaml
+                    - <<: *$5" >>configtx.yaml
 
-    echo "" >> configtx.yaml
+    echo "" >>configtx.yaml
 }
 
 function addPart6Configtx() {
@@ -504,9 +427,9 @@ function addPart6Configtx() {
                 - *$3
                 - *$4
             Capabilities:
-                <<: *ApplicationCapabilities" >> configtx.yaml
+                <<: *ApplicationCapabilities" >>configtx.yaml
 
-    echo "" >> configtx.yaml
+    echo "" >>configtx.yaml
 }
 
 function prepareForStart() {
@@ -519,13 +442,12 @@ function prepareForStart() {
     fi
 
     # Untar bin package
-    if [ ! -d "bin" ] 
-    then
+    if [ ! -d "bin" ]; then
         echo "extract binary files..."
         tar xvf bin.tar.xz
     fi
 
-    if [ ! -d "production" ];then
+    if [ ! -d "production" ]; then
         mkdir production
     fi
 }
@@ -536,25 +458,22 @@ function distributeCerts() {
 
     index=0
     hostArray=()
-    while read line
-    do
+    while read line; do
         host=$(echo $line | awk '{print $3}')
-        if [ ! $host == "" ]
-        then
+        if [ ! $host == "" ]; then
             hostArray[$index]=$host
         else
             continue
         fi
-        index=`expr $index + 1`
-    done < ./conf/orgs.conf
+        index=$(expr $index + 1)
+    done <./conf/orgs.conf
 
     length=${#hostArray[@]}
-    while(( $length>0 ))
-    do
-        ssh root@${hostArray[`expr $length - 1`]} " [ -d /var/local/hyperledger/fabric/msp ] || mkdir -p /var/local/hyperledger/fabric/msp "
-        scp -r ./crypto-config root@${hostArray[`expr $length - 1`]}:/var/local/hyperledger/fabric/msp/
-        scp ./$DOCKER_COMPOSE_FILE_CA ./$DOCKER_COMPOSE_FILE_PEER ./$DOCKER_COMPOSE_FILE_ORDERER root@${hostArray[`expr $length - 1`]}:/var/local/hyperledger/fabric/
-        length=`expr $length - 1`
+    while (($length > 0)); do
+        ssh root@${hostArray[$(expr $length - 1)]} " [ -d /var/local/hyperledger/fabric/msp ] || mkdir -p /var/local/hyperledger/fabric/msp "
+        scp -r ./crypto-config root@${hostArray[$(expr $length - 1)]}:/var/local/hyperledger/fabric/msp/
+        scp ./$DOCKER_COMPOSE_FILE_CA ./$DOCKER_COMPOSE_FILE_PEER ./$DOCKER_COMPOSE_FILE_ORDERER root@${hostArray[$(expr $length - 1)]}:/var/local/hyperledger/fabric/
+        length=$(expr $length - 1)
     done
 }
 
@@ -562,12 +481,12 @@ MODE=$1
 shift
 # Determine whether starting or stopping
 if [ "$MODE" == "up" ]; then
-    prepareForStart
+    # prepareForStart
     genCerts
-    distributeCerts
-    genChannelArtifacts
-    startOrderer
-    startPeer
+    # distributeCerts
+    # genChannelArtifacts
+    # startOrderer
+    # startPeer
     # startCA
     # startCLI
 elif [ "$MODE" == "down" ]; then
@@ -576,10 +495,10 @@ elif [ "$MODE" == "down" ]; then
     stopPeer
     stopOrderer
 elif [ "$MODE" == "clean" ]; then
-    cleanFiles   
+    cleanFiles
 elif [ "$MODE" == "addorg" ]; then
     addOrg
 else
     help
-    exit 1 
+    exit 1
 fi
