@@ -8,21 +8,21 @@ ff02::1 ip6-allnodes
 ff02::2 ip6-allrouters
 
 # server1
-172.16.15.66    orderer1.example.com
-172.16.15.66    peer0.orga.example.com
-172.16.15.66    couchdb.orga.example.com
-172.16.15.66    ca.orga.example.com
-172.16.15.66    hbase.example.com
-172.16.15.66    hdfs.example.com
+172.16.15.65    orderer0.example.com
+172.16.15.65    peer0.orga.example.com
+172.16.15.65    couchdb.orga.example.com
+172.16.15.65    ca.orga.example.com
 
 # server2
-172.16.15.66    orderer2.example.com
+172.16.15.66    orderer1.example.com
 172.16.15.66    couchdb.orgb.example.com
 172.16.15.66    peer0.orgb.example.com
 172.16.15.66    ca.orgb.example.com
+172.16.15.66    hbase.example.com
+172.16.15.66    hdfs.example.com
 
 # server3
-172.16.15.66    orderer3.example.com
-172.16.15.66    couchdb.orgc.example.com
-172.16.15.66    peer0.orgc.example.com
-172.16.15.66    ca.orgc.example.com
+172.16.15.67    orderer2.example.com
+172.16.15.67    couchdb.orgc.example.com
+172.16.15.67    peer0.orgc.example.com
+172.16.15.67    ca.orgc.example.com

@@ -14,53 +14,27 @@ function help() {
     echo "      - 'clean' - clean all the files using by the networks"
 }
 
-# Generates Org certs using cryptogen tool
 function genCerts() {
+    echo "正在生成初始密钥......"
+
     # generate crypto-config.yaml
     ./crypto-config.sh
-
-    which cryptogen
-    if [ "$?" -ne 0 ]; then
-        echo "cryptogen tool not found."
-        exit 1
-    fi
-    echo
-    echo "##########################################################"
-    echo "##### Generate certificates using cryptogen tool #########"
-    echo "##########################################################"
 
     if [ -d "crypto-config" ]; then
         rm -rf crypto-config
     fi
-    set -x
-    cryptogen generate --config=./crypto-config.yaml
-    res=$?
-    set +x
-    if [ $res -ne 0 ]; then
-        echo "Failed to generate certificates..."
-        exit 1
-    fi
-    echo
+    cryptogen generate --config=./crypto-config.yaml >> ./log.log 2>&1
 }
 
-# Generate Channel Artifacts used in the network
 function genChannelArtifacts() {
-    # generate configtx.yaml
-    # ./configtx.sh
+    echo "正在生成通道构件......"
 
-    which configtxgen
-    if [ "$?" -ne 0 ]; then
-        echo "configtxgen tool not found. exiting"
-        exit 1
-    fi
+    # 生成 configtx.yaml
+    ./configtx.sh
 
     if [ ! -d "./channel-artifacts" ]; then
         mkdir ./channel-artifacts
     fi
-
-    echo "##########################################################"
-    echo "#################  生成系统通道创世区块  ####################"
-    echo "##########################################################"
 
     # 获取设置的系统通道名
     while read line; do
@@ -75,47 +49,18 @@ function genChannelArtifacts() {
 
         if [ $varSwitch == "system" ]; then
             channelid=$(echo $value | tr '[A-Z]' '[a-z]')
-            set -x
-            configtxgen -profile $value -channelID $channelid -outputBlock ./channel-artifacts/genesis.block
-            res=$?
-            set +x
-            if [ $res -ne 0 ]; then
-                echo "Failed to generate orderer genesis block..."
-                exit 1
-            fi
-        else
-            break
+            configtxgen -profile $value -channelID $channelid -outputBlock ./channel-artifacts/genesis.block >> ./log.log 2>&1
+        elif [ $varSwitch == "app" ]; then
+            channelid=$(echo $value | tr '[A-Z]' '[a-z]')
+            configtxgen -profile $value -outputCreateChannelTx ./channel-artifacts/${channelid}.tx -channelID ${channelid} >> ./log.log 2>&1
+            string=$(echo $line | awk '{print $2}')
+            array=(${string//,/ })  
+            for var in ${array[@]}
+            do       
+                configtxgen -profile $value -outputAnchorPeersUpdate ./channel-artifacts/${var}anchors.tx -channelID ${channelid} -asOrg $var >> ./log.log 2>&1
+            done
         fi
-    done < ./conf/channel.conf
-
-    echo
-    echo "##########################################################"
-    echo "##################    生成通道配置交易    ##################"
-    echo "##########################################################"
-    set -x
-    configtxgen -profile TxChannel -outputCreateChannelTx ./channel-artifacts/${CHANNEL_NAME}.tx -channelID $CHANNEL_NAME
-    res=$?
-    set +x
-    if [ $res -ne 0 ]; then
-        echo "Failed to generate channel configuration transaction..."
-        exit 1
-    fi
-
-    echo
-    echo "##########################################################"
-    echo "##################    生成更新锚节点交易    #################"
-    echo "##########################################################"
-    set -x
-    configtxgen -profile TxChannel -outputAnchorPeersUpdate ./channel-artifacts/OrgAanchors.tx -channelID $CHANNEL_NAME -asOrg OrgA
-    configtxgen -profile TxChannel -outputAnchorPeersUpdate ./channel-artifacts/OrgBanchors.tx -channelID $CHANNEL_NAME -asOrg OrgB
-    configtxgen -profile TxChannel -outputAnchorPeersUpdate ./channel-artifacts/OrgCanchors.tx -channelID $CHANNEL_NAME -asOrg OrgC
-    res=$?
-    set +x
-    if [ $res -ne 0 ]; then
-        echo "Failed to generate anchor peer update for Org..."
-        exit 1
-    fi
-    echo
+    done <./conf/channel.conf
 }
 
 # Start a CLI peer container for operation
@@ -147,6 +92,31 @@ function stopCLI() {
 function addOrg() {
     cryptogen generate --config=./orgc-crypto.yaml
     configtxgen -printOrg OrgC >./channel-artifacts/orgc.json
+}
+
+# 测试远程主机是否可以正常登录
+function testRemoteHost() {
+    echo "正在测试远程登录......"
+    index=0
+    hostArray=()
+    while read line; do
+        host=$(echo $line | awk '{print $3}')
+        if [ ! $line == "" ]; then
+            hostArray[$index]=$line
+        else
+            continue
+        fi
+        index=$(expr $index + 1)
+    done <./conf/remoteHosts.conf
+
+    length=${#hostArray[@]}
+    while (($length > 0)); do
+        if [ ! $(ssh root@${hostArray[$(expr $length - 1)]} " pwd ") = "/root" ]; then
+            echo "不能登录到 ${hostArray[$(expr $length - 1)]}，请配置该主机的 ssh 免密登录。"
+            exit
+        fi
+        length=$(expr $length - 1)
+    done
 }
 
 function downloadImages() {
@@ -184,8 +154,10 @@ function downloadImages() {
 }
 
 function prepareForStart() {
+    testRemoteHost
+
     # Download docker images
-    echo "Downloading docker images......"
+    echo "正在下载 Docker 镜像......"
     downloadImages
     if [ $? -ne 0 ]; then
         echo "ERROR !!!! Unable to download docker images"
@@ -203,27 +175,30 @@ function prepareForStart() {
     fi
 }
 
-function distributeCerts() {
+function distributeFiles() {
     ## TODO 删除其他组织的的私钥
-    echo "Distributing certs to orgs..."
+    echo "正在向远程主机复制相关文件......"
 
     index=0
     hostArray=()
     while read line; do
-        host=$(echo $line | awk '{print $3}')
-        if [ ! $host == "" ]; then
-            hostArray[$index]=$host
+        if [ ! $line == "" ]; then
+            hostArray[$index]=$line
         else
             continue
         fi
         index=$(expr $index + 1)
-    done <./conf/orgs.conf
+    done <./conf/remoteHosts.conf
 
     length=${#hostArray[@]}
     while (($length > 0)); do
-        ssh root@${hostArray[$(expr $length - 1)]} " [ -d /var/local/hyperledger/fabric/msp ] || mkdir -p /var/local/hyperledger/fabric/msp "
-        scp -r ./crypto-config root@${hostArray[$(expr $length - 1)]}:/var/local/hyperledger/fabric/msp/
-        scp ./$DOCKER_COMPOSE_FILE_CA ./$DOCKER_COMPOSE_FILE_PEER ./$DOCKER_COMPOSE_FILE_ORDERER root@${hostArray[$(expr $length - 1)]}:/var/local/hyperledger/fabric/
+        echo "==>${hostArray[$(expr $length - 1)]}"
+        ssh root@${hostArray[$(expr $length - 1)]} " [ -d /var/local/hyperledger/fabric/conf ] || mkdir -p /var/local/hyperledger/fabric/conf "
+        ssh root@${hostArray[$(expr $length - 1)]} " [ -d /var/local/hyperledger/fabric/channel-artifacts ] || mkdir -p /var/local/hyperledger/fabric/channel-artifacts "
+        scp -r ./crypto-config root@${hostArray[$(expr $length - 1)]}:/var/local/hyperledger/fabric/ >> log.log
+        scp -r ./conf/hosts root@${hostArray[$(expr $length - 1)]}:/var/local/hyperledger/fabric/conf/hosts >> log.log
+        scp -r ./channel-artifacts/genesis.block root@${hostArray[$(expr $length - 1)]}:/var/local/hyperledger/fabric/channel-artifacts/genesis.block >> log.log
+        scp ./$DOCKER_COMPOSE_FILE_CA ./$DOCKER_COMPOSE_FILE_PEER ./$DOCKER_COMPOSE_FILE_ORDERER root@${hostArray[$(expr $length - 1)]}:/var/local/hyperledger/fabric/ >> log.log
         length=$(expr $length - 1)
     done
 }
@@ -232,19 +207,19 @@ MODE=$1
 shift
 # Determine whether starting or stopping
 if [ "$MODE" == "up" ]; then
-    # prepareForStart
-    # genCerts
-    # distributeCerts
+    prepareForStart
+    genCerts
     genChannelArtifacts
-    # startOrderer
-    # startPeer
-    # startCA
+    distributeFiles
+    startOrderers
+    # startPeers
+    # startCAs
     # startCLI
 elif [ "$MODE" == "down" ]; then
-    stopCLI
-    stopCA
-    stopPeer
-    stopOrderer
+    # stopCLI
+    # stopCAs
+    # stopPeers
+    stopOrderers
 elif [ "$MODE" == "clean" ]; then
     cleanFiles
 elif [ "$MODE" == "addorg" ]; then

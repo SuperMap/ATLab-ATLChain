@@ -23,20 +23,22 @@ services:
             # cluster
             - ORDERER_GENERAL_CLUSTER_CLIENTCERTIFICATE=/var/hyperledger/orderer/tls/server.crt
             - ORDERER_GENERAL_CLUSTER_CLIENTPRIVATEKEY=/var/hyperledger/orderer/tls/server.key
+            - ORDERER_GENERAL_CLUSTER_ROOTCAS=[/var/hyperledger/orderer/tls/ca.crt]
             # genesis file           
             - ORDERER_GENERAL_GENESISMETHOD=file
             - ORDERER_GENERAL_GENESISFILE=/var/hyperledger/orderer/orderer.genesis.block
             # logging level
             - FABRIC_LOGGING_SPEC=INFO
+            - ORDERER_FILELEDGER_LOCATION=/var/hyperledger/production/orderer
 
         working_dir: /opt/gopath/src/github.com/hyperledger/fabric
         command: orderer
         volumes:
             - ./conf/hosts:/etc/hosts
             - ./channel-artifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
-            - ./crypto-config/ordererOrganizations/example.com/orderers/orderer1.example.com/msp:/var/hyperledger/orderer/msp
-            - ./crypto-config/ordererOrganizations/example.com/orderers/orderer1.example.com/tls:/var/hyperledger/orderer/tls
-            - ./production/orderer1.example.com:/var/hyperledger/production/orderer
+            - ./crypto-config/ordererOrganizations/example.com/orderers/$NODENAME/msp:/var/hyperledger/orderer/msp
+            - ./crypto-config/ordererOrganizations/example.com/orderers/$NODENAME/tls:/var/hyperledger/orderer/tls
+            - ./production/$NODENAME:/var/hyperledger/production/orderer
         ports:
           - 7050:7050
         networks:

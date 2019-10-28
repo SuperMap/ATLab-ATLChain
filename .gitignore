@@ -40,3 +40,5 @@ ATLChain_NETWORK/network-config/crypto-config/
 ATLChain_NETWORK/scripts/log.txt
 ATLChain_NETWORK/network-config/ca-config/
 ATLChain_NETWORK/crypto-config/
+ATLChain_NETWORK/crypto-config.yaml
+ATLChain_NETWORK/configtx.yaml

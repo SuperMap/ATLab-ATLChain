@@ -29,7 +29,6 @@ function genCryptoConfig() {
 }
 
 function addOrgOrdererCryptoConfig() {
-    # TODO 子节点数量需要可配置
     echo "  - Name: $1
     Domain: $2
     EnableNodeOUs: true
