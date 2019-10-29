@@ -14,26 +14,22 @@ services:
             - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
             - FABRIC_LOGGING_SPEC=INFO
             - CORE_PEER_ID=cli
-            - CORE_PEER_ADDRESS=${CORE_PEER_ADDRESS}
-            - CORE_PEER_LOCALMSPID=OrgA
-            - CORE_PEER_TLS_ENABLED=false
-            - CORE_PEER_TLS_CERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/orga.example.com/peers/peer0.orga.example.com/tls/server.crt
-            - CORE_PEER_TLS_KEY_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/orga.example.com/peers/peer0.orga.example.com/tls/server.key
-            - CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/orga.example.com/peers/peer0.orga.example.com/tls/ca.crt
-            - CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/orga.example.com/users/Admin@orga.example.com/msp
-            - ORDERER_CA=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/tls/ca.crt
+            - CORE_PEER_ADDRESS=127.0.0.1
+            - CORE_PEER_LOCALMSPID=null
+            - CORE_PEER_TLS_ENABLED=true
+            - CORE_PEER_TLS_CERT_FILE=tls/server.crt
+            - CORE_PEER_TLS_KEY_FILE=tls/server.key
+            - CORE_PEER_TLS_ROOTCERT_FILE=tls/ca.crt
+            - CORE_PEER_MSPCONFIGPATH=msp
+            - ORDERER_CA=tls/ca.crt
         working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
         command: /bin/bash
         volumes:
             - /var/run/:/host/var/run/
             - ./conf/hosts:/etc/hosts
             - ./../ATLChain_CC/:/opt/gopath/src/github.com/chaincode
-            - ./../ATLChain_DEMO/:/opt/gopath/src/github.com/hyperledger/fabric/peer/demo/
             - ./crypto-config:/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/
             - ./scripts:/opt/gopath/src/github.com/hyperledger/fabric/peer/scripts/
             - ./channel-artifacts:/opt/gopath/src/github.com/hyperledger/fabric/peer/channel-artifacts
         networks:
             - atln
-        ports:
-            - 10001:4444
-            - 10002:4000

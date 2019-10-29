@@ -3,7 +3,17 @@
 export PATH=./bin:$PATH
 export FABRIC_CFG_PATH=${PWD}
 
-. ./nodes.sh
+IMAGE_TAG1="1.4.3"
+IMAGE_TAG2="0.4.15"
+
+#compose files
+DOCKER_COMPOSE_FILE_ORDERER="docker-compose-orderer.yaml"
+DOCKER_COMPOSE_FILE_PEER="docker-compose-peer.yaml"
+DOCKER_COMPOSE_FILE_CA="docker-compose-ca.yaml"
+DOCKER_COMPOSE_FILE_CLI="docker-compose-cli.yaml"
+
+# default compose project name
+export COMPOSE_PROJECT_NAME=atlproj
 
 function help() {
     echo "Usage: "
@@ -23,7 +33,7 @@ function genCerts() {
     if [ -d "crypto-config" ]; then
         rm -rf crypto-config
     fi
-    cryptogen generate --config=./crypto-config.yaml >> ./log.log 2>&1
+    cryptogen generate --config=./crypto-config.yaml >>./log.log 2>&1
 }
 
 function genChannelArtifacts() {
@@ -49,49 +59,42 @@ function genChannelArtifacts() {
 
         if [ $varSwitch == "system" ]; then
             channelid=$(echo $value | tr '[A-Z]' '[a-z]')
-            configtxgen -profile $value -channelID $channelid -outputBlock ./channel-artifacts/genesis.block >> ./log.log 2>&1
+            configtxgen -profile $value -channelID $channelid -outputBlock ./channel-artifacts/genesis.block >>./log.log 2>&1
         elif [ $varSwitch == "app" ]; then
             channelid=$(echo $value | tr '[A-Z]' '[a-z]')
-            configtxgen -profile $value -outputCreateChannelTx ./channel-artifacts/${channelid}.tx -channelID ${channelid} >> ./log.log 2>&1
+            configtxgen -profile $value -outputCreateChannelTx ./channel-artifacts/${channelid}.tx -channelID ${channelid} >>./log.log 2>&1
             string=$(echo $line | awk '{print $2}')
-            array=(${string//,/ })  
-            for var in ${array[@]}
-            do       
-                configtxgen -profile $value -outputAnchorPeersUpdate ./channel-artifacts/${var}anchors.tx -channelID ${channelid} -asOrg $var >> ./log.log 2>&1
+            array=(${string//,/ })
+            for var in ${array[@]}; do
+                configtxgen -profile $value -outputAnchorPeersUpdate ./channel-artifacts/${var}anchors.tx -channelID ${channelid} -asOrg $var >>./log.log 2>&1
             done
         fi
     done <./conf/channel.conf
 }
 
-# Start a CLI peer container for operation
-function startCLI() {
-    IMAGETAG1=$IMAGE_TAG1 docker-compose -f ${DOCKER_COMPOSE_FILE_CLI} up -d 2>&1
-    if [ $? -ne 0 ]; then
-        echo "ERROR !!!! Unable to start CLI node"
-        exit 1
-    fi
-}
+# 安装前的准备
+function prepare() {
+    testRemoteHost
 
-# Remove the files generated
-function cleanFiles() {
-    if [ -d "./crypto-config" ]; then
-        rm -rf crypto-config
-    fi
-    if [ -d "./channel-artifacts" ]; then
-        rm -rf channel-artifacts
-    fi
-    if [ -d "./production" ]; then
-        rm -rf production
-    fi
-}
+    echo "正在检查远程主机docker镜像......"
+    index=0
+    hostArray=()
+    while read line; do
+        if [ ! "$line" == "" ]; then
+            hostArray[$index]=$line
+        else
+            continue
+        fi
+        index=$(expr $index + 1)
+    done <./conf/remoteHosts.conf
 
-function stopCLI() {
-    IMAGETAG1=$IMAGE_TAG1 docker-compose -f ${DOCKER_COMPOSE_FILE_CLI} down 2>&1
-}
-
-function addOrg() {
-    cryptogen generate --config=./orgc-crypto.yaml
-    configtxgen -printOrg OrgC >./channel-artifacts/orgc.json
+    length=${#hostArray[@]}
+    while (($length > 0)); do
+        echo "    ==>${hostArray[$(expr $length - 1)]}"
+        scp prepare-for-start.sh root@${hostArray[$(expr $length - 1)]}:/root >>log.log
+        ssh root@${hostArray[$(expr $length - 1)]} " bash prepare-for-start.sh "
+        length=$(expr $length - 1)
+    done
 }
 
 # 测试远程主机是否可以正常登录
@@ -119,62 +122,6 @@ function testRemoteHost() {
     done
 }
 
-function downloadImages() {
-    if [ !"$(docker images hyperledger/fabric-tools:amd64-1.4.3 -q)" == "18ed4db0cd57" ]; then
-        docker pull hyperledger/fabric-tools:amd64-1.4.3
-    fi
-
-    if [ !"$(docker images hyperledger/fabric-ccenv:amd64-1.4.3 -q)" == "18ed4db0cd57" ]; then
-        docker pull hyperledger/fabric-ccenv:amd64-1.4.3
-    fi
-
-    if [ !"$(docker images hyperledger/fabric-javaenv:amd64-1.4.3 -q)" == "18ed4db0cd57" ]; then
-        docker pull hyperledger/fabric-javaenv:amd64-1.4.3
-    fi
-
-    if [ !"$(docker images hyperledger/fabric-orderer:amd64-1.4.3 -q)" == "18ed4db0cd57" ]; then
-        docker pull hyperledger/fabric-orderer:amd64-1.4.3
-    fi
-
-    if [ !"$(docker images hyperledger/fabric-peer:amd64-1.4.3 -q)" == "18ed4db0cd57" ]; then
-        docker pull hyperledger/fabric-peer:amd64-1.4.3
-    fi
-
-    if [ !"$(docker images hyperledger/fabric-ca:amd64-1.4.3 -q)" == "18ed4db0cd57" ]; then
-        docker pull hyperledger/fabric-ca:amd64-1.4.3
-    fi
-
-    if [ !"$(docker images hyperledger/fabric-couchdb：amd64-0.4.15 -q)" == "18ed4db0cd57" ]; then
-        docker pull hyperledger/fabric-couchdb：amd64-0.4.15
-    fi
-
-    if [ !"$(docker images hyperledger/fabric-baseos：amd64-0.4.15 -q)" == "18ed4db0cd57" ]; then
-        docker pull hyperledger/fabric-baseos：amd64-0.4.15
-    fi
-}
-
-function prepareForStart() {
-    testRemoteHost
-
-    # Download docker images
-    echo "正在下载 Docker 镜像......"
-    downloadImages
-    if [ $? -ne 0 ]; then
-        echo "ERROR !!!! Unable to download docker images"
-        exit 1
-    fi
-
-    # Untar bin package
-    if [ ! -d "bin" ]; then
-        echo "extract binary files..."
-        tar xvf bin.tar.xz
-    fi
-
-    if [ ! -d "production" ]; then
-        mkdir production
-    fi
-}
-
 function distributeFiles() {
     ## TODO 删除其他组织的的私钥
     echo "正在向远程主机复制相关文件......"
@@ -192,38 +139,132 @@ function distributeFiles() {
 
     length=${#hostArray[@]}
     while (($length > 0)); do
-        echo "==>${hostArray[$(expr $length - 1)]}"
-        ssh root@${hostArray[$(expr $length - 1)]} " [ -d /var/local/hyperledger/fabric/conf ] || mkdir -p /var/local/hyperledger/fabric/conf "
-        ssh root@${hostArray[$(expr $length - 1)]} " [ -d /var/local/hyperledger/fabric/channel-artifacts ] || mkdir -p /var/local/hyperledger/fabric/channel-artifacts "
-        scp -r ./crypto-config root@${hostArray[$(expr $length - 1)]}:/var/local/hyperledger/fabric/ >> log.log
-        scp -r ./conf/hosts root@${hostArray[$(expr $length - 1)]}:/var/local/hyperledger/fabric/conf/hosts >> log.log
-        scp -r ./channel-artifacts/genesis.block root@${hostArray[$(expr $length - 1)]}:/var/local/hyperledger/fabric/channel-artifacts/genesis.block >> log.log
-        scp ./$DOCKER_COMPOSE_FILE_CA ./$DOCKER_COMPOSE_FILE_PEER ./$DOCKER_COMPOSE_FILE_ORDERER root@${hostArray[$(expr $length - 1)]}:/var/local/hyperledger/fabric/ >> log.log
+        url=${hostArray[$(expr $length - 1)]}
+
+        echo "    ==>$url"
+        ssh root@$url " [ -d /var/local/hyperledger/fabric/conf ] || mkdir -p /var/local/hyperledger/fabric/conf "
+        ssh root@$url " [ -d /var/local/hyperledger/fabric/channel-artifacts ] || mkdir -p /var/local/hyperledger/fabric/channel-artifacts "
+        scp -r ./crypto-config root@$url:/var/local/hyperledger/fabric/ >>log.log
+        scp -r ./conf/hosts root@$url:/var/local/hyperledger/fabric/conf/hosts >>log.log
+        scp -r ./channel-artifacts/genesis.block root@$url:/var/local/hyperledger/fabric/channel-artifacts/genesis.block >>log.log
+        scp ./$DOCKER_COMPOSE_FILE_CA ./$DOCKER_COMPOSE_FILE_PEER ./$DOCKER_COMPOSE_FILE_ORDERER root@$url:/var/local/hyperledger/fabric/ >>log.log
         length=$(expr $length - 1)
     done
 }
 
+function startNodes() {
+    echo "启动节点......"
+
+    echo "    ==>cli"
+    IMAGETAG1=$IMAGE_TAG1 docker-compose -f ${DOCKER_COMPOSE_FILE_CLI} up -d
+
+    index=0
+    hostArray=()
+    while read line; do
+        host=$(echo $line | awk '{print $2}')
+        if [ ! "$host" == "" ]; then
+            hostArray[$index]=$host
+        else
+            continue
+        fi
+        index=$(expr $index + 1)
+    done <./conf/hosts
+
+    length=${#hostArray[@]}
+    while (($length > 0)); do
+        url=${hostArray[$(expr $length - 1)]}
+        idx=$(expr index $url '.')
+        orgurl=${url:$idx}
+        if [ "orderer" == ${url:0:7} ]; then
+            echo "    ==>$url"
+            ssh root@${hostArray[$(expr $length - 1)]} " cd /var/local/hyperledger/fabric && NODENAME=$url ORGURL=$orgurl IMAGETAG1=$IMAGE_TAG1 docker-compose -f ${DOCKER_COMPOSE_FILE_ORDERER} up -d "
+        elif [ "peer" == ${url:0:4} ]; then
+            echo "    ==>$url"
+            ssh root@$url " cd /var/local/hyperledger/fabric && NODENAME=$url ORGURL=$orgurl IMAGETAG1=$IMAGE_TAG1 IMAGETAG2=$IMAGE_TAG2 docker-compose -f ${DOCKER_COMPOSE_FILE_PEER} up -d"
+        elif [ "ca" == ${url:0:2} ]; then
+            echo "    ==>$url"
+            key=$(ls crypto-config/peerOrganizations/$orgurl/ca | sed -n '/_sk/p')
+            cert=$(ls crypto-config/peerOrganizations/$orgurl/ca | sed -n '/.pem/p')
+            ssh root@$url " cd /var/local/hyperledger/fabric && NODENAME=$url ORGURL=$orgurl KEY=$key CERT=$cert IMAGETAG1=$IMAGE_TAG1 docker-compose -f ${DOCKER_COMPOSE_FILE_CA} up -d "
+        fi
+        length=$(expr $length - 1)
+    done
+}
+
+function stopNodes() {
+    echo "停止节点......"
+
+    index=0
+    hostArray=()
+    while read line; do
+        host=$(echo $line | awk '{print $2}')
+        if [ ! "$host" == "" ]; then
+            hostArray[$index]=$host
+        else
+            continue
+        fi
+        index=$(expr $index + 1)
+    done <./conf/hosts
+
+    length=${#hostArray[@]}
+    while (($length > 0)); do
+        url=${hostArray[$(expr $length - 1)]}
+        idx=$(expr index $url '.')
+        orgurl=${url:$idx}
+        if [ "orderer" == ${url:0:7} ]; then
+            echo "    ==>$url"
+            ssh root@${hostArray[$(expr $length - 1)]} " cd /var/local/hyperledger/fabric && NODENAME=$url ORGURL=$orgurl IMAGETAG1=$IMAGE_TAG1 docker-compose -f ${DOCKER_COMPOSE_FILE_ORDERER} down "
+        elif [ "peer" == ${url:0:4} ]; then
+            echo "    ==>$url"
+            ssh root@$url " cd /var/local/hyperledger/fabric && NODENAME=$url ORGURL=$orgurl IMAGETAG1=$IMAGE_TAG1 IMAGETAG2=$IMAGE_TAG2 docker-compose -f ${DOCKER_COMPOSE_FILE_PEER} down "
+        elif [ "ca" == ${url:0:2} ]; then
+            echo "    ==>$url"
+            set -x
+            key=$(ls crypto-config/peerOrganizations/$orgurl/ca | sed -n '/_sk/p')
+            cert=$(ls crypto-config/peerOrganizations/$orgurl/ca | sed -n '/.pem/p')
+            ssh root@$url " cd /var/local/hyperledger/fabric && NODENAME=$url ORGURL=$orgurl KEY=$key CERT=$cert IMAGETAG1=$IMAGE_TAG1 docker-compose -f ${DOCKER_COMPOSE_FILE_CA} down "
+            set +x
+        fi
+        length=$(expr $length - 1)
+    done
+
+    echo "    ==>cli"
+    IMAGETAG1=$IMAGE_TAG1 docker-compose -f ${DOCKER_COMPOSE_FILE_CLI} down
+}
+
+# Remove the files generated
+function cleanFiles() {
+    if [ -d "./crypto-config" ]; then
+        rm -rf crypto-config
+    fi
+    if [ -d "./channel-artifacts" ]; then
+        rm -rf channel-artifacts
+    fi
+    if [ -d "./production" ]; then
+        rm -rf production
+    fi
+}
+
+function addOrg() {
+    cryptogen generate --config=./orgc-crypto.yaml
+    configtxgen -printOrg OrgC >./channel-artifacts/orgc.json
+}
+
 MODE=$1
 shift
-# Determine whether starting or stopping
 if [ "$MODE" == "up" ]; then
-    prepareForStart
+    prepare
     genCerts
     genChannelArtifacts
     distributeFiles
-    startOrderers
-    # startPeers
-    # startCAs
-    # startCLI
+    startNodes
 elif [ "$MODE" == "down" ]; then
-    # stopCLI
-    # stopCAs
-    # stopPeers
-    stopOrderers
+    stopNodes
 elif [ "$MODE" == "clean" ]; then
+    # TODO 清理远程主机
     cleanFiles
-elif [ "$MODE" == "addorg" ]; then
-    addOrg
+# elif [ "$MODE" == "addorg" ]; then
+#     addOrg
 else
     help
     exit 1

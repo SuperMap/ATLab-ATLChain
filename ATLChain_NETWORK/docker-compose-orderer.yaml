@@ -36,8 +36,8 @@ services:
         volumes:
             - ./conf/hosts:/etc/hosts
             - ./channel-artifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
-            - ./crypto-config/ordererOrganizations/example.com/orderers/$NODENAME/msp:/var/hyperledger/orderer/msp
-            - ./crypto-config/ordererOrganizations/example.com/orderers/$NODENAME/tls:/var/hyperledger/orderer/tls
+            - ./crypto-config/ordererOrganizations/$ORGURL/orderers/$NODENAME/msp:/var/hyperledger/orderer/msp
+            - ./crypto-config/ordererOrganizations/$ORGURL/orderers/$NODENAME/tls:/var/hyperledger/orderer/tls
             - ./production/$NODENAME:/var/hyperledger/production/orderer
         ports:
           - 7050:7050
