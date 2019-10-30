@@ -24,4 +24,4 @@ OrgC        orgb.example.com
 1. 配置文件分为两部分：序组织部分和节点组织部分；
 2. 排序组织默认所有节点都参与raft；
 3. 有几个活动节点就写几个，排序节点为orderer0.example.com，orderer0.example.com，Peer 节点为peer0.orga.example.com
-4. 端口默认7050，7051，7052，暂不可调整
+4. 端口默认7050，7051，7052，暂不可调整;

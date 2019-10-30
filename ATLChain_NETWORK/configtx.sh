@@ -7,44 +7,50 @@ function genConfigtx() {
     else
         rm configtx.yaml
     fi
-    echo "Organizations:" > configtx.yaml
+    echo "Organizations:" >configtx.yaml
 
-    while read line; do
-        value=$(echo $line | awk '{print $1}')
-        if [ $value == "Orderer:" ]; then
-            varSwitch="orderer"
-            continue
-        elif [ $value == "Peer:" ]; then
-            varSwitch="peer"
-            continue
-        fi
+    OLD_IFS="$IFS"
+    IFS=" "
 
-        if [ $varSwitch == "orderer" ]; then
-            addPart1Configtx $line
-        elif [ $varSwitch == "peer" ]; then
-            addPart2Configtx $line
-        fi
-    done < ./conf/orgs.conf
+    i=0
+    while [ $i -lt ${#ordererOrgArrays[@]} ]; do
+        ordererArray=(${ordererOrgArrays[$i]})
+        addPart1Configtx ${ordererArray[@]}
+        let i++
+    done
 
-    addPart3Configtx
+    echo "PeerOrgs:" >>crypto-config.yaml
+    i=0
+    while [ $i -lt ${#peerOrgArrays[@]} ]; do
+        peerArray=(${peerOrgArrays[$i]})
+        addPart2Configtx ${peerArray[@]}
+        let i++
+    done
 
-    while read line; do
-        value=$(echo $line | awk '{print $1}')
-        if [ $value == "SystemChannel:" ]; then
-            varSwitch="system"
-            continue
-        elif [ $value == "ApplicationChannel:" ]; then
-            varSwitch="app"
-            continue
-        fi
+    i=0
+    while [ $i -lt ${#ordererOrgArrays[@]} ]; do
+        ordererArray=(${ordererOrgArrays[$i]})
+        addPart3Configtx ${ordererArray[@]}
+        let i++
+    done
 
-        if [ $varSwitch == "system" ]; then
-            addPart5Configtx $line
-        elif [ $varSwitch == "app" ]; then
-            addPart6Configtx $line
-        fi
+    i=0
+    while [ $i -lt ${#sysChannelArrays[@]} ]; do
+        sysArray=(${sysChannelArrays[$i]})
+        addPart5Configtx ${sysArray[@]}
+        let i++
+    done
 
-    done < ./conf/channel.conf
+    echo "PeerOrgs:" >>crypto-config.yaml
+    i=0
+    while [ $i -lt ${#appchannelArrays[@]} ]; do
+        appArray=(${appchannelArrays[$i]})
+        addPart6Configtx ${appArray[@]}
+        let i++
+    done
+
+    IFS="$OLD_IFS"
+
 }
 
 function addPart1Configtx() {
@@ -74,34 +80,31 @@ function addPart2Configtx() {
         Policies: &$1Policies
             Readers:
                 Type: Signature
-                Rule: $5
+                Rule: $4
             Writers:
                 Type: Signature
-                Rule: $6
+                Rule: $5
             Admins:
                 Type: Signature
                 Rule: \"OR('$1.admin')\"
 
-        OrdererEndpoints:" >> configtx.yaml
-        string=$7
-        array=(${string//,/ })  
-        for var in ${array[@]}
-        do
-            echo "            - $var:7050" >> configtx.yaml
-        done
+        OrdererEndpoints:" >>configtx.yaml
+    string=$6
+    array=(${string//,/ })
+    for var in ${array[@]}; do
+        echo "            - $var:7050" >>configtx.yaml
+    done
 
-        echo "        AnchorPeers:" >> configtx.yaml
+    echo "        AnchorPeers:" >>configtx.yaml
 
-        string=$8
-        array=(${string//,/ })  
-        for var in ${array[@]}
-        do
-            echo "            - Host: $var
-              Port: 7051" >> configtx.yaml
-        done
-            
+    string=$7
+    array=(${string//,/ })
+    for var in ${array[@]}; do
+        echo "            - Host: $var
+              Port: 7051" >>configtx.yaml
+    done
 
-    echo "" >> configtx.yaml
+    echo "" >>configtx.yaml
 }
 
 function addPart3Configtx() {
@@ -158,14 +161,14 @@ Application: &ApplicationDefaults
 
 Orderer: &OrdererDefaults
     OrdererType: etcdraft
-    Addresses: " >> configtx.yaml
-    
-    while read line; do
-        domain=$(echo $line | awk '{print $1}')
-        hostname=$(echo $line | awk '{print $2}')
-        echo "        - $hostname.$domain:7050" >> configtx.yaml
-    done < ./conf/raft.conf
-    
+    Addresses: " >>configtx.yaml
+
+    count=0
+    while (($count < $3)); do
+        echo "        - orderer${count}.$2:7050" >>configtx.yaml
+        count=$(expr $count + 1)
+    done
+
     echo "    BatchTimeout: 2s
 
     BatchSize:
@@ -181,18 +184,18 @@ Orderer: &OrdererDefaults
             - kafka2:9092
 
     EtcdRaft:
-        Consenters:" >> configtx.yaml
+        Consenters:" >>configtx.yaml
 
-    while read line; do
-        domain=$(echo $line | awk '{print $1}')
-        hostname=$(echo $line | awk '{print $2}')
-        echo "            - Host: $hostname.$domain
+    count=0
+    while (($count < $3)); do
+        echo "            - Host: orderer${count}.$2
               Port: 7050
-              ClientTLSCert: crypto-config/ordererOrganizations/$domain/orderers/$hostname.$domain/tls/server.crt
-              ServerTLSCert: crypto-config/ordererOrganizations/$domain/orderers/$hostname.$domain/tls/server.crt" >> configtx.yaml
-    done < ./conf/raft.conf
+              ClientTLSCert: crypto-config/ordererOrganizations/$2/orderers/orderer${count}.$2/tls/server.crt
+              ServerTLSCert: crypto-config/ordererOrganizations/$2/orderers/orderer${count}.$2/tls/server.crt" >>configtx.yaml
+        count=$(expr $count + 1)
+    done
 
-    echo "" >> configtx.yaml
+    echo "" >>configtx.yaml
     echo "        Options:
             TickInterval: 500ms
             ElectionTick: 10
@@ -232,9 +235,9 @@ Channel: &ChannelDefaults
             Rule: \"MAJORITY Admins\"
 
     Capabilities:
-        <<: *ChannelCapabilities" >> configtx.yaml
+        <<: *ChannelCapabilities" >>configtx.yaml
 
-    echo "" >> configtx.yaml
+    echo "" >>configtx.yaml
 }
 
 function addPart5Configtx() {
@@ -248,26 +251,24 @@ function addPart5Configtx() {
             Organizations:" >>configtx.yaml
 
     string=$2
-    array=(${string//,/ })  
-    for var in ${array[@]}
-    do
-        echo "                - <<: *$var" >> configtx.yaml
+    array=(${string//,/ })
+    for var in ${array[@]}; do
+        echo "                - <<: *$var" >>configtx.yaml
     done
 
     echo "            Capabilities:
                 <<: *OrdererCapabilities
         Consortiums:
             SampleConsortium:
-                Organizations:" >> configtx.yaml
+                Organizations:" >>configtx.yaml
 
     string=$3
-    array=(${string//,/ })  
-    for var in ${array[@]}
-    do
-        echo "                - <<: *$var" >> configtx.yaml
+    array=(${string//,/ })
+    for var in ${array[@]}; do
+        echo "                - <<: *$var" >>configtx.yaml
     done
 
-    echo "" >> configtx.yaml
+    echo "" >>configtx.yaml
 }
 
 function addPart6Configtx() {
@@ -276,13 +277,12 @@ function addPart6Configtx() {
         <<: *ChannelDefaults
         Application:
             <<: *ApplicationDefaults
-            Organizations:" >> configtx.yaml
+            Organizations:" >>configtx.yaml
 
     string=$2
-    array=(${string//,/ })  
-    for var in ${array[@]}
-    do       
-        echo "                - *$var" >> configtx.yaml
+    array=(${string//,/ })
+    for var in ${array[@]}; do
+        echo "                - *$var" >>configtx.yaml
     done
 
     echo "            Capabilities:
@@ -290,4 +290,3 @@ function addPart6Configtx() {
 
     echo "" >>configtx.yaml
 }
-
