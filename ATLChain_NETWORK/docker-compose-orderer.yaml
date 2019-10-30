@@ -34,7 +34,7 @@ services:
         working_dir: /opt/gopath/src/github.com/hyperledger/fabric
         command: orderer
         volumes:
-            - ./conf/hosts:/etc/hosts
+            # - ./conf/hosts:/etc/hosts
             - ./channel-artifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
             - ./crypto-config/ordererOrganizations/$ORGURL/orderers/$NODENAME/msp:/var/hyperledger/orderer/msp
             - ./crypto-config/ordererOrganizations/$ORGURL/orderers/$NODENAME/tls:/var/hyperledger/orderer/tls

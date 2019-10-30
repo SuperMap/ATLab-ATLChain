@@ -4,6 +4,7 @@
 IMAGE_TAG1="1.4.3"
 IMAGE_TAG2="0.4.15"
 
+# 判断系统中是否存在 docker 镜像，没有就下载
 function downloadImages() {
     if [ ! "$(docker images hyperledger/fabric-tools:$IMAGE_TAG1 -q)" == "18ed4db0cd57" ]; then
         docker pull hyperledger/fabric-tools:$IMAGE_TAG1
@@ -38,6 +39,7 @@ function downloadImages() {
     fi
 }
 
+# 启动前的准备工作
 function prepareForStart() {
     # testRemoteHost
 

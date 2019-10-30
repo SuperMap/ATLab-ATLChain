@@ -51,7 +51,7 @@ services:
         command: peer node start
         volumes:
             - /var/run/:/host/var/run/
-            - ./conf/hosts:/etc/hosts
+            # - ./conf/hosts:/etc/hosts
             - ./crypto-config/peerOrganizations/$ORGURL/peers/$NODENAME/msp:/etc/hyperledger/fabric/msp
             - ./crypto-config/peerOrganizations/$ORGURL/peers/$NODENAME/tls:/etc/hyperledger/fabric/tls
             - ./production/$NODENAME:/var/hyperledger/production

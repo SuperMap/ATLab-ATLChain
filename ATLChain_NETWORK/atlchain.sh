@@ -6,13 +6,13 @@ export FABRIC_CFG_PATH=${PWD}
 IMAGE_TAG1="1.4.3"
 IMAGE_TAG2="0.4.15"
 
-#compose files
+# compose 配置文件
 DOCKER_COMPOSE_FILE_ORDERER="docker-compose-orderer.yaml"
 DOCKER_COMPOSE_FILE_PEER="docker-compose-peer.yaml"
 DOCKER_COMPOSE_FILE_CA="docker-compose-ca.yaml"
 DOCKER_COMPOSE_FILE_CLI="docker-compose-cli.yaml"
 
-# default compose project name
+# 默认 compose 工程名
 export COMPOSE_PROJECT_NAME=atlproj
 
 function help() {
@@ -24,23 +24,170 @@ function help() {
     echo "      - 'clean' - clean all the files using by the networks"
 }
 
+# 读取配置文件
+function readConf() {
+    while read line || [[ -n $line ]]; do
+        # 判断配置段落
+        if [ "$line" == "" ]; then
+            continue
+        elif [ $(echo $line | awk '{print $1}') == "Orderer:" ]; then
+            varSwitch="orderer"
+            continue
+        elif [ $(echo $line | awk '{print $1}') == "Peer:" ]; then
+            varSwitch="peer"
+            continue
+        elif [ $(echo $line | awk '{print $1}') == "SystemChannel:" ]; then
+            varSwitch="syschannel"
+            continue
+        elif [ $(echo $line | awk '{print $1}') == "ApplicationChannel:" ]; then
+            varSwitch="appchannel"
+            continue
+        fi
+
+        # 将配置内容读进数组
+        if [ $varSwitch == "orderer" ]; then
+            ordererOrgArrays[${#ordererOrgArrays[@]}]=$line
+        elif [ $varSwitch == "peer" ]; then
+            peerOrgArrays[${#peerOrgArrays[@]}]=$line
+        elif [ $varSwitch == "syschannel" ]; then
+            sysChannelArrays[${#sysChannelArrays[@]}]=$line
+        elif [ $varSwitch == "appchannel" ]; then
+            appchannelArrays[${#appchannelArrays[@]}]=$line
+        fi
+    done <./conf/conf.conf
+
+    # 根据配置文件中的信息自动分解出组织及其节点的详细信息
+    getHostsInfo
+}
+
+# 获取各个组织的域名、节点信息
+function getHostsInfo() {
+    hosts=()
+    OLD_IFS="$IFS"
+    IFS=" "
+
+    # 获取 Orderer 及其所有节点的信息
+    i=0
+    while [ $i -lt ${#ordererOrgArrays[@]} ]; do
+        array=(${ordererOrgArrays[$i]})
+        nodeNum=$(expr ${array[2]} - 1)
+        nodeHosts=""
+        while [ $nodeNum -ge 0 ]; do
+            nodeHosts="$nodeHosts orderer${nodeNum}.${array[1]}"
+            let nodeNum--
+        done
+
+        hosts[${#hosts[@]}]="${array[0]} ${array[1]} $nodeHosts"
+        let i++
+    done
+
+    # 获取 Peer 及其所有节点的信息
+    i=0
+    while [ $i -lt ${#peerOrgArrays[@]} ]; do
+        array=(${peerOrgArrays[$i]})
+        nodeNum=$(expr ${array[2]} - 1)
+        nodeHosts=""
+        while [ $nodeNum -ge 0 ]; do
+            nodeHosts="$nodeHosts peer${nodeNum}.${array[1]}"
+            let nodeNum--
+        done
+
+        # 获取 CA 节点信息
+        caArray=(${array[7]//,/ })
+        for var in ${caArray[@]}; do
+            nodeHosts="$nodeHosts $var"
+        done
+
+        hosts[${#hosts[@]}]="${array[0]} ${array[1]} $nodeHosts"
+        let i++
+    done
+    IFS="$OLD_IFS"
+}
+
+# 安装前的准备
+function prepareBeforeStart() {
+    testRemoteHost
+
+    echo "正在检查远程主机docker镜像......"
+
+    OLD_IFS="$IFS"
+    IFS=" "
+
+    # 向各节点复制启动前的检查脚本
+    i=0
+    while [ $i -lt ${#hosts[@]} ]; do
+        hostArray=(${hosts[$i]})
+        nodeNum=$(expr ${#hostArray[@]} - 1)
+        while [ $nodeNum -ge 2 ]; do
+            echo "    ==>${hostArray[$nodeNum]} CHECKING......"
+            scp prepare-for-start.sh root@${hostArray[$nodeNum]}:/root >>log.log
+            ssh root@${hostArray[$nodeNum]} " bash prepare-for-start.sh | tee -a log.log "
+            res=$?
+            if [ $res -ne 0 ]; then
+                echo " ERROR !!! 节点 ${hostArray[$nodeNum]} 环境准备失败，请查看日志。"
+                exit 1
+            fi
+            echo "    ==>${hostArray[$nodeNum]} SUCCESS"
+            let nodeNum--
+        done
+        let i++
+    done
+
+    IFS="$OLD_IFS"
+}
+
+# 测试远程主机是否可以正常登录
+function testRemoteHost() {
+    echo "正在测试远程登录......"
+
+    OLD_IFS="$IFS"
+    IFS=" "
+
+    i=0
+    while [ $i -lt ${#hosts[@]} ]; do
+        hostArray=(${hosts[$i]})
+        nodeNum=$(expr ${#hostArray[@]} - 1)
+        while [ $nodeNum -ge 2 ]; do
+            echo "    ==>${hostArray[$nodeNum]} CHECKING......"
+            if [ ! $(ssh root@${hostArray[$nodeNum]} " pwd ") == "/root" ]; then
+                echo "不能登录到 ${hostArray[$nodeNum]}，请配置该主机的 ssh 免密登录。"
+                exit
+            fi
+            echo "    ==>${hostArray[$nodeNum]} SUCCESS"
+            let nodeNum--
+        done
+        let i++
+    done
+
+    IFS="$OLD_IFS"
+}
+
+# 生成加密材料
 function genCerts() {
     echo "正在生成初始密钥......"
 
-    # generate crypto-config.yaml
-    ./crypto-config.sh
+    # 生成 crypto-config.yaml
+    . ./crypto-config.sh
+    genCryptoConfig
 
     if [ -d "crypto-config" ]; then
         rm -rf crypto-config
     fi
-    cryptogen generate --config=./crypto-config.yaml >>./log.log 2>&1
+    cryptogen generate --config=./crypto-config.yaml >>./log.log
+    res=$?
+    if [ $res -ne 0 ]; then
+        echo " ERROR !!! 生成加密材料失败，请查看日志。"
+        exit 1
+    fi
 }
 
+# 生成通道构建
 function genChannelArtifacts() {
     echo "正在生成通道构件......"
 
     # 生成 configtx.yaml
-    ./configtx.sh
+    . ./configtx.sh
+    genConfigtx
 
     if [ ! -d "./channel-artifacts" ]; then
         mkdir ./channel-artifacts
@@ -72,61 +219,11 @@ function genChannelArtifacts() {
     done <./conf/channel.conf
 }
 
-# 安装前的准备
-function prepare() {
-    testRemoteHost
-
-    echo "正在检查远程主机docker镜像......"
-    index=0
-    hostArray=()
-    while read line; do
-        if [ ! "$line" == "" ]; then
-            hostArray[$index]=$line
-        else
-            continue
-        fi
-        index=$(expr $index + 1)
-    done <./conf/remoteHosts.conf
-
-    length=${#hostArray[@]}
-    while (($length > 0)); do
-        echo "    ==>${hostArray[$(expr $length - 1)]}"
-        scp prepare-for-start.sh root@${hostArray[$(expr $length - 1)]}:/root >>log.log
-        ssh root@${hostArray[$(expr $length - 1)]} " bash prepare-for-start.sh "
-        length=$(expr $length - 1)
-    done
-}
-
-# 测试远程主机是否可以正常登录
-function testRemoteHost() {
-    echo "正在测试远程登录......"
-    index=0
-    hostArray=()
-    while read line; do
-        host=$(echo $line | awk '{print $3}')
-        if [ ! $line == "" ]; then
-            hostArray[$index]=$line
-        else
-            continue
-        fi
-        index=$(expr $index + 1)
-    done <./conf/remoteHosts.conf
-
-    length=${#hostArray[@]}
-    while (($length > 0)); do
-        if [ ! $(ssh root@${hostArray[$(expr $length - 1)]} " pwd ") = "/root" ]; then
-            echo "不能登录到 ${hostArray[$(expr $length - 1)]}，请配置该主机的 ssh 免密登录。"
-            exit
-        fi
-        length=$(expr $length - 1)
-    done
-}
-
 function distributeFiles() {
     ## TODO 删除其他组织的的私钥
     echo "正在向远程主机复制相关文件......"
 
-    index=0
+    index=1
     hostArray=()
     while read line; do
         if [ ! $line == "" ]; then
@@ -158,7 +255,7 @@ function startNodes() {
     echo "    ==>cli"
     IMAGETAG1=$IMAGE_TAG1 docker-compose -f ${DOCKER_COMPOSE_FILE_CLI} up -d
 
-    index=0
+    index=1
     hostArray=()
     while read line; do
         host=$(echo $line | awk '{print $2}')
@@ -191,10 +288,15 @@ function startNodes() {
     done
 }
 
+function operatePeers() {
+    docker exec cli sh -c "scripts/script.sh"
+    # docker exec cli sh -c "SYS_CHANNEL=$CH_NAME && scripts/upgrade_to_v14.sh $CHANNEL_NAME $CLI_DELAY $LANGUAGE $CLI_TIMEOUT $VERBOSE"
+}
+
 function stopNodes() {
     echo "停止节点......"
 
-    index=0
+    index=1
     hostArray=()
     while read line; do
         host=$(echo $line | awk '{print $2}')
@@ -232,7 +334,7 @@ function stopNodes() {
     IMAGETAG1=$IMAGE_TAG1 docker-compose -f ${DOCKER_COMPOSE_FILE_CLI} down
 }
 
-# Remove the files generated
+# 删除生成的文件
 function cleanFiles() {
     if [ -d "./crypto-config" ]; then
         rm -rf crypto-config
@@ -245,19 +347,33 @@ function cleanFiles() {
     fi
 }
 
+# TODO 添加组织
 function addOrg() {
     cryptogen generate --config=./orgc-crypto.yaml
     configtxgen -printOrg OrgC >./channel-artifacts/orgc.json
 }
 
+echo
+echo "   _____                                             "
+echo "  / ____|                                            "
+echo " | (___  _   _ _ __   ___ _ __ _ __ ___   __ _ _ __  "
+echo "  \___ \| | | | '_ \ / _ \ '__| '_ \` _ \ / _\` | '_ \ "
+echo "  ____) | |_| | |_) |  __/ |  | | | | | | (_| | |_) |"
+echo " |_____/ \__,_| .__/ \___|_|  |_| |_| |_|\__,_| .__/ "
+echo "              | |                             | |    "
+echo "              |_|                             |_|    "
+echo
+
 MODE=$1
 shift
+readConf
 if [ "$MODE" == "up" ]; then
-    prepare
-    genCerts
+    # prepareBeforeStart
+    # genCerts
     genChannelArtifacts
-    distributeFiles
-    startNodes
+    # distributeFiles
+    # startNodes
+    # operatePeers
 elif [ "$MODE" == "down" ]; then
     stopNodes
 elif [ "$MODE" == "clean" ]; then

@@ -291,4 +291,3 @@ function addPart6Configtx() {
     echo "" >>configtx.yaml
 }
 
-genConfigtx
