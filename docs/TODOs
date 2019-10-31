@@ -1,0 +1,17 @@
+1. 链码实例化的等待时间、链码调用完成后的等待时间目前是固定的5s，需要灵活调整。
+2. 排序组织默认所有节点都参与raft，后续要做成可控制。
+3. 有几个活动节点就写几个，节点个数就写几个
+4. 端口默认7050，7051，7052，暂不可调整;
+5. 应用通道必须和排序通道一一对应，如，conf.conf 9-13行如下：
+
+    ``` 
+    SystemChannel:      #通道名，排序组织名，联盟组织名
+    OrdererChannel    OrgOrderer    OrgA,OrgB,OrgC
+
+    ApplicationChannel:     #通道名，排序组织名，联盟组织名
+    TxChannel    OrgA,OrgB,OrgC
+    ```
+
+    在表明应用通道 TxChannel 所使用的排序通道为 OrdererChannel。
+6. 未设置链码策略、链码名、版本号。使用 Fabric 默认策略，链码名默认“atlchainCC”，默认版本“1.0”
+

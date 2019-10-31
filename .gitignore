@@ -34,10 +34,12 @@
 ATLChain_CC/java/.gradle/
 ATLChain_CC/java/build/
 
+.tx
 ATLChain_DEMO/server/fabric-client-kv-orga/
 ATLChain_DEMO/web/public/
 ATLChain_NETWORK/network-config/crypto-config/
-ATLChain_NETWORK/scripts/log.txt
+ATLChain_NETWORK/scripts/log.log
+ATLChain_NETWORK/scripts/conf
 ATLChain_NETWORK/network-config/ca-config/
 ATLChain_NETWORK/crypto-config/
 ATLChain_NETWORK/crypto-config.yaml
