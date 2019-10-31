@@ -40,8 +40,8 @@ function prepareBeforeStart() {
         nodeNum=$(expr ${#hostArray[@]} - 1)
         while [ $nodeNum -ge 2 ]; do
             echo "    ==>${hostArray[$nodeNum]} CHECKING......"
-            scp prepare-for-start.sh root@${hostArray[$nodeNum]}:/root >>log.log
-            ssh root@${hostArray[$nodeNum]} " bash prepare-for-start.sh | tee -a log.log "
+            scp ./scripts/prepare-for-start.sh root@${hostArray[$nodeNum]}:/var/local/hyperledger/fabric/ >>log.log
+            ssh root@${hostArray[$nodeNum]} " cd /var/local/hyperledger/fabric/ && bash prepare-for-start.sh | tee -a log.log "
             res=$?
             if [ $res -ne 0 ]; then
                 echo " ERROR !!! 节点 ${hostArray[$nodeNum]} 环境准备失败，请查看日志。"
@@ -87,7 +87,7 @@ function genCerts() {
     echo "正在生成初始密钥......"
 
     # 生成 crypto-config.yaml
-    . ./crypto-config.sh
+    . ./scripts/crypto-config.sh
     genCryptoConfig
 
     if [ -d "crypto-config" ]; then
@@ -106,7 +106,7 @@ function genChannelArtifacts() {
     echo "正在生成网络构件......"
 
     # 生成 configtx.yaml
-    . ./configtx.sh
+    . ./scripts/configtx.sh
     genConfigtx
 
     if [ ! -d "./channel-artifacts" ]; then
@@ -153,6 +153,7 @@ function genChannelArtifacts() {
 
 function distributeFiles() {
     ## TODO 删除其他组织的的私钥
+    ## TODO 只向对应的节点发送 docker-compose YAML 文件
     echo "正在向远程主机复制相关文件......"
 
     OLD_IFS="$IFS"
@@ -168,9 +169,9 @@ function distributeFiles() {
             ssh root@$url " [ -d /var/local/hyperledger/fabric/conf ] || mkdir -p /var/local/hyperledger/fabric/conf "
             ssh root@$url " [ -d /var/local/hyperledger/fabric/channel-artifacts ] || mkdir -p /var/local/hyperledger/fabric/channel-artifacts "
             scp -r ./crypto-config root@$url:/var/local/hyperledger/fabric/ >>log.log
-            # scp -r ./conf/hosts root@$url:/var/local/hyperledger/fabric/conf/hosts >>log.log
+            scp -r ./conf/hosts root@$url:/var/local/hyperledger/fabric/conf/hosts >>log.log
             scp ./channel-artifacts/genesis.block root@$url:/var/local/hyperledger/fabric/channel-artifacts/genesis.block >>log.log
-            scp ./$DOCKER_COMPOSE_FILE_CA ./$DOCKER_COMPOSE_FILE_PEER ./$DOCKER_COMPOSE_FILE_ORDERER root@$url:/var/local/hyperledger/fabric/ >>log.log
+            scp -r ./docker-compose-conf root@$url:/var/local/hyperledger/fabric/ >>log.log
             echo "    ==>$url DONE"
             let nodeNum--
         done
@@ -184,7 +185,7 @@ function startNodes() {
     echo "启动节点......"
 
     echo "    ==>cli"
-    IMAGETAG1=$IMAGE_TAG1 docker-compose -f ${DOCKER_COMPOSE_FILE_CLI} up -d
+    IMAGETAG1=$IMAGE_TAG1 docker-compose -f ./docker-compose-conf/${DOCKER_COMPOSE_FILE_CLI} up -d
 
     OLD_IFS="$IFS"
     IFS=" "
@@ -194,19 +195,20 @@ function startNodes() {
         hostArray=(${hosts[$i]})
         echo ${hostArray[@]}
 
+        mspid=${hostArray[0]}
         orgurl=${hostArray[1]}
         nodeNum=$(expr ${#hostArray[@]} - 1)
         while [ $nodeNum -ge 2 ]; do
             url=${hostArray[$nodeNum]}
             echo "    ==>节点 $url STARTING......"
             if [ "orderer" == ${url:0:7} ]; then
-                ssh root@$url " cd  /var/local/hyperledger/fabric && NODENAME=$url ORGURL=$orgurl IMAGETAG1=$IMAGE_TAG1 docker-compose -f ${DOCKER_COMPOSE_FILE_ORDERER} up -d "
+                ssh root@$url " cd  /var/local/hyperledger/fabric && LOCALMSPID=$mspid NODENAME=$url ORGURL=$orgurl IMAGETAG1=$IMAGE_TAG1 docker-compose -f ./docker-compose-conf/${DOCKER_COMPOSE_FILE_ORDERER} up -d "
             elif [ "peer" == ${url:0:4} ]; then
-                ssh root@$url " cd /var/local/hyperledger/fabric && NODENAME=$url ORGURL=$orgurl IMAGETAG1=$IMAGE_TAG1 IMAGETAG2=$IMAGE_TAG2 docker-compose -f ${DOCKER_COMPOSE_FILE_PEER} up -d "
+                ssh root@$url " cd /var/local/hyperledger/fabric && LOCALMSPID=$mspid NODENAME=$url ORGURL=$orgurl IMAGETAG1=$IMAGE_TAG1 IMAGETAG2=$IMAGE_TAG2 docker-compose -f ./docker-compose-conf/${DOCKER_COMPOSE_FILE_PEER} up -d "
             else
                 key=$(ls crypto-config/peerOrganizations/$orgurl/ca | sed -n '/_sk/p')
                 cert=$(ls crypto-config/peerOrganizations/$orgurl/ca | sed -n '/.pem/p')
-                ssh root@$url " cd /var/local/hyperledger/fabric && NODENAME=$url ORGURL=$orgurl KEY=$key CERT=$cert IMAGETAG1=$IMAGE_TAG1 docker-compose -f ${DOCKER_COMPOSE_FILE_CA} up -d "
+                ssh root@$url " cd /var/local/hyperledger/fabric && NODENAME=$url ORGURL=$orgurl KEY=$key CERT=$cert IMAGETAG1=$IMAGE_TAG1 docker-compose -f ./docker-compose-conf/${DOCKER_COMPOSE_FILE_CA} up -d "
             fi
             echo "    ==>$url STARTED"
             echo 
@@ -219,8 +221,7 @@ function startNodes() {
 }
 
 function operatePeers() {
-    docker exec cli sh -c "scripts/script.sh"
-    # docker exec cli sh -c "SYS_CHANNEL=$CH_NAME && scripts/upgrade_to_v14.sh $CHANNEL_NAME $CLI_DELAY $LANGUAGE $CLI_TIMEOUT $VERBOSE"
+    docker exec cli sh -c "cd scripts && ./script.sh"
 }
 
 function stopNodes() {
@@ -238,17 +239,17 @@ function stopNodes() {
         nodeNum=$(expr ${#hostArray[@]} - 1)
         while [ $nodeNum -ge 2 ]; do
             url=${hostArray[$nodeNum]}
-            echo "    ==>节点 $url STARTING......"
+            echo "    ==>节点 $url STOPPING......"
             if [ "orderer" == ${url:0:7} ]; then
-                ssh root@$url " cd  /var/local/hyperledger/fabric && NODENAME=$url ORGURL=$orgurl IMAGETAG1=$IMAGE_TAG1 docker-compose -f ${DOCKER_COMPOSE_FILE_ORDERER} down "
+                ssh root@$url " cd  /var/local/hyperledger/fabric && NODENAME=$url ORGURL=$orgurl IMAGETAG1=$IMAGE_TAG1 docker-compose -f ./docker-compose-conf/${DOCKER_COMPOSE_FILE_ORDERER} down "
             elif [ "peer" == ${url:0:4} ]; then
-                ssh root@$url " cd /var/local/hyperledger/fabric && NODENAME=$url ORGURL=$orgurl IMAGETAG1=$IMAGE_TAG1 IMAGETAG2=$IMAGE_TAG2 docker-compose -f ${DOCKER_COMPOSE_FILE_PEER} down "
+                ssh root@$url " cd /var/local/hyperledger/fabric && NODENAME=$url ORGURL=$orgurl IMAGETAG1=$IMAGE_TAG1 IMAGETAG2=$IMAGE_TAG2 docker-compose -f ./docker-compose-conf/${DOCKER_COMPOSE_FILE_PEER} down "
             else
                 key=$(ls crypto-config/peerOrganizations/$orgurl/ca | sed -n '/_sk/p')
                 cert=$(ls crypto-config/peerOrganizations/$orgurl/ca | sed -n '/.pem/p')
-                ssh root@$url " cd /var/local/hyperledger/fabric && NODENAME=$url ORGURL=$orgurl KEY=$key CERT=$cert IMAGETAG1=$IMAGE_TAG1 docker-compose -f ${DOCKER_COMPOSE_FILE_CA} down "
+                ssh root@$url " cd /var/local/hyperledger/fabric && NODENAME=$url ORGURL=$orgurl KEY=$key CERT=$cert IMAGETAG1=$IMAGE_TAG1 docker-compose -f ./docker-compose-conf/${DOCKER_COMPOSE_FILE_CA} down "
             fi
-            echo "    ==>$url STARTED"
+            echo "    ==>$url STOPPED"
             echo 
             let nodeNum--
         done
@@ -258,7 +259,7 @@ function stopNodes() {
     IFS="$OLD_IFS"
 
     echo "    ==>cli"
-    IMAGETAG1=$IMAGE_TAG1 docker-compose -f ${DOCKER_COMPOSE_FILE_CLI} down
+    IMAGETAG1=$IMAGE_TAG1 docker-compose -f ./docker-compose-conf/${DOCKER_COMPOSE_FILE_CLI} down
 }
 
 # 删除生成的文件
@@ -293,15 +294,15 @@ echo
 
 MODE=$1
 shift
-. ./readConf.sh
-readConf
+. ./scripts/readConf.sh 
+readConf ./conf/conf.conf
 if [ "$MODE" == "up" ]; then
-    # prepareBeforeStart
-    # genCerts
-    # genChannelArtifacts
-    # distributeFiles
+    prepareBeforeStart
+    genCerts
+    genChannelArtifacts
+    distributeFiles
     startNodes
-    # operatePeers
+    operatePeers
 elif [ "$MODE" == "down" ]; then
     stopNodes
 elif [ "$MODE" == "clean" ]; then

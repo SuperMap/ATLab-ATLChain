@@ -41,8 +41,6 @@ function downloadImages() {
 
 # 启动前的准备工作
 function prepareForStart() {
-    # testRemoteHost
-
     # Download docker images
     downloadImages
     if [ $? -ne 0 ]; then

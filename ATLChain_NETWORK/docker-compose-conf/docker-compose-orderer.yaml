@@ -13,7 +13,7 @@ services:
         environment:
             # base env
             - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
-            - ORDERER_GENERAL_LOCALMSPID=OrgOrderer
+            - ORDERER_GENERAL_LOCALMSPID=$LOCALMSPID
             - ORDERER_GENERAL_LOCALMSPDIR=/var/hyperledger/orderer/msp
             # TLS
             - ORDERER_GENERAL_TLS_ENABLED=true
@@ -34,11 +34,11 @@ services:
         working_dir: /opt/gopath/src/github.com/hyperledger/fabric
         command: orderer
         volumes:
-            # - ./conf/hosts:/etc/hosts
-            - ./channel-artifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
-            - ./crypto-config/ordererOrganizations/$ORGURL/orderers/$NODENAME/msp:/var/hyperledger/orderer/msp
-            - ./crypto-config/ordererOrganizations/$ORGURL/orderers/$NODENAME/tls:/var/hyperledger/orderer/tls
-            - ./production/$NODENAME:/var/hyperledger/production/orderer
+            - ./../conf/hosts:/etc/hosts
+            - ./../channel-artifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
+            - ./../crypto-config/ordererOrganizations/$ORGURL/orderers/$NODENAME/msp:/var/hyperledger/orderer/msp
+            - ./../crypto-config/ordererOrganizations/$ORGURL/orderers/$NODENAME/tls:/var/hyperledger/orderer/tls
+            - ./../production/$NODENAME:/var/hyperledger/production/orderer
         ports:
           - 7050:7050
         networks:

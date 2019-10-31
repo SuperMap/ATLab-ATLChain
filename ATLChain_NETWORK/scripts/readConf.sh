@@ -18,6 +18,9 @@ function readConf() {
         elif [ $(echo $line | awk '{print $1}') == "ApplicationChannel:" ]; then
             varSwitch="appchannel"
             continue
+        elif [ $(echo $line | awk '{print $1}') == "Chaincode:" ]; then
+            varSwitch="chaincode"
+            continue
         fi
 
         # 将配置内容读进数组
@@ -29,8 +32,10 @@ function readConf() {
             sysChannelArrays[${#sysChannelArrays[@]}]=$line
         elif [ $varSwitch == "appchannel" ]; then
             appchannelArrays[${#appchannelArrays[@]}]=$line
+        elif [ $varSwitch == "chaincode" ]; then
+            CC_PKG_FILE=$line
         fi
-    done <./conf/conf.conf
+    done <$1
 
     # 根据配置文件中的信息自动分解出组织及其节点的详细信息
     getHostsInfo

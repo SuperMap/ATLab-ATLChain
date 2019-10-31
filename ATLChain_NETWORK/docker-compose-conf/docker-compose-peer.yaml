@@ -32,7 +32,7 @@ services:
             # gossip
             - CORE_PEER_GOSSIP_BOOTSTRAP=$NODENAME:7051
             - CORE_PEER_GOSSIP_EXTERNALENDPOINT=$NODENAME:7051
-            - CORE_PEER_LOCALMSPID=OrgA
+            - CORE_PEER_LOCALMSPID=$LOCALMSPID
              # TLS
             - CORE_PEER_TLS_ENABLED=true
             - CORE_PEER_TLS_CERT_FILE=/etc/hyperledger/fabric/tls/server.crt
@@ -51,10 +51,10 @@ services:
         command: peer node start
         volumes:
             - /var/run/:/host/var/run/
-            # - ./conf/hosts:/etc/hosts
-            - ./crypto-config/peerOrganizations/$ORGURL/peers/$NODENAME/msp:/etc/hyperledger/fabric/msp
-            - ./crypto-config/peerOrganizations/$ORGURL/peers/$NODENAME/tls:/etc/hyperledger/fabric/tls
-            - ./production/$NODENAME:/var/hyperledger/production
+            - ./../conf/hosts:/etc/hosts
+            - ./../crypto-config/peerOrganizations/$ORGURL/peers/$NODENAME/msp:/etc/hyperledger/fabric/msp
+            - ./../crypto-config/peerOrganizations/$ORGURL/peers/$NODENAME/tls:/etc/hyperledger/fabric/tls
+            - ./../production/$NODENAME:/var/hyperledger/production
         ports:
           - 7051:7051
           - 7052:7052
