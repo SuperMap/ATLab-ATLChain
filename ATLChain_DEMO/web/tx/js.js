@@ -1,9 +1,9 @@
 // enroll
 
-// var RESTURL = "http://127.0.0.1:7002";
-// var FileURL = "http://127.0.0.1:7001";
-var RESTURL = "http://175.154.161.50:7002";
-var FileURL = "http://175.154.161.50:7001";
+var RESTURL = "http://127.0.0.1:4000";
+var FileURL = "http://127.0.0.1:4444";
+// var RESTURL = "http://175.154.161.50:7002";
+// var FileURL = "http://175.154.161.50:7001";
 
 $(document).ready(function(){
     // 设置预设值
@@ -25,6 +25,7 @@ $(document).ready(function(){
         <li><a href=\"trace.html\" id=\"trace_bar\">追溯记录</a></li> \
         <li><a href=\"getDataFromHBase.html\" id=\"getDataFromHBase_bar\">获取HBASE数据</a></li> \
         <li><a href=\"getDataFromHDFS.html\" id=\"getDataFromHDFS_bar\">获取HDFS数据</a></li> \
+        <li><a href=\"getDataFromIPFS.html\" id=\"getDataFromIPFS_bar\">获取IPFS数据</a></li> \
         <li><a href=\"userCenter.html\" id=\"userCenter_bar\">个人信息</a></li> \
         </ul>");
 
@@ -46,7 +47,7 @@ $(document).ready(function(){
                 let triggerDelay = 100;
                 let removeDelay = 1000;
                 //存放多个下载的url，
-                let url_arr=[FileURL + "/tx/msp/" + username,  FileURL + "/tx/msp/" + data.filename];
+                let url_arr=[FileURL + "/msp/" + username,  FileURL + "/msp/" + data.filename];
                 
                 url_arr.forEach(function(item,index){
                     _createIFrame(item, index * triggerDelay, removeDelay);
@@ -327,7 +328,7 @@ $(document).ready(function(){
                             $.ajax({
                                 type:'post',
                                 
-                                url: RESTURL + '/channels/atlchannel/chaincodes/atlchainCC/putTx',
+                                url: RESTURL + '/channels/txchannel/chaincodes/atlchainCC/putTx',
                                 data:JSON.stringify({
                                     'fcn': 'Put',
                                     'peers':['peer0.orga.example.com'],
@@ -388,7 +389,7 @@ $(document).ready(function(){
                             $.ajax({
                                 type:'post',
                                 
-                                url: RESTURL + '/channels/atlchannel/chaincodes/atlchainCC/AddRecord',
+                                url: RESTURL + '/channels/txchannel/chaincodes/atlchainCC/AddRecord',
                                 data:JSON.stringify({
                                     'args':[argsHash, args, signature, fileString_PubkeyPEM],
                                     'imgdata':fileString_Image,
@@ -474,7 +475,7 @@ $(document).ready(function(){
                 $.ajax({
                     type:'post',
     
-                    url: RESTURL + '/channels/atlchannel/chaincodes/atlchainCC/AddRecord',
+                    url: RESTURL + '/channels/txchennal/chaincodes/atlchainCC/AddRecord',
                     data:JSON.stringify({
                         'args':[argsHash, args, signature, fileString_PubkeyPEM],
                         'username':getCookie("username"),
@@ -535,7 +536,7 @@ $(document).ready(function(){
     function getTractionOneKey(txid, pData){
         $.ajax({
             type:'post',
-            url: RESTURL + '/channels/atlchannel/chaincodes/atlchainCC/TraceRecord',
+            url: RESTURL + '/channels/txchannel/chaincodes/atlchainCC/TraceRecord',
             data:JSON.stringify({
                 // 'fcn': 'getHistoryByKey',
                 // 'peer': 'peer0.orga.example.com',
@@ -577,7 +578,7 @@ $(document).ready(function(){
     function getTractionStepByStep(txid, pData){
         $.ajax({
             type:'post',
-            url: RESTURL + '/channels/atlchannel/chaincodes/atlchainCC/TraceRecord',
+            url: RESTURL + '/channels/txchannel/chaincodes/atlchainCC/TraceRecord',
             data:JSON.stringify({
                 // 'fcn': 'getHistoryByKey',
                 // 'peer': 'peer0.orga.example.com',
@@ -711,7 +712,7 @@ $(document).ready(function(){
 
                 $.ajax({
                     type:'post',
-                    url: RESTURL + '/channels/atlchannel/chaincodes/atlchainCC/GetRecord',
+                    url: RESTURL + '/channels/txchannel/chaincodes/atlchainCC/GetRecord',
                     data:JSON.stringify({
                         'fcn': 'Get',
                         'peer': 'peer0.orga.example.com',
@@ -774,7 +775,7 @@ $(document).ready(function(){
 
                 $.ajax({
                     type:'post',
-                    url: RESTURL + '/channels/atlchannel/chaincodes/atlchainCC/GetRecord',
+                    url: RESTURL + '/channels/txchannel/chaincodes/atlchainCC/GetRecord',
                     data:JSON.stringify({
                         'fcn': 'Get',
                         'peer': 'peer0.orga.example.com',
@@ -814,7 +815,7 @@ $(document).ready(function(){
         console.log("txID: " + args);
         $.ajax({
             type:'post',
-            url: RESTURL + '/channels/atlchannel/chaincodes/atlchainCC/GetRecord',
+            url: RESTURL + '/channels/txchannel/chaincodes/atlchainCC/GetRecord',
             data:JSON.stringify({
                 'fcn': 'Get',
                 'peer': 'peer0.orga.example.com',
@@ -877,6 +878,26 @@ $(document).ready(function(){
             type:'get',
             
             url: RESTURL + '/GetFileFromHDFS?filename=' + $("#fileName_hdfs_input").val(),
+            data:JSON.stringify({}),
+            headers: {
+                "authorization": "Bearer " + getCookie("token"),
+                "content-type": "application/json"
+            },
+            success:function(data){
+                console.log(data);
+                $("#result_input").html(FormatOutputHDFS(data));
+            },
+            error:function(err){
+                console.log(err);
+            }
+        });
+    });
+
+    $("#ipfs_btn").click(function(){
+        $.ajax({
+            type:'get',
+            
+            url: RESTURL + '/GetFileFromIPFS?filename=' + $("#fileName_ipfs_input").val(),
             data:JSON.stringify({}),
             headers: {
                 "authorization": "Bearer " + getCookie("token"),
@@ -990,7 +1011,7 @@ function FormatOutputForHBaseData(data){
 }
 
 function FormatOutputHDFS(data){
-    var str = "<a href=../tmp/" + data + ">" + data + "</a>";
+    var str = "<a href=../public/tmp/" + data + ">" + data + "</a>";
     return str;
 }
 

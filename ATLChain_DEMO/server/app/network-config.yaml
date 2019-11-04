@@ -38,13 +38,13 @@ version: "1.0"
 #
 channels:
   # name of the channel
-  atlchannel:
+  txchannel:
     # Required. list of orderers designated by the application to use for transactions on this
     # channel. This list can be a result of access control ("orga" can only access "ordererA"), or
     # operational decisions to share loads from applications among the orderers.  The values must
     # be "names" of orgs defined under "organizations/peers"
     orderers:
-      - orderer.example.com
+      - orderer0.example.com
 
     # Required. list of peers from participating orgs
     peers:
@@ -103,7 +103,7 @@ channels:
     # this list with the query results of getInstalledChaincodes() and getInstantiatedChaincodes()
     chaincodes:
       # the format follows the "cannonical name" of chaincodes by fabric code
-      - atlchainCC:v0
+      - atlchainCC:v0.4.1
 
 #
 # list of participating organizations in this network
@@ -132,9 +132,9 @@ organizations:
     # this way. The SDK should allow applications to set the org admin identity via APIs, and only use
     # this route as an alternative when it exists.
     adminPrivateKey:
-      path: ../../crypto/peerOrganizations/orga.example.com/users/Admin@orga.example.com/msp/keystore/46ff324bbac601bc01fdfb1d05adbc3c40992139d5f63de27b37ed64a4a3187d_sk
+      path: /home/cy/Documents/ATL/SuperMap/ATLab-ATLChain/ATLChain_NETWORK/crypto-config/peerOrganizations/orga.example.com/users/Admin@orga.example.com/msp/keystore/e9d26a06c8853db2f9c4d8f912dc9627ad403b4d567b8403babb8863754a421e_sk
     signedCert:
-      path: ../../crypto/peerOrganizations/orga.example.com/users/Admin@orga.example.com/msp/signcerts/Admin@orga.example.com-cert.pem
+      path: /home/cy/Documents/ATL/SuperMap/ATLab-ATLChain/ATLChain_NETWORK/crypto-config/peerOrganizations/orga.example.com/users/Admin@orga.example.com/msp/signcerts/Admin@orga.example.com-cert.pem
 
   # the profile will contain public information about organizations other than the one it belongs to.
   # These are necessary information to make transaction lifecycles work, including MSP IDs and
@@ -149,9 +149,9 @@ organizations:
     certificateAuthorities:
       - ca.orgb.example.com
     adminPrivateKey:
-      path: ../../crypto/peerOrganizations/orgb.example.com/users/Admin@orgb.example.com/msp/keystore/7322d5cb8e1c367a2bffe5a5e126b0718f11e81b72b72b755a40ef0717892497_sk
+      path: /home/cy/Documents/ATL/SuperMap/ATLab-ATLChain/ATLChain_NETWORK/crypto-config/peerOrganizations/orgb.example.com/users/Admin@orgb.example.com/msp/keystore/e58232f8053941ce3808ed241d84168ed7cf5286badb2f8dd8e45487579924ff_sk
     signedCert:
-      path: ../../crypto/peerOrganizations/orgb.example.com/users/Admin@orgb.example.com/msp/signcerts/Admin@orgb.example.com-cert.pem
+      path: /home/cy/Documents/ATL/SuperMap/ATLab-ATLChain/ATLChain_NETWORK/crypto-config/peerOrganizations/orgb.example.com/users/Admin@orgb.example.com/msp/signcerts/Admin@orgb.example.com-cert.pem
 
   OrgC:
     mspid: OrgC
@@ -161,25 +161,25 @@ organizations:
     certificateAuthorities:
       - ca.orgc.example.com
     adminPrivateKey:
-      path: ../../crypto/peerOrganizations/orgc.example.com/users/Admin@orgc.example.com/msp/keystore/0f7a5a8b4d817278e4c045511ed7391f1364a381dff4c1cc2fcaefefc36194fa_sk
+      path: /home/cy/Documents/ATL/SuperMap/ATLab-ATLChain/ATLChain_NETWORK/crypto-config/peerOrganizations/orgc.example.com/users/Admin@orgc.example.com/msp/keystore/7309cacdb31dac9051888793cce0c0ddccf0ed2884a828af2441a2af82c1b42b_sk
     signedCert:
-      path: ../../crypto/peerOrganizations/orgc.example.com/users/Admin@orgc.example.com/msp/signcerts/Admin@orgc.example.com-cert.pem
+      path: /home/cy/Documents/ATL/SuperMap/ATLab-ATLChain/ATLChain_NETWORK/crypto-config/peerOrganizations/orgc.example.com/users/Admin@orgc.example.com/msp/signcerts/Admin@orgc.example.com-cert.pem
 #
 # List of orderers to send transaction and channel create/update requests to. For the time
 # being only one orderer is needed. If more than one is defined, which one get used by the
 # SDK is implementation specific. Consult each SDK's documentation for its handling of orderers.
 #
 orderers:
-  orderer.example.com:
-    url: grpc://orderer.example.com:7050
+  orderer0.example.com:
+    url: grpcs://orderer0.example.com:7050
 
     # these are standard properties defined by the gRPC library
     # they will be passed in as-is to gRPC client constructor
     grpcOptions:
-      ssl-target-name-override: orderer.example.com
+      ssl-target-name-override: orderer0.example.com
 
     tlsCACerts:
-      path:
+      path: /home/cy/Documents/ATL/SuperMap/ATLab-ATLChain/ATLChain_NETWORK/crypto-config/ordererOrganizations/example.com/tlsca/tlsca.example.com-cert.pem
 
 #
 # List of peers to send various requests to, including endorsement, query
@@ -188,11 +188,11 @@ orderers:
 peers:
   peer0.orga.example.com:
     # this URL is used to send endorsement and query requests
-    url: grpc://peer0.orga.example.com:7051
+    url: grpcs://peer0.orga.example.com:7051
     grpcOptions:
       ssl-target-name-override: peer0.orga.example.com
     tlsCACerts:
-      path: 
+      path: /home/cy/Documents/ATL/SuperMap/ATLab-ATLChain/ATLChain_NETWORK/crypto-config/peerOrganizations/orga.example.com/tlsca/tlsca.orga.example.com-cert.pem
 
   peer1.orga.example.com:
     url: grpc://peer1.orga.example.com:7051
@@ -250,7 +250,7 @@ certificateAuthorities:
       - enrollId: admin
         enrollSecret: adminpw
     # [Optional] The optional name of the CA.
-    caName: ca-orga
+    caName: ca
 
   ca.orgb.example.com:
     url: http://ca.orgb.example.com:7054
@@ -262,7 +262,7 @@ certificateAuthorities:
       - enrollId: admin
         enrollSecret: adminpw
     # [Optional] The optional name of the CA.
-    caName: ca-orgb
+    caName: ca
 
   ca.orgc.example.com:
     url: http://ca.orgc.example.com:7054
@@ -274,4 +274,4 @@ certificateAuthorities:
       - enrollId: admin
         enrollSecret: adminpw
     # [Optional] The optional name of the CA.
-    caName: ca-orgc
+    caName: ca

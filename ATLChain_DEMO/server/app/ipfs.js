@@ -8,12 +8,12 @@ class Ipfs {
         this.ipfsClient = ipfsAPI(ip, '5001', { protocol: 'http' })
     }
 
-    add(filePath) {
+    add(filePath, callback) {
         var data = fs.readFileSync(filePath);
         var extname = path.extname(filePath);
         var buffer = Buffer.from(data.toString());
         this.ipfsClient.add(buffer)
-            .then(rsp => console.log(rsp[0].hash))
+            .then(rsp => callback(rsp[0].path))
             .catch(err => console.error(err))
         return extname;
     }
@@ -28,8 +28,8 @@ class Ipfs {
     }
 
     get(hash, savePath, extname) {
-        this.ipfsClient.get(hash, function (err, contents) {
-            contents.forEach((content) => {
+        this.ipfsClient.get(hash, function (err, files) {
+            files.forEach((file) => {
                 fs.writeFile(savePath + extname, file.content.toString('utf8'), function (err) {
                     if (err) {
                         throw err

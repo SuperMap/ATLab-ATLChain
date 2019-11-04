@@ -50,32 +50,50 @@
 // console.log("======================== End test hdfs.js =======================")
  
   
-console.log("======================== Begin test hbase.js =======================")
-var hbase = require('./hbase.js');
-// var hbaseClient = new hbase('hbase.example.com', '8080');
-var hbaseClient = new hbase('localhost', '8080');
-console.log(hbaseClient);
-// hbaseClient.put('test', 'rowkey2', 'cf:name', 'myname', putCallback);
-hbaseClient.get('test', 'rowkey', 'cf:name', getCallback);
+// console.log("======================== Begin test hbase.js =======================")
+// var hbase = require('./hbase.js');
+// // var hbaseClient = new hbase('hbase.example.com', '8080');
+// var hbaseClient = new hbase('localhost', '8080');
+// console.log(hbaseClient);
+// // hbaseClient.put('test', 'rowkey2', 'cf:name', 'myname', putCallback);
+// hbaseClient.get('test', 'rowkey', 'cf:name', getCallback);
 
-function getCallback(err, val){
-    if(err != null){
-        console.log("err: " + err);
-        hbaseClient.createTable("test","cf", getCallback);
-        hbaseClient.put('test', 'rowkey', 'cf:name', 'test data', putCallback);
-    }
-    console.log(val);
-}
+// function getCallback(err, val){
+//     if(err != null){
+//         console.log("err: " + err);
+//         hbaseClient.createTable("test","cf", getCallback);
+//         hbaseClient.put('test', 'rowkey', 'cf:name', 'test data', putCallback);
+//     }
+//     console.log(val);
+// }
 
-function putCallback(){
-    console.log("finish");
-}
+// function putCallback(){
+//     console.log("finish");
+// }
 
-console.log("======================== End test hbase.js =======================")
+// console.log("======================== End test hbase.js =======================")
 
 
 // console.log("======================== Start test write file =======================")
 // var fs = require('fs');
 // fs.writeFileSync('/tmp/fstest', "fstest");
 // console.log("======================== End test write file =======================")
+
+console.log("======================== Start test ipfs.js =======================")
+var ipfs = require('./ipfs.js');
+
+var ipfsClient = new ipfs("127.0.0.1");
+ipfsClient.add("../../web/tx/tmp/" + "c2105a46d86af7c387afd71bdaca39c54a79ee2d103d0e579c3ecc0bf50cc38e", (res) => console.log(res));
+// console.log("ddddddd" + path);
+// // var path = ipfsClient.add("/home/cy/Desktop/testFile");
+// console.log(path);
+
+// console.log(ipfsClient.cat("QmXMe4H2Uhwjzdm1uPs89eyN1jpiFg5e7jeE2eWaHWhmBr"));
+
+ipfsClient.get("QmXMe4H2Uhwjzdm1uPs89eyN1jpiFg5e7jeE2eWaHWhmBr", "/home/cy/Desktop/tt", ".txt");
+
+// ipfsClient.addPin("QmX1EhYcaG85Zn759TbomfytVjtcJLzw2md3yPq2Rw2FQr");
+// ipfsClient.rmPin("QmX1EhYcaG85Zn759TbomfytVjtcJLzw2md3yPq2Rw2FQr");
+
+console.log("======================== End test ipfs.js =======================")
 

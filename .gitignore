@@ -8,8 +8,8 @@
 *.log
 
 # config files generated
-*.tx
-*.block
+.tx
+.block
 *genesisblock
 *production/
 
@@ -31,10 +31,6 @@
 # idea
 .idea/
 
-ATLChain_CC/java/.gradle/
-ATLChain_CC/java/build/
-
-.tx
 ATLChain_DEMO/server/fabric-client-kv-orga/
 ATLChain_DEMO/web/public/
 ATLChain_NETWORK/network-config/crypto-config/
@@ -44,3 +40,12 @@ ATLChain_NETWORK/network-config/ca-config/
 ATLChain_NETWORK/crypto-config/
 ATLChain_NETWORK/crypto-config.yaml
 ATLChain_NETWORK/configtx.yaml
+ATLChain_CC/java/commonCC/.project
+ATLChain_CC/java/commonCC/src/main/main1.iml
+ATLChain_CC/java/commonCC/.classpath
+ATLChain_CC/java/commonCC/.gradle
+ATLChain_CC/java/commonCC/.settings
+ATLChain_DEMO/web/tx/msp/
+ATLChain_DEMO/web/tx/tmp/
+ATLChain_DEMO/web/reg/tmp/
+ATLChain_NETWORK/channel-artifacts/
