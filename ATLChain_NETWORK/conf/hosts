@@ -8,21 +8,21 @@ ff02::1 ip6-allnodes
 ff02::2 ip6-allrouters
 
 # server1
-172.16.15.65    orderer0.example.com
-172.16.15.65    peer0.orga.example.com
-172.16.15.65    couchdb.orga.example.com
-172.16.15.65    ca.orga.example.com
+<ip_address1>    orderer0.example1.com
+<ip_address1>    peer0.orga.example1.com
+<ip_address1>    couchdb.orga.example1.com
+<ip_address1>    ca.orga.example1.com
 
 # server2
-172.16.15.66    orderer1.example.com
-172.16.15.66    couchdb.orgb.example.com
-172.16.15.66    peer0.orgb.example.com
-172.16.15.66    ca.orgb.example.com
-172.16.15.66    hbase.example.com
-172.16.15.66    hdfs.example.com
+<ip_address2>    orderer1.example2.com
+<ip_address2>    couchdb.orgb.example2.com
+<ip_address2>    peer0.orgb.example2.com
+<ip_address2>    ca.orgb.example2.com
+<ip_address2>    hbase.example2.com  # 可选
+<ip_address2>    hdfs.example2.com   # 可选
 
 # server3
-172.16.15.67    orderer2.example.com
-172.16.15.67    couchdb.orgc.example.com
-172.16.15.67    peer0.orgc.example.com
-172.16.15.67    ca.orgc.example.com
+<ip_address3>    orderer2.example3.com
+<ip_address3>    couchdb.orgc.example3.com
+<ip_address3>    peer0.orgc.example3.com
+<ip_address3>    ca.orgc.example3.com

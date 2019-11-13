@@ -275,12 +275,6 @@ function cleanFiles() {
     fi
 }
 
-# TODO 添加组织
-function addOrg() {
-    cryptogen generate --config=./orgc-crypto.yaml
-    configtxgen -printOrg OrgC >./channel-artifacts/orgc.json
-}
-
 echo
 echo "   _____                                             "
 echo "  / ____|                                            "
@@ -308,8 +302,6 @@ elif [ "$MODE" == "down" ]; then
 elif [ "$MODE" == "clean" ]; then
     # TODO 清理远程主机
     cleanFiles
-# elif [ "$MODE" == "addorg" ]; then
-#     addOrg
 else
     help
     exit 1
