@@ -40,6 +40,7 @@ function prepareBeforeStart() {
         nodeNum=$(expr ${#hostArray[@]} - 1)
         while [ $nodeNum -ge 2 ]; do
             echo "    ==>${hostArray[$nodeNum]} CHECKING......"
+            ssh root@$url " [ -d /var/local/hyperledger/fabric ] || mkdir -p /var/local/hyperledger/fabric "
             scp ./scripts/prepare-for-start.sh root@${hostArray[$nodeNum]}:/var/local/hyperledger/fabric/ >>log.log
             ssh root@${hostArray[$nodeNum]} " cd /var/local/hyperledger/fabric/ && bash prepare-for-start.sh | tee -a log.log "
             res=$?
