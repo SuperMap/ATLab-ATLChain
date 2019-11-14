@@ -48,14 +48,6 @@ function prepareForStart() {
         exit 1
     fi
 
-    # Untar bin package
-    if [ ! -d "bin" ]; then
-        if [ -f "bin.tar.xz" ]; then
-            echo "extract binary files..."
-            tar xvf bin.tar.xz
-        fi
-    fi
-
     if [ ! -d "production" ]; then
         mkdir production
     fi
