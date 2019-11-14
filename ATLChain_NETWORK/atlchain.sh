@@ -28,6 +28,15 @@ function help() {
 function prepareBeforeStart() {
     testRemoteHost
 
+    # Untar bin package
+    if [ ! -d "bin" ]; then
+        if [ -f "bin.tar.xz" ]; then
+            echo "extract binary files..."
+            tar xvf bin.tar.xz
+        fi
+    fi
+    export PATH=$PATH:$PWD/bin
+
     echo "正在检查远程主机docker镜像......"
 
     OLD_IFS="$IFS"
