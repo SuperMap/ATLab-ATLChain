@@ -28,6 +28,15 @@ function help() {
 function prepareBeforeStart() {
     testRemoteHost
 
+    # Untar bin package
+    if [ ! -d "bin" ]; then
+        if [ -f "bin.tar.xz" ]; then
+            echo "extract binary files..."
+            tar xvf bin.tar.xz
+        fi
+    fi
+    export PATH=$PATH:$PWD/bin
+
     echo "正在检查远程主机docker镜像......"
 
     OLD_IFS="$IFS"
@@ -40,6 +49,7 @@ function prepareBeforeStart() {
         nodeNum=$(expr ${#hostArray[@]} - 1)
         while [ $nodeNum -ge 2 ]; do
             echo "    ==>${hostArray[$nodeNum]} CHECKING......"
+            ssh root@${hostArray[$nodeNum]} " [ -d /var/local/hyperledger/fabric ] || mkdir -p /var/local/hyperledger/fabric "
             scp ./scripts/prepare-for-start.sh root@${hostArray[$nodeNum]}:/var/local/hyperledger/fabric/ >>log.log
             ssh root@${hostArray[$nodeNum]} " cd /var/local/hyperledger/fabric/ && bash prepare-for-start.sh | tee -a log.log "
             res=$?
