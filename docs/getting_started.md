@@ -24,24 +24,24 @@ ff02::1 ip6-allnodes
 ff02::2 ip6-allrouters
 
 # server1
-<ip_address1>    orderer0.example.com
-<ip_address1>    peer0.orga.example.com
-<ip_address1>    couchdb.orga.example.com
-<ip_address1>    ca.orga.example.com
+<ip_address1>    orderer0.example1.com
+<ip_address1>    peer0.orga.example1.com
+<ip_address1>    couchdb.orga.example1.com
+<ip_address1>    ca.orga.example1.com
 
 # server2
-<ip_address2>    orderer1.example.com
-<ip_address2>    couchdb.orgb.example.com
-<ip_address2>    peer0.orgb.example.com
-<ip_address2>    ca.orgb.example.com
-<ip_address2>    hbase.example.com  # 可选
-<ip_address2>    hdfs.example.com   # 可选
+<ip_address2>    orderer1.example2.com
+<ip_address2>    couchdb.orgb.example2.com
+<ip_address2>    peer0.orgb.example2.com
+<ip_address2>    ca.orgb.example2.com
+<ip_address2>    hbase.example2.com  # 可选
+<ip_address2>    hdfs.example2.com   # 可选
 
 # server3
-<ip_address3>    orderer2.example.com
-<ip_address3>    couchdb.orgc.example.com
-<ip_address3>    peer0.orgc.example.com
-<ip_address3>    ca.orgc.example.com
+<ip_address3>    orderer2.example3.com
+<ip_address3>    couchdb.orgc.example3.com
+<ip_address3>    peer0.orgc.example3.com
+<ip_address3>    ca.orgc.example3.com
 ```
 
 该配置文件表示，网络部署在三台服务器上，每台服务器上都有一个排序节点，一个记账节点，一个 Couchdb 数据库，一个 CA 节点。分布式数据存储 HDFS 和 HBase 可根据实际情况配置。
