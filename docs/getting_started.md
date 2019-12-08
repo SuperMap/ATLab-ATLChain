@@ -73,8 +73,7 @@ $ vim /etc/hosts
 
 - 排序节点域名均为 `orderer+<index>+<Domain>` 的格式，例如 `orderer0.example.com`，`orderer1.example.com`。
 - 记账节点域名均为 `peer+<index>+<Domain>` 的格式，例如 `peer0.orga.example.com`，`peer1.orgb.example.com`。
-- 具体配置如下
-- 
+
 
 
 ### conf.conf 配置文件
