@@ -45,11 +45,36 @@ ff02::2 ip6-allrouters
 ```
 
 该配置文件表示，网络部署在三台服务器上，每台服务器上都有一个排序节点，一个记账节点，一个 Couchdb 数据库，一个 CA 节点。分布式数据存储 HDFS 和 HBase 可根据实际情况配置。
+根据上述修改hosts文件后，也需要将三个server修改到当前主节点的hosts文件如上，修改命令如下
+
+```shell
+$ vim /etc/hosts
+
+<ip_address1>    orderer0.example.com
+<ip_address1>    peer0.orga.example.com
+<ip_address1>    couchdb.orga.example.com
+<ip_address1>    ca.orga.example.com
+
+# server2
+<ip_address2>    orderer1.example.com
+<ip_address2>    couchdb.orgb.example.com
+<ip_address2>    peer0.orgb.example.com
+<ip_address2>    ca.orgb.example.com
+
+# server3
+<ip_address3>    orderer2.example.com
+<ip_address3>    couchdb.orgc.example.com
+<ip_address3>    peer0.orgc.example.com
+<ip_address3>    ca.orgc.example.com
+```
+
 
 #### 节点域名命名规则
 
 - 排序节点域名均为 `orderer+<index>+<Domain>` 的格式，例如 `orderer0.example.com`，`orderer1.example.com`。
 - 记账节点域名均为 `peer+<index>+<Domain>` 的格式，例如 `peer0.orga.example.com`，`peer1.orgb.example.com`。
+
+
 
 ### conf.conf 配置文件
 
