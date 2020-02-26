@@ -2,7 +2,7 @@
 
 # 远程主机启动网络前的准备工作
 IMAGE_TAG1="1.4.4"
-IMAGE_TAG2="0.4.15"
+IMAGE_TAG2="0.4.18"
 
 # 判断系统中是否存在 docker 镜像，没有就下载
 function downloadImages() {
@@ -30,11 +30,11 @@ function downloadImages() {
         docker pull hyperledger/fabric-ca:$IMAGE_TAG1
     fi
 
-    if [ ! "$(docker images hyperledger/fabric-couchdb:$IMAGE_TAG2 -q)" == "8de128a55539" ]; then
+    if [ ! "$(docker images hyperledger/fabric-couchdb:$IMAGE_TAG2 -q)" == "d369d4eaa0fd" ]; then
         docker pull hyperledger/fabric-couchdb:$IMAGE_TAG2
     fi
 
-    if [ ! "$(docker images hyperledger/fabric-baseos:$IMAGE_TAG2 -q)" == "9d6ec11c60ff" ]; then
+    if [ ! "$(docker images hyperledger/fabric-baseos:$IMAGE_TAG2 -q)" == "c256a6aad46f" ]; then
         docker pull hyperledger/fabric-baseos:$IMAGE_TAG2
     fi
 }
