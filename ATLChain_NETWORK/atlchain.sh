@@ -3,7 +3,7 @@
 export PATH=./bin:$PATH
 export FABRIC_CFG_PATH=${PWD}
 
-IMAGE_TAG1="1.4.3"
+IMAGE_TAG1="1.4.4"
 IMAGE_TAG2="0.4.15"
 
 # compose 配置文件
